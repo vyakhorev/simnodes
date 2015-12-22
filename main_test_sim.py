@@ -1,7 +1,8 @@
 import datetime
 
 from model.model import cNodeFieldModel
-from model.nodes.classes import cItemConsumer, cItemGenerator
+
+# from model.nodes.classes import cItemConsumer, cItemGenerator
 
 
 if __name__ == '__main__':
@@ -22,7 +23,6 @@ if __name__ == '__main__':
     producer.connect_other_node(consumer)
 
     the_model.addNodes([consumer, producer])
-
 
 
     print('********************************')

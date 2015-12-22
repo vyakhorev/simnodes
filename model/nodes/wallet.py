@@ -1,9 +1,10 @@
-
+from model.nodes.metatypes import mtQueue, mtPile
+import model.nodes.simulengin.simulengin as simulengin
 import model.nodes.meta
 import simpy
 from collections import namedtuple
 
-class cValuedResource(model.nodes.meta.MetaStruct):
+class cValuedResource(simulengin.cConnToDEVS):
     def __init__(self, name, value=0):
         super().__init__()
         self.name = name
@@ -102,11 +103,11 @@ class cDeal:
         self.activity_enabled = simpy.Resource(env)
 
     def release(self):
-        #realease resource
+        # realease resource
 
 class cDealWallet:
     def create_deal(self):
-        #simpy resource that would be used in the Node
+        # simpy resource that would be used in the Node
 
     pass
     #???

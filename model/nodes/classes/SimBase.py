@@ -5,7 +5,7 @@ import model.nodes.simulengin.simulengin as simulengin
 import simpy
 
 
-class cSimNode(simulengin.cConnToDEVS, model.nodes.meta.MetaStruct):
+class cSimNode(simulengin.cConnToDEVS):
     """
         This class covers simulation behaviour of every Node.
     """

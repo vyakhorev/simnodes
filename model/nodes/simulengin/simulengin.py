@@ -7,6 +7,7 @@ import datetime
 import random
 import sys
 import model.nodes.simulengin.statkeeper as statkeeper
+import model.nodes.meta
 
 class cDiscreteEventSystem(object):
     # TODO: implement methods to cope with node structure during simulation
@@ -103,7 +104,7 @@ class cContainerPart(simpy.Container):
         if len(self.filled.users) > 0:
             self.filled.release(self.filled.users[0])
 
-class cConnToDEVS(object):
+class cConnToDEVS(model.nodes.meta.MetaStruct):
     def log_repr(self):
         return self.__repr__()
 
