@@ -12,6 +12,7 @@ if __name__ == '__main__':
     consumer.set_cons_conv('food', 10, 1)
     consumer.spawn_item('money', 100)
     consumer.spawn_item('food', 10)
+    print('Hello')
 
     producer = cItemConsumer('food factory')
     producer.set_prod_conv('food', 100, 5)
