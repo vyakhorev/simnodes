@@ -2,28 +2,26 @@ import datetime
 
 from model.model import cNodeFieldModel
 
-# from model.nodes.classes import cItemConsumer, cItemGenerator
+from model.nodes.classes.AbstEconNode import cItemConsumer, cItemGenerator
 
 
 if __name__ == '__main__':
     # Create a model, run simulation, print log + iterate over nodes
     the_model = cNodeFieldModel()
 
-    consumer = cItemConsumer('hungry man')
-    consumer.set_cons_conv('food', 10, 1)
+    consumer = cItemConsumer('hungry_man')
+    consumer.set_cons_conv('food', 'energy', 0.5, 10, 1)
     consumer.spawn_item('money', 100)
     consumer.spawn_item('food', 10)
-    print('hi')
 
-    producer = cItemConsumer('food factory')
-    producer.set_prod_conv('food', 100, 5)
-    producer.spawn_item('food', 50)
-    producer.spawn_item('money', 200)
+    producer = cItemGenerator('food_factory')
+    producer.set_prod_conv('money', 'food', 2, 50, 5)
+    producer.spawn_item('money', 100)
+    producer.spawn_item('food', 10)
 
-    producer.connect_other_node(consumer)
+    consumer.connect_other_node(producer)
 
     the_model.addNodes([consumer, producer])
-
 
     print('********************************')
     print('********START SIMULATION********')
