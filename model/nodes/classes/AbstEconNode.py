@@ -2,6 +2,7 @@ __author__ = 'User'
 import model.nodes.metatypes as metatypes
 import model.nodes.classes.Ports as ports
 from model.nodes.classes.SimBase import cSimNode
+import model.nodes.simulengin.simulengin as simulengin
 from model.nodes.wallet import cWallet
 import simpy
 
@@ -46,9 +47,7 @@ class cItemConsumer(cAbstEconNode):
     def gen_cons_conv(self):
         while 1:
             yield self.timeout(self.consumption_freq)
-            # yield below?
-            yield self.res_wallet.do_conversion('good',self.consumption_qtty,'energy', )
-
+            # yield from wallet !
 
 class cItemGenerator(cAbstEconNode):
     def __init__(self, name):
@@ -69,115 +68,44 @@ class cItemGenerator(cAbstEconNode):
     def gen_prod_conv(self):
         while 1:
             yield self.timeout(self.production_freq)
-            self.res_wallet
 
     def gen_food_service_conv(self):
         # offer a deal for money -> food
         while 1:
+            # yield from wallet !
+
+# Conveyors are structure bricks for node's logic
+
+class cConveyor(simulengin.cConnToDEVS):
+    # something that takes from one wallet and puts to other wallet
+    def __init__(self):
+        self.source_wallet = None
+        self.
+
+class cDetermConsumptionConveyor(cConveyor):
+    # Consumes an item from wallet every interval
+    def __init__(self, item, volume, interval):
+        super().__init__()
+        self.item = item
+        self.volume = volume
+        self.interval = interval
+
+    def set_source_wallet(self, wallet):
+        self.source_wallet = wallet
+
+    def set_surplus_wallet(self, wallet):
+        self.surplus_wallet = wallet
+
+    def init_sim(self):
+        pass
+
+    def my_generator(self):
+        pass
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-# class cAbstEconNode(cSimNode):
-#
-#     def __init__(self, name):
-#         super().__init__(name)
-#         self.res_threads = {}
-#         self.resources = []
-#         self.request_resource_port = ports.cPortUoWQueue(self)
-#         self.offer_resource_port = ports.cPortUoWQueue(self)
-#         self.register_port(self.request_resource_port)
-#         self.register_port(self.offer_resource_port)
-#
-#         self.resource_nodes = []
-#
-#     def add_resource(self, new_resource):
-#         self.resources += [new_resource]
-#
-#     def connect_resource_nodes(self, buddies):
-#         self.resource_nodes += buddies
-#         for bud in buddies:
-#             #bud.connected_buddies += [self]
-#             self.request_resource_port.connect_to_port(bud.offer_resource_port)
-#
-#     #################################
-#
-#     def init_sim(self):
-#         pass
-#
-#     def my_generator(self):
-#         self.as_process(self.request_generator())
-#         self.as_process(self.offer_generator())
-#         yield self.empty_event()
-#
-#     def request_generator(self):
-#         raise NotImplementedError()
-#
-#     def offer_generator(self):
-#         raise NotImplementedError()
-#
-#     def request_res(self):
-#         pass
-#
-#     def release_res(self):
-#         pass
-#
-#
-# class cWarehouse(cAbstEconNode):
-#     def __init__(self, name):
-#         super().__init__(name)
-#
-#     def request_generator(self):
-#         msg = {'type':'gimme_men'}
-#         self.request_resource_port.put_uow(msg)
-#
-#     def offer_generator(self):
-#         yield self.empty_event()
-#
-#
-# class cManNode(cAbstEconNode):
-#     def __init__(self, name):
-#         super().__init__(name)
-#
-#     def add_man(self):
-#         self.resources += [eRes.resMan('Ivan')]
-#
-#     ###################
-#
-#     def init_sim(self):
-#         super().init_sim()
-#         men_count = 0
-#         for res in self.resources:
-#             if type(res) == eRes.resMan:
-#                 men_count += 1
-#         self.men = simpy.Resource(self.simpy_env, men_count)
-#
-#     def request_generator(self):
-#         yield self.empty_event()
-#
-#     def offer_generator(self):
-#         self.as_process(self.serve_offers())
-#         yield self.empty_event()
-#
-#     def serve_offers(self):
-#         while 1:
-#             msg = yield self.offer_resource_port.get_uow()
-#             if msg['type'] == 'gimme_men':
-#                 yield self.give_man()
-#
-#     def give_man(self):
-#         yield self.men.request()
 
 
 

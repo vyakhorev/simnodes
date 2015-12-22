@@ -24,6 +24,7 @@ class cDiscreteEventSystem(object):
         self.log_printers = []
         self.nodes = []
         self.ports = []
+        self.others = [] #test purposes
 
     def register_node(self, a_node):
         a_node.s_set_devs(self)
@@ -31,6 +32,10 @@ class cDiscreteEventSystem(object):
         for port_i in a_node.ports.values():
             port_i.s_set_devs(self)
             self.ports += [port_i]
+
+    def register_other(self, other_obj):
+        other_obj.s_set_devs(self)
+        self.others += [other_obj]
 
     def convert_datetime_to_simtime(self, a_real_date):
         if not(a_real_date is None):
@@ -57,6 +62,9 @@ class cDiscreteEventSystem(object):
             for port_i in n_i.ports.values():
                 port_i.init_sim()
                 self.simpy_env.process(port_i.my_generator())
+        for oth_i in self.others:
+            oth_i.init_sim()
+            self.simpy_env.process(oth_i.my_generator())
         yield empty_event(self.simpy_env) #Formality
 
     def add_node_during_simulation(self, a_node, do_register = 1):

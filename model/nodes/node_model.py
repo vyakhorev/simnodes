@@ -18,9 +18,13 @@ class cNodeModel(object):
     def __init__(self):
         self.nodes = []  #TODO: ordered dict here?
         self.observers = []
+        self.others = [] #test purposes
 
     def addNode(self, newNode):
         self.nodes += [newNode]
+
+    def addOtherSimObj(self, otherObj):
+        self.others += [otherObj]
 
     def addNodes(self, nodesList):
         for n_i in nodesList:
@@ -45,10 +49,13 @@ class cNodeModel(object):
         for n_i in self.nodes:
             # nothing interesting in there
             running_devs.register_node(n_i)
+        for oth_i in self.others:
+            running_devs.register_other(oth_i)
         # Run the devs with simul_runner
         sim_manager = cSimulRunner(running_devs)
         for obs_i in self.observers:
             sim_manager.add_sim_observer(obs_i)
+
         sim_results = sim_manager.run_and_return_log(sim_until, print_console=True, print_to_list=None)
         return [sim_results, sim_manager]
 

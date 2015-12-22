@@ -23,6 +23,10 @@ class cNodeFieldModel():
     def addObserver(self, new_oberver):
         self.NodeSystem.addObserver(new_oberver)
 
+    def addOtherSimObj(self, new_obj):
+        # test purposes
+        self.NodeSystem.addOtherSimObj(new_obj)
+
     def run_sim(self, start_date=None, until=100, seed = None):
         # There may be more logic here
         if start_date is None:
