@@ -103,7 +103,9 @@ class mtQueue():
 class mtPile():
     _simulatable = True
 
-    def __init__(self, level=0):
+    def __init__(self, level=0, simstate=0, simpy_env=None):
+        #todo: if simstate - then give_sim_analog(simpy_env)
+        # may be there is another way....
         self.proxyLevel = level
 
     def add(self, val):

@@ -3,12 +3,14 @@ import datetime
 from model.model import cNodeFieldModel
 
 from model.nodes.classes.AbstEconNode import cItemConsumer, cItemGenerator
+# from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
 
 
 if __name__ == '__main__':
     # Create a model, run simulation, print log + iterate over nodes
     the_model = cNodeFieldModel()
 
+    # Variant 2
     consumer = cItemConsumer('hungry_man')
     consumer.set_cons_conv('food', 'energy', 0.5, 10, 1)
     consumer.spawn_item('money', 100)
@@ -22,6 +24,13 @@ if __name__ == '__main__':
     consumer.connect_other_node(producer)
 
     the_model.addNodes([consumer, producer])
+
+    # # Variant 1
+    # ea1 = cNodeEconAgent('econagent1')
+    # ea2 = cNodeEconAgent('econagent2')
+    # ea1.connect_buddies([ea2])
+    # ea1.send_msg()
+    # the_model.addNodes([ea1, ea2])
 
     print('********************************')
     print('********START SIMULATION********')

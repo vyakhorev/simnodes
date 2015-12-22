@@ -7,7 +7,6 @@ from collections import namedtuple
 
 class cValuedResource(simulengin.cConnToDEVS):
 
-
     def __init__(self, name, value=0):
         super().__init__()
         self.name = name
@@ -22,9 +21,6 @@ class cValuedResource(simulengin.cConnToDEVS):
 
     def set_capacity(self, value):
         self.value.add(value)
-
-    def init_sim(self):
-        raise NotImplemented()
 
     def my_generator(self):
         raise NotImplemented()
@@ -43,8 +39,10 @@ class cWallet(simulengin.cConnToDEVS):
 
     def __init__(self):
         self.res_all = {}
+        self.my_pile = mtPile(level=100)
 
     def spawn_item(self, name, qtty):
+        # Todo: depending on the state (simulated or not) create mtPile or Container
         self.res_all[name] = cItem(name, qtty)
 
     def spawn_pile(self, name, qtty):
@@ -60,7 +58,17 @@ class cWallet(simulengin.cConnToDEVS):
         else:
             return 0
 
+    def init_sim(self):
+        super().init_sim()
+        for key_i, res_i in self.res_all.items():
+            res_i.s_set_devs(self.devs)
+            res_i.init_sim()
+
     def my_generator(self):
+        self.sent_log("test - taking 10")
+        yield self.my_pile.get(10)
+        print(self.my_pile.level)
+        self.sent_log("test - took 10 !!! :-)")
         self.as_process(self.gen_do_conversion('rubles', 40, 'dollars', 0.8))
         yield self.empty_event()
 
@@ -72,17 +80,22 @@ class cWallet(simulengin.cConnToDEVS):
 
     def add_items(self, name, qtty):
         if not self.check_existance(name):
-            yield self.spawn_item(name, 0)
+            self.spawn_item(name, 0)
+            self.res_all[name].s_set_devs(self.devs)
+            self.res_all[name].init_sim()
         self.res_all[name].value.put(qtty)
         yield self.empty_event()
 
     def take_qtty(self, name, qtty):
-        qtty_available = self.check_qtty(name)
-        self.sent_log('qtty_available {}'.format(qtty_available))
-        if qtty_available.level < qtty:
-            # todo partly consume
-            return 'not enough'
-        yield self.res_all[name].value.get(qtty)
+        print("*"*20)
+        self.sent_log(self.res_all[name].value.level)
+        print("*"*20)
+        #qtty_available = self.check_qtty(name)
+        #self.sent_log('qtty_available {}'.format(qtty_available.level))
+        if self.res_all[name].value.level < qtty:
+            self.sent_log("not enough items")
+            # Alternative path?
+        return self.res_all[name].value.get(qtty)
 
     # /?
 
@@ -97,14 +110,10 @@ class cWallet(simulengin.cConnToDEVS):
     # TODO: apply worker for conversion?
 
     def gen_do_exchange(self, resource_from, qtty_from, resource_to, qtty_to):
-
-        # istaken = self.take_qtty(resource_from, qtty_from)
-        istaken = self.as_process(self.take_qtty(resource_from, qtty_from))
-        self.sent_log('Im here')
-        if istaken:
-            # type check? Which to spawn - item/pile/...?
-            self.add_items(resource_to, qtty_to)
-            yield self.empty_event()
+        yield self.take_qtty(resource_from, qtty_from)
+        self.sent_log('item taken!')
+        self.as_process(self.add_items(resource_to, qtty_to))
+        self.sent_log('item added!')
         yield self.empty_event()
 
     def gen_do_conversion(self, resource_from, qtty_from, resource_to, qtty_to):

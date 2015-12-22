@@ -142,6 +142,7 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
     def convert_to_simulatables(self, simpy_env):
         for attr, val in self.__dict__.items():
             if hasattr(val, '_simulatable'):
+                print("converted: " + str(attr) + " " + str(val))
                 new_val = val.give_sim_analog(simpy_env)
                 #setattr(self, "_nosim_", new_val) # delete ??
                 setattr(self, attr, new_val)
