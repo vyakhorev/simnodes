@@ -3,7 +3,7 @@ import model.nodes.meta
 import simpy
 from collections import namedtuple
 
-class cResource(model.nodes.meta.MetaStruct):
+class cValuedResource(model.nodes.meta.MetaStruct):
     def __init__(self, name, value=0):
         super().__init__()
         self.name = name
@@ -12,17 +12,11 @@ class cResource(model.nodes.meta.MetaStruct):
     def set_capacity(self, value):
         self.value = value
 
-class cItem(cResource):
+class cItem(cValuedResource): #store
     pass
 
-class cPile(cResource):
+class cPile(cValuedResource): #container
     pass
-
-
-class cWorker(cResource):
-    pass
-
-
 
 class cWallet:
     # Todo: different types of resources
@@ -39,6 +33,8 @@ class cWallet:
     def spawn_worker(self, name, qtty):
         self.res_all[name] = cWorker(name, qtty)
 
+
+    # ?
     def check_existance(self, name):
         if name in self.res_all:
             return 1
@@ -63,6 +59,7 @@ class cWallet:
             return False
         self.res_all[name] -= qtty
         return True
+    # /?
 
     #*** INTERFACE
 
@@ -71,6 +68,8 @@ class cWallet:
 
     #*** OPERATIONS
     # TODO: for multiple items to multiple items
+    # TODO: yield "gen_do"
+    # TODO: apply worker for conversion?
 
     def gen_do_exchange(self, resource_from, qtty_from, resource_to, qtty_to):
         istaken = self.take_qtty(resource_from, qtty_from)
@@ -83,12 +82,32 @@ class cWallet:
     def gen_do_conversion(self, resource_from, qtty_from, resource_to, qtty_to):
         return self.do_exchange(resource_from, qtty_from, resource_to, qtty_to)
 
+    def gen_do_multiple_exchange(self):
+        pass
+
+    def gen_do_multiple_conversion(self):
+        pass
+
+#####################################
+class cWorker:
+    pass
+
+class cWorkForceWallet:
+    pass
+
 ######################################
 
 class cDeal:
-    pass
+    def __init__(self):
+        self.activity_enabled = simpy.Resource(env)
+
+    def release(self):
+        #realease resource
 
 class cDealWallet:
+    def create_deal(self):
+        #simpy resource that would be used in the Node
+
     pass
     #???
 

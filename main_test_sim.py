@@ -19,7 +19,6 @@ if __name__ == '__main__':
     producer.spawn_item('food', 50)
     producer.spawn_item('money', 200)
 
-
     producer.connect_other_node(consumer)
 
     the_model.addNodes([consumer, producer])
