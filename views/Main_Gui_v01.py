@@ -1,0 +1,89 @@
+"""
+    The view class(es) should contain the minimal logic required to connect to the signals coming from the widgets in your layout.
+    View events can call and pass basic information to a method in the view class and onto a method in a controller class,
+    where the heavier logic will be.
+"""
+
+# Pyqt5
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+# Utils
+import sys
+import math
+from random import randint
+# generated views
+from views.gen.Main_Gui_v01_draft import Ui_MainWindow
+
+
+class c_MainView(QMainWindow):
+
+    # properties to read/write widget value
+    # Kinda this:
+    # @property
+    # def running(self):
+    #     return self.ui.pushButton_running.isChecked()
+    # @running.setter
+    # def running(self, value):
+    #     self.ui.pushButton_running.setChecked(value)
+
+    def __init__(self, model):
+
+        # instance of model
+        self.model = model
+
+        # Gui constructor
+        super(c_MainView, self).__init__()
+
+        # building windows
+        self.build_ui()
+
+        # register func with model for future model update announcements
+        # if you have complicated logic, not simple Qabstract model
+        # self.model.subscribe_update_func(self.update_ui_from_model)
+
+    def build_ui(self):
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+
+        # Create a main application window with buttons
+        # view = c_Baseview()
+
+        # connect signal to method
+        self.ui.butQuit.clicked.connect(self.close)
+
+        # self.ui.pushButton_running.clicked.connect(self.on_running)
+
+    def set_scene(self, scene):
+        self.ui.mainView.setScene(scene)
+
+    def new_tab(self, nodename, WGtype=QWidget):
+        # todo Make tabs container, make tab singleton ?
+        self.tab1 = WGtype
+
+        self.ui.wgMain.addTab(self.tab1, nodename)
+
+    def connectSignals(self, main_ctrl):
+
+        self.ui.butAddnode.clicked.connect(main_ctrl.addNode)
+        self.ui.butConnect.clicked.connect(main_ctrl.connection)
+        self.ui.butParam.clicked.connect(main_ctrl.open_new_tab)
+
+    def wheelEvent(self, event):
+        """
+            managing Viewer zooming in and out
+        """
+        print('Wheel acting !!!  x: {0},  y: {1}'.format(event.angleDelta().x(), event.angleDelta().y()))
+        delta = event.angleDelta().y()
+        factor = 1.35 ** (delta / 240.0)
+        self.ui.mainView.scale(factor, factor)
+    # =====================================================
+
+
+    def on_running(self):
+        self.main_ctrl.change_running(self.running)
+
+    def update_ui_from_model(self):
+        self.running = self.model.running
+
+

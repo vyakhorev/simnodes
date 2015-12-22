@@ -1,0 +1,1 @@
+C:\Ilua\Nodes\Nodes_v02\View>pyuic5.bat -o ui_v01_draft.py -x ui_v01.ui

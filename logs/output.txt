@@ -1,0 +1,1098 @@
+inited port with id : cPortUoWQueue_1 for class : client1 (node id cNodeEconAgent_1)
+inited port with id : cPortUoWQueue_2 for class : client2 (node id cNodeEconAgent_2)
+inited port with id : cPortUoWQueue_3 for class : client3 (node id cNodeEconAgent_3)
+inited port with id : cPortUoWQueue_4 for class : client4 (node id cNodeEconAgent_4)
+connecting port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1) with cPortUoWQueue_1 port_id to port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2) with cPortUoWQueue_2 port_id 
+connecting port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1) with cPortUoWQueue_1 port_id to port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3) with cPortUoWQueue_3 port_id 
+connecting port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1) with cPortUoWQueue_1 port_id to port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4) with cPortUoWQueue_4 port_id 
+connecting port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4) with cPortUoWQueue_4 port_id to port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2) with cPortUoWQueue_2 port_id 
+set to send to random one 
+set to send to described one 
+set to send to described one 
+set to send to described one 
+set to send to described one 
+********************************
+********START SIMULATION********
+********************************
+I'm client1 with connected buddies : [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]
+I'm client2 with connected buddies : [client1 (node id cNodeEconAgent_1), client4 (node id cNodeEconAgent_4)]
+I'm client3 with connected buddies : [client1 (node id cNodeEconAgent_1)]
+I'm client4 with connected buddies : [client1 (node id cNodeEconAgent_1), client2 (node id cNodeEconAgent_2)]
+@0   client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_node
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@0   client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@0   client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@0   client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@0   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+@0   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_node
+@0   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+@0   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_node
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@0   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_neigh 
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_neigh 
+@0   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_neigh 
+@0   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@1   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : deleted        
+@1   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@1   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@1   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@1   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : deleted        
+@1   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@1   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@1   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@1   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@1   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : deleted        
+@1   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@1   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_in_node
+@2   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@2   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_receiving] put cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@3   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@3   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@3   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@3   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : [gen_serve_receiving] put cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_in_node
+@4   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@4   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_receiving] put cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_in_node
+@5   client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_node
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@5   client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@5   client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@5   client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@5   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+@5   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_node
+@5   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+@5   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_node
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@5   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_neigh 
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_neigh 
+@5   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_neigh 
+@5   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@6   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@6   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@6   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@6   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : deleted        
+@6   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@6   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : deleted        
+@6   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@6   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_receiving] put cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@6   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@6   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@6   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : deleted        
+@6   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@7   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : deleted        
+@7   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@7   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@7   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@7   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : deleted        
+@7   port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@7   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : deleted        
+@7   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@7   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@7   port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_in_node
+@8   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@8   port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_receiving] put cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@9   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@9   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@9   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@9   port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : [gen_serve_receiving] put cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_in_node
+@10  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_node
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@10  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@10  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@10  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+	4:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+
+@10  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+@10  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_node
+@10  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+@10  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_node
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@10  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_neigh 
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_neigh 
+@10  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_neigh 
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_receiving] put cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_in_node
+@10  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@11  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@11  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@11  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@11  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@11  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@11  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : [gen_serve_receiving] put cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_in_node
+@11  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@11  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : deleted        
+@11  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@11  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_in_node
+@12  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@12  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_receiving] put cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@13  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@13  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_receiving] put cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_in_node
+@15  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_node
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@15  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@15  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@15  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@15  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+@15  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_node
+@15  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+@15  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_node
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@15  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_neigh 
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_neigh 
+@15  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_neigh 
+@15  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@16  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : deleted        
+@16  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : deleted        
+@16  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : deleted        
+@16  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@16  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : [gen_serve_receiving] put cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@16  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@16  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@16  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_receiving] put cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_in_node
+@16  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_receiving] put cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@17  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@17  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@17  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : [gen_serve_receiving] put cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_in_node
+@17  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_in_node
+@20  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_node
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : trying to send cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [put_uow] put cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_node
+@20  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@20  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@20  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@20  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+@20  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_node
+@20  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : trying to send cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+@20  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [put_uow] put cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_node
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@20  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_out_neigh 
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_out_neigh 
+@20  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_sending] put cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_out_neigh 
+@20  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_sending] put cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_out_neigh 
+@21  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  from  connected_to.queue_out_neigh
+@21  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : deleted        
+@21  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : gen_serve_external_taking got cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@21  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@21  port cPortUoWQueue_2 @ client2 (node id cNodeEconAgent_2)                   : [gen_serve_receiving] put cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)]  to queue_in_node
+@21  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  from  connected_to.queue_out_neigh
+@21  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@21  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : deleted        
+@21  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : gen_serve_external_taking got cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@21  port cPortUoWQueue_3 @ client3 (node id cNodeEconAgent_3)                   : [gen_serve_receiving] put cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)]  to queue_in_node
+@22  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : gen_serve_external_taking got cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  from  connected_to.queue_out_neigh
+@22  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : gen_serve_external_taking got cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  from  connected_to.queue_out_neigh
+@22  port cPortUoWQueue_1 @ client1 (node id cNodeEconAgent_1)                   : [gen_serve_receiving] put cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)]  to queue_in_node
+@22  port cPortUoWQueue_4 @ client4 (node id cNodeEconAgent_4)                   : [gen_serve_receiving] put cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)]  to queue_in_node
+@25  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@25  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@25  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@25  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@30  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@30  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@30  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@30  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@35  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@35  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@35  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@35  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@40  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@40  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@40  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@40  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@45  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@45  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@45  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@45  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@50  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@50  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@50  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@50  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@55  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@55  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@55  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@55  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@60  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@60  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@60  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@60  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@65  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@65  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@65  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@65  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@70  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@70  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@70  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@70  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@75  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@75  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@75  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@75  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@80  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@80  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@80  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@80  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@85  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@85  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@85  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@85  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@90  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@90  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@90  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@90  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@95  client1 (node id cNodeEconAgent_1)                                          : 
+queue_in_node: 
+	1:cMessage_5 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	2:cMessage_10 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	3:cMessage_15 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	4:cMessage_20 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+	5:cMessage_25 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client1 (node id cNodeEconAgent_1)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@95  client2 (node id cNodeEconAgent_2)                                          : 
+queue_in_node: 
+	1:cMessage_4 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	2:cMessage_9 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	3:cMessage_14 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	4:cMessage_16 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_19 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+	6:cMessage_24 'shipment 11 of water for 165' from client4 (node id cNodeEconAgent_4) to [client2 (node id cNodeEconAgent_2)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@95  client3 (node id cNodeEconAgent_3)                                          : 
+queue_in_node: 
+	1:cMessage_1 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_2 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	3:cMessage_7 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	4:cMessage_11 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_12 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	6:cMessage_17 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+	7:cMessage_21 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	8:cMessage_22 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client3 (node id cNodeEconAgent_3)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
+@95  client4 (node id cNodeEconAgent_4)                                          : 
+queue_in_node: 
+	1:cMessage_3 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	2:cMessage_6 'shipment 57 of cable for 5700' from client1 (node id cNodeEconAgent_1) to [client2 (node id cNodeEconAgent_2), client3 (node id cNodeEconAgent_3), client4 (node id cNodeEconAgent_4)] 
+	3:cMessage_8 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	4:cMessage_13 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	5:cMessage_18 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+	6:cMessage_23 'shipment 11 of water for 165' from client1 (node id cNodeEconAgent_1) to [client4 (node id cNodeEconAgent_4)] 
+queue_out_node: 
+queue_in_neigh: 
+queue_out_neigh: 
+
