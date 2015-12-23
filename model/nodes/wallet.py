@@ -140,6 +140,7 @@ class cWallet(simulengin.cConnToDEVS):
 
             elif self.refused in res_event:
                 self.sent_log('refused event')
+                # TODO: fill queue with StorGet() and handle future implement
                 self.refused_queue.put('cant take {} from {}'.format(qtty, self.res_all[name].value.level))
                 self.refused = self.simpy_env.event()
 
