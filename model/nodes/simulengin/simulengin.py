@@ -25,6 +25,7 @@ class cDiscreteEventSystem(object):
         self.nodes = []
         self.ports = []
         self.others = [] #test purposes
+        self.is_simulation_running = False
 
     def register_node(self, a_node):
         a_node.s_set_devs(self)
@@ -55,6 +56,7 @@ class cDiscreteEventSystem(object):
 
     def my_generator(self):
         #Это самый первый генератор, куда мы заходим
+        self.is_simulation_running = True
         self.build_system()
         for n_i in self.nodes:
             n_i.init_sim()
@@ -113,12 +115,19 @@ class cContainerPart(simpy.Container):
             self.filled.release(self.filled.users[0])
 
 class cConnToDEVS(model.nodes.meta.MetaStruct):
+    def __init__(self):
+        super().__init__()
+        self.is_simulation_running = False
+
     def log_repr(self):
         return self.__repr__()
 
     def s_set_devs(self, discrete_event_system):
         self.devs = discrete_event_system
         self.simpy_env = self.devs.simpy_env
+        if self.devs.is_simulation_running:
+            self.devs.simpy_env.process(self.my_generator())
+            self.init_sim()
 
     def sent_log(self, a_msg):
         self.devs.sent_log(self, a_msg)
@@ -138,6 +147,7 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
     def init_sim(self):
         # There is simpy environment already available here
         self.convert_to_simulatables(self.simpy_env)
+        self.is_simulation_running = True
 
     def convert_to_simulatables(self, simpy_env):
         for attr, val in self.__dict__.items():

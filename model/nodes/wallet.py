@@ -11,7 +11,10 @@ class cValuedResource(simulengin.cConnToDEVS):
         super().__init__()
         self.name = name
         # self.value = value
-        self.value = mtPile(level=value)
+        if self.is_simulation_running:
+            self.value = simpy.Container(self.simpy_env)
+        else:
+            self.value = mtPile(level=value)
 
     # def __add__(self, other):
     #     return self.value + other.value
@@ -23,7 +26,7 @@ class cValuedResource(simulengin.cConnToDEVS):
         self.value.add(value)
 
     def my_generator(self):
-        raise NotImplemented()
+        yield self.empty_event()
 
     def __repr__(self):
         return str(self.name) + " : " + str(self.value)
@@ -81,8 +84,8 @@ class cWallet(simulengin.cConnToDEVS):
     def add_items(self, name, qtty):
         if not self.check_existance(name):
             self.spawn_item(name, 0)
+            # This was a workaround before self.is_simulation_running
             self.res_all[name].s_set_devs(self.devs)
-            self.res_all[name].init_sim()
         self.res_all[name].value.put(qtty)
         yield self.empty_event()
 
@@ -140,7 +143,7 @@ class cWorkForceWallet:
 
 class cDeal:
     def __init__(self):
-        self.activity_enabled = simpy.Resource(env)
+        pass
 
     def release(self):
         pass
