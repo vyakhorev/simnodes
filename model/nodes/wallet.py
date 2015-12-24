@@ -148,14 +148,6 @@ class cWallet(simulengin.cConnToDEVS):
                 some_getter.cancel()
         yield self.empty_event()
 
-    def get_later(self, event):
-        print('AAAAAAAAAAAAAAAAAAA')
-        self.sent_log('trying to trigger {}'.format(event))
-        self.devs.simpy_env.event.trigger(event)
-
-        # yield event
-        print('Success')
-
     # *** INTERFACE
 
     def res_slice(self, res_type):
@@ -179,6 +171,64 @@ class cWallet(simulengin.cConnToDEVS):
     def gen_wallet_take_with_ev(self, resource, qtty):
         yield self.simpy_env.process(self.gen_take_qtty2(resource, qtty))
         self.sent_log('item may be taken !')
+
+    '''
+        New Concept
+    '''
+    def get_exact(self, name, qtty):
+        """
+            Called from Node, it gets and waits concrete amount
+        :return:
+        """
+        if type(self.res_all[name]) == cPile:
+            print('value {} '.format(self.res_all[name].value.level))
+
+            if self.res_all[name].value.level < qtty:
+                self.sent_log("not enough value level ")
+                yield self.res_all[name].value.get(qtty)
+                yield qtty
+
+            # self.sent_log('get done for {}'.format(qtty))
+
+        elif type(self.res_all[name]) == cItem:
+            print('count {} '.format(self.res_all[name]))
+            if len(self.res_all[name].count.items()) <= 0:
+                self.sent_log("not enough items")
+            yield self.res_all[name].value.get(qtty)
+
+        yield self.empty_event()
+
+    def get_exact_urgenty_or_skip(self, name, qtty):
+        """
+            Called from Node, it gets concrete amount or skip call if cant get all at once
+        :return:
+        """
+        pass
+
+    def get_available(self, name, qtty):
+        """
+            Called from Node, it gets resource immediately of amount it could afford
+        :return:
+        """
+        if type(self.res_all[name]) == cPile:
+            print('value {} '.format(self.res_all[name].value.level))
+
+            if self.res_all[name].value.level < qtty:
+                self.sent_log("not enough value level ")
+                # yield self.res_all[name].value.get(self.res_all[name].value.level)
+                self.res_all[name].value.get(qtty)
+                yield self.res_all[name].value.level
+
+            yield self.res_all[name].value.get(qtty)
+
+        elif type(self.res_all[name]) == cItem:
+            print('count {} '.format(self.res_all[name]))
+            if len(self.res_all[name].count.items()) <= 0:
+                self.sent_log("not enough items")
+                yield self.res_all[name].count.get(self.res_all[name].count.level)
+            yield self.res_all[name].value.get(qtty)
+
+        yield self.empty_event()
 
     def __repr__(self):
         return str(self.res_all)
@@ -214,13 +264,9 @@ class nodochka(simulengin.cConnToDEVS):
 
     def my_generator(self):
         self.as_process(self.gen_debug())
-        self.as_process(self.some_gen('Take', self.a, 'rubles', 40, 80))
-        self.as_process(self.some_gen('Take', self.a, 'rubles', 80, 80))
-        self.as_process(self.some_gen('Take', self.a, 'rubles', 90, 10))
-        self.as_process(self.some_gen('Take', self.a, 'rubles', 92, 15))
-        self.as_process(self.some_gen('Add', self.a, 'rubles', 85, 115))
-        self.as_process(self.some_gen('Take', self.a, 'rubles', 95, 8))
-        self.as_process(self.some_gen('Add', self.b, 'gold ingots', 40, 7))
+        self.as_process(self.some_gen('Take', self.a, 'rubles', 40, 120))
+        self.as_process(self.some_gen('Add', self.a, 'rubles', 50, 80))
+        self.as_process(self.some_gen('Take', self.a, 'rubles', 60, 80))
         self.as_process(self.refusals_listen(self.a))
         self.as_process(self.refusals_listen(self.b))
         yield self.empty_event()
@@ -230,8 +276,6 @@ class nodochka(simulengin.cConnToDEVS):
         self.sent_log('some catched {}'.format(msg))
 
         yield self.simpy_env.timeout(15)
-        self.sent_log('trying to get later !!!')
-        who.get_later(msg)
 
     def gen_debug(self):
         while True:
@@ -248,7 +292,8 @@ class nodochka(simulengin.cConnToDEVS):
     def some_gen(self, operation, patient, resource, when, qtty):
         yield self.simpy_env.timeout(when)
         if operation == 'Take':
-            self.as_process(patient.gen_wallet_take_with_ev(resource, qtty))
+            got = next(patient.get_exact(resource, qtty))
+            self.sent_log('ive got {}'.format(got))
             print('taker')
             yield self.simpy_env.timeout(1)
         elif operation == 'Add':
@@ -271,7 +316,7 @@ if __name__ == '__main__':
     b.spawn_item('gold ingots', 4)
 
     nod1 = nodochka(a, b)
-
+    simpy.Store
     # print('a : {}, b : {}'.format(a, b))
     the_model.addOtherSimObj(a)
     the_model.addOtherSimObj(b)
