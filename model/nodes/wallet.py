@@ -142,7 +142,8 @@ class cWallet(simulengin.cConnToDEVS):
                 self.sent_log('refused event')
                 # TODO: fill queue with StorGet() and handle future implement
                 # self.refused_queue.put('cant take {} from {}'.format(qtty, self.res_all[name].value.level))
-                self.refused_queue.put(some_getter)
+                clone_event = some_getter
+                self.refused_queue.put(clone_event)
 
                 self.refused = simpy.Environment.event(self.simpy_env)
                 some_getter.cancel()
@@ -151,10 +152,13 @@ class cWallet(simulengin.cConnToDEVS):
     def get_later(self, event):
         print('AAAAAAAAAAAAAAAAAAA')
         self.sent_log('trying to trigger {}'.format(event))
-        self.devs.simpy_env.event.trigger(event)
+        self.as_process(self.event_yielder(event))
 
         # yield event
         print('Success')
+
+    def event_yielder(self, some_event):
+        yield some_event
 
     # *** INTERFACE
 
@@ -276,6 +280,8 @@ if __name__ == '__main__':
     the_model.addOtherSimObj(a)
     the_model.addOtherSimObj(b)
     the_model.addOtherSimObj(nod1)
+
+    simpy.resources.container.ContainerGet
 
     loganddata, runner = the_model.run_sim(datetime.date(2015, 11, 15), until=120, seed=555)
     # a.gen_do_conversion('rubles', 40, 'dollar', 1)
