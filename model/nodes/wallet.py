@@ -95,7 +95,7 @@ class cWallet(simulengin.cConnToDEVS):
             # This was a workaround before self.is_simulation_running
             self.res_all[name].s_set_devs(self.devs)
         if type(self.res_all[name]) == cPile:
-            self.res_all[name].level.put(qtty)
+            self.res_all[name].value.put(qtty)
         if type(self.res_all[name]) == cItem:
             for i in range(qtty):
                 self.res_all[name].count.put('name')
@@ -121,6 +121,7 @@ class cWallet(simulengin.cConnToDEVS):
             yield self.res_all[name].value.get(qtty)
 
         yield self.empty_event()
+
     def gen_take_qtty2(self, name, qtty):
         # if name not in self.res_all:
         #     self.sent_log('{} has not {} key'.format(type(self), name))
@@ -128,38 +129,32 @@ class cWallet(simulengin.cConnToDEVS):
 
         if type(self.res_all[name]) == cPile:
             print('value {} '.format(self.res_all[name].value.level))
+            print('level {}, required qtt {}'.format(self.res_all[name].value.level, qtty))
             if self.res_all[name].value.level < qtty:
                 self.refused.succeed()
 
-            res_event = yield self.res_all[name].value.get(qtty) | self.refused
-            print('res_event {}'.format(res_event))
+            some_getter = self.res_all[name].value.get(qtty)
+            res_event = yield some_getter | self.refused
+            print(res_event.events[0])
+            # print('res_event callbacks {}'.format(res_event.callbacks))
 
-            if self.res_all[name].value.get(qtty) in res_event:
-                self.sent_log('managed to take')
-                return self.res_all[name].value.get(qtty)
-
-            elif self.refused in res_event:
+            if self.refused in res_event:
                 self.sent_log('refused event')
                 # TODO: fill queue with StorGet() and handle future implement
-                self.refused_queue.put('cant take {} from {}'.format(qtty, self.res_all[name].value.level))
-                self.refused = self.simpy_env.event()
+                # self.refused_queue.put('cant take {} from {}'.format(qtty, self.res_all[name].value.level))
+                self.refused_queue.put(some_getter)
 
-            else:
-                self.sent_log('smth wrong')
-        #
-        #     if self.res_all[name].value.level < qtty:
-        #         self.sent_log("not enough value level ")
-        #         # Alternative path?
-        #     yield self.res_all[name].value.get(qtty)
-        #
-        # elif type(self.res_all[name]) == cItem:
-        #     print('count {} '.format(self.res_all[name]))
-        #     if len(self.res_all[name].count.items()) <= 0:
-        #         self.sent_log("not enough items")
-        #     yield self.res_all[name].value.get(qtty)
-
+                self.refused = simpy.Environment.event(self.simpy_env)
+                some_getter.cancel()
         yield self.empty_event()
 
+    def get_later(self, event):
+        print('AAAAAAAAAAAAAAAAAAA')
+        self.sent_log('trying to trigger {}'.format(event))
+        self.devs.simpy_env.event.trigger(event)
+
+        # yield event
+        print('Success')
 
     # *** INTERFACE
 
@@ -184,23 +179,6 @@ class cWallet(simulengin.cConnToDEVS):
     def gen_wallet_take_with_ev(self, resource, qtty):
         yield self.simpy_env.process(self.gen_take_qtty2(resource, qtty))
         self.sent_log('item may be taken !')
-
-    # def gen_do_exchange(self, resource_from, qtty_from, resource_to, qtty_to):
-    #     yield self.take_qtty(resource_from, qtty_from)
-    #     self.sent_log('item taken!')
-    #     self.as_process(self.add_items(resource_to, qtty_to))
-    #     self.sent_log('item added!')
-    #     yield self.empty_event()
-    #
-    # def gen_do_conversion(self, resource_from, qtty_from, resource_to, qtty_to):
-    #     yield self.timeout(40)
-    #     self.as_process(self.gen_do_exchange(resource_from, qtty_from, resource_to, qtty_to))
-    #
-    # def gen_do_multiple_exchange(self):
-    #     pass
-    #
-    # def gen_do_multiple_conversion(self):
-    #     pass
 
     def __repr__(self):
         return str(self.res_all)
@@ -238,6 +216,10 @@ class nodochka(simulengin.cConnToDEVS):
         self.as_process(self.gen_debug())
         self.as_process(self.some_gen('Take', self.a, 'rubles', 40, 80))
         self.as_process(self.some_gen('Take', self.a, 'rubles', 80, 80))
+        self.as_process(self.some_gen('Take', self.a, 'rubles', 90, 10))
+        self.as_process(self.some_gen('Take', self.a, 'rubles', 92, 15))
+        self.as_process(self.some_gen('Add', self.a, 'rubles', 85, 115))
+        self.as_process(self.some_gen('Take', self.a, 'rubles', 95, 8))
         self.as_process(self.some_gen('Add', self.b, 'gold ingots', 40, 7))
         self.as_process(self.refusals_listen(self.a))
         self.as_process(self.refusals_listen(self.b))
@@ -247,8 +229,18 @@ class nodochka(simulengin.cConnToDEVS):
         msg = yield who.refused_queue.get()
         self.sent_log('some catched {}'.format(msg))
 
+        yield self.simpy_env.timeout(15)
+        self.sent_log('trying to get later !!!')
+        who.get_later(msg)
+
     def gen_debug(self):
         while True:
+            # current_event_queue = self.simpy_env._queue
+            # print('=======Events List=======')
+            # for que_el in current_event_queue:
+            #     print(que_el)
+            # print('=========================')
+            # print('next event @ {}'.format(self.simpy_env.peek()))
             print(self.a)
             print(self.b)
             yield self.timeout(2)
@@ -285,7 +277,7 @@ if __name__ == '__main__':
     the_model.addOtherSimObj(b)
     the_model.addOtherSimObj(nod1)
 
-    loganddata, runner = the_model.run_sim(datetime.date(2015, 11, 15), until=100, seed=555)
+    loganddata, runner = the_model.run_sim(datetime.date(2015, 11, 15), until=120, seed=555)
     # a.gen_do_conversion('rubles', 40, 'dollar', 1)
     # print(a.res_slice(cItem))
     # print('a : {}, b : {}'.format(a, b))
