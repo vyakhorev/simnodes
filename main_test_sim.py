@@ -1,23 +1,30 @@
 import datetime
 
 from model.model import cNodeFieldModel
-
+from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 
 
 if __name__ == '__main__':
     # Create a model, run simulation, print log + iterate over nodes
+
     the_model = cNodeFieldModel()
+    #
+    # client1_supply_line = cNodeClientSupplyLine("client1")
+    # client1_supply_line.add_supply_line("apples", 5, 10, 1)
+    # client1_supply_line.add_supply_line("bread", 10, 1, 3)
+    #
+    # client2_supply_line = cNodeClientSupplyLine("client2")
+    # client2_supply_line.add_supply_line("apples", 5, 11, 2)
+    # client2_supply_line.add_supply_line("bread", 10, 1, 4)
+    # client2_supply_line.add_supply_line("pizza", 50, 1, 5)
 
-    client1_supply_line = cNodeClientSupplyLine("client1")
-    client1_supply_line.add_supply_line("apples", 5, 10, 1)
-    client1_supply_line.add_supply_line("bread", 10, 1, 3)
-
-    client2_supply_line = cNodeClientSupplyLine("client2")
-    client2_supply_line.add_supply_line("apples", 5, 11, 2)
-    client2_supply_line.add_supply_line("bread", 10, 1, 4)
-    client2_supply_line.add_supply_line("pizza", 50, 1, 5)
-
+    node1 = cNodeEconAgent('node1')
+    node2 = cNodeEconAgent('node2')
+    node3 = cNodeEconAgent('node3')
+    node1.connect_buddies([node2, node3])
+    node1.send_msg_to(node3)
+    the_model.addNodes([node1, node2, node3])
 
     # example
     # consumer = cItemConsumer('hungry_man')

@@ -101,6 +101,17 @@ class cWallet(simulengin.cConnToDEVS):
                 self.res_all[name].count.put('name')
         yield self.empty_event()
 
+    def add_items(self, name, qtty):
+        if not self.check_existance(name):
+            self.spawn_item(name, 0)
+            # This was a workaround before self.is_simulation_running
+            self.res_all[name].s_set_devs(self.devs)
+        if type(self.res_all[name]) == cPile:
+            self.res_all[name].value.put(qtty)
+        if type(self.res_all[name]) == cItem:
+            for i in range(qtty):
+                self.res_all[name].count.put('name')
+
     def gen_take_qtty(self, name, qtty):
         # if name not in self.res_all:
         #     self.sent_log('{} has not {} key'.format(type(self), name))
@@ -167,6 +178,10 @@ class cWallet(simulengin.cConnToDEVS):
         yield self.simpy_env.process(self.gen_add_items(resource, qtty))
         self.sent_log('item added !')
 
+    def wallet_add(self, resource, qtty):
+        yield self.simpy_env.process(self.gen_add_items(resource, qtty))
+        self.sent_log('item added !')
+
     # more logic, filling refusals queue
     def gen_wallet_take_with_ev(self, resource, qtty):
         yield self.simpy_env.process(self.gen_take_qtty2(resource, qtty))
@@ -186,7 +201,6 @@ class cWallet(simulengin.cConnToDEVS):
             if self.res_all[name].value.level < qtty:
                 self.sent_log("not enough value level ")
                 yield self.res_all[name].value.get(qtty)
-                yield qtty
 
             # self.sent_log('get done for {}'.format(qtty))
 

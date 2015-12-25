@@ -101,6 +101,24 @@ class mtQueue():
             somestore.put(el)
         return somestore
 
+class mtFilteredQueue():
+    _simulatable = True
+
+    def __init__(self, *args):
+        self.proxylist = deque
+        for el in args:
+            self.proxylist(el)
+
+    def add(self, val):
+        self.proxylist.append(val)
+
+    def give_sim_analog(self, simpy_env):
+        """ Create Simpy.FilteredStore obj for self.proxylist"""
+        somestore = simpy.FilterStore(simpy_env)
+        for el in self.proxylist:
+            somestore.put(el)
+        return somestore
+
 class mtPile():
     _simulatable = True
 

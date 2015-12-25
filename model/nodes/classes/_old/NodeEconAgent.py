@@ -78,6 +78,14 @@ class cNodeEconAgent(cSimNode):
         if not self.pushing:
             self.pushing = True
 
+    def send_msg_to_all(self):
+        basic_uow = self.makeUow(self.msgtype)
+        msg = [basic_uow, self, [self.connected_buddies]]
+        self.messages.append(msg)
+        if not self.pushing:
+            self.pushing = True
+
+
     # Flexible Uow maker according to uow type
     @methdispatch
     def makeUow(self, uowtype):
@@ -123,7 +131,7 @@ class cNodeEconAgent(cSimNode):
 
         # IDEA for action in self.actions ; actions declare in children
         if self.pushing:
-            print("I AM HERE")
+            # print("I AM HERE")
             self.as_process(self.gen_send_spam())
 
         yield self.empty_event()
@@ -132,7 +140,8 @@ class cNodeEconAgent(cSimNode):
         for i in range(5):
             for msg in self.messages:
                 msg = cMessage(*msg)
-                self.port_orders.put_uow(msg)
+                # self.port_orders.put_uow(msg)
+                self.port_orders.put_uow_to_all(msg)
             yield self.timeout(5)
 
     # =====================================================
