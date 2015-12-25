@@ -24,6 +24,7 @@ class cPortUoWQueue(cSimPort):
 
         print('inited port with id : {} for class : {}'.format(self.nodeid, parent_node))
 
+        # TODO: FilteredStore mechanics here noded
         self.queue_in_neigh = metatypes.mtQueue()
         self.queue_out_neigh = metatypes.mtQueue()
         self.queue_in_node = metatypes.mtQueue()
@@ -55,6 +56,9 @@ class cPortUoWQueue(cSimPort):
         self.queue_out_node.put(msg)
         self.sent_log("[put_uow] put "+str(msg) +" to queue_out_node")
 
+    def put_uow_to_all(self, uow):
+        for port_id, neigh_port in self.connected_ports.items():
+            self.put_uow_to(uow, neigh_port)
 
     def put_uow_to(self, uow, port): # node calls port to send this uow
         # CALL THIS FROM NODE, NOT FROM OTHER PORT
