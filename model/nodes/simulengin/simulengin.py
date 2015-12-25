@@ -115,6 +115,14 @@ class cContainerPart(simpy.Container):
             self.filled.release(self.filled.users[0])
 
 class cConnToDEVS(model.nodes.meta.MetaStruct):
+    # TODO: we have a serious problem here with during-sim construction
+    # You should call s_set_devs everytime you create an object other than
+    # Node and Port. It's too complicated. It's better to build the proper
+    # classes right from devs (or use devs as a final builder for classes).
+    # This kind of call (like new_obj = self.devs.cNewObjClass()) would
+    # guarantee the proper solution for any simulatable object.
+    # (also we have to distinguish between generating and passive entities).
+
     def __init__(self):
         super().__init__()
         self.is_simulation_running = False

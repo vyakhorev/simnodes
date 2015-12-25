@@ -76,6 +76,7 @@ class StrList(List):
 
 
 # -------------------------------------
+# TODO: metatypes.mtResource()
 class mtQueue():
     _simulatable = True
 

@@ -2,35 +2,37 @@ import datetime
 
 from model.model import cNodeFieldModel
 
-from model.nodes.classes.AbstEconNode import cItemConsumer, cItemGenerator
-# from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
+from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 
 
 if __name__ == '__main__':
     # Create a model, run simulation, print log + iterate over nodes
     the_model = cNodeFieldModel()
 
-    # Variant 2
-    consumer = cItemConsumer('hungry_man')
-    consumer.set_cons_conv('food', 'energy', 0.5, 10, 1)
-    consumer.spawn_item('money', 100)
-    consumer.spawn_item('food', 10)
+    client1_supply_line = cNodeClientSupplyLine("client1")
+    client1_supply_line.add_supply_line("apples", 5, 10, 1)
+    client1_supply_line.add_supply_line("bread", 10, 1, 3)
 
-    producer = cItemGenerator('food_factory')
-    producer.set_prod_conv('money', 'food', 2, 50, 5)
-    producer.spawn_item('money', 100)
-    producer.spawn_item('food', 10)
+    client2_supply_line = cNodeClientSupplyLine("client2")
+    client2_supply_line.add_supply_line("apples", 5, 11, 2)
+    client2_supply_line.add_supply_line("bread", 10, 1, 4)
+    client2_supply_line.add_supply_line("pizza", 50, 1, 5)
 
-    consumer.connect_other_node(producer)
 
-    the_model.addNodes([consumer, producer])
-
-    # # Variant 1
-    # ea1 = cNodeEconAgent('econagent1')
-    # ea2 = cNodeEconAgent('econagent2')
-    # ea1.connect_buddies([ea2])
-    # ea1.send_msg()
-    # the_model.addNodes([ea1, ea2])
+    # example
+    # consumer = cItemConsumer('hungry_man')
+    # consumer.set_cons_conv('food', 'energy', 0.5, 10, 1)
+    # consumer.spawn_item('money', 100)
+    # consumer.spawn_item('food', 10)
+    #
+    # producer = cItemGenerator('food_factory')
+    # producer.set_prod_conv('money', 'food', 2, 50, 5)
+    # producer.spawn_item('money', 100)
+    # producer.spawn_item('food', 10)
+    #
+    # consumer.connect_other_node(producer)
+    #
+    # the_model.addNodes([consumer, producer])
 
     print('********************************')
     print('********START SIMULATION********')
