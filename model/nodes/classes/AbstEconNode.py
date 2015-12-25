@@ -62,13 +62,18 @@ class cAbstEconNode(cSimNode):
         while 1:
             wrong_commitment = yield self.commitment_wallet.get(wr_address_filter)
             self.sent_log("received a wrong commitment " + str(wrong_commitment))
-            wrong_commitment.add_visitor(self)
             self.wrong_address_commitments.append(wrong_commitment)
 
     def gen_recent_wrong_comm_queue(self):
         # (re-)sent all the commitments that are typed like not(expected_comm_type in self.commitment_types)-wrong ones
         while 1:
             new_wrong_comm = yield self.wrong_address_commitments.get()
+            if not(self.node_id in new_wrong_comm.visited_nodes):
+                # may be it's better to register this thing when the commitment is created
+                new_wrong_comm.add_visitor(self)
+            else:
+                # by def, else is not possible
+                self.sent_log("Something impossible happend in [gen_recent_wrong_comm_queue]")
             self.the_port.put_uow_to_all(new_wrong_comm)
 
     def gen_receive_new_commitments(self):
@@ -79,12 +84,11 @@ class cAbstEconNode(cSimNode):
             is_it_new = not(self.node_id in new_commitment.visited_nodes)
             if is_it_new:
                 self.commitment_wallet.put(is_it_new)
+                new_commitment.add_visitor(self)
             else:
                 self.sent_log("already been here case")
-                yield self.timeout(1)
+                yield self.timeout(1) # filter would eliminate this timeout
             yield self.empty_event()
-
-
 
 # Concrete nodes
 
