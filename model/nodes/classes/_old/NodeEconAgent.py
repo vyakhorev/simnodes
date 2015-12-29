@@ -141,6 +141,7 @@ class cNodeEconAgent(cSimNode):
             for msg in self.messages:
                 msg = cMessage(*msg)
                 # self.port_orders.put_uow(msg)
+                # self.port_orders.put_uow_to(msg)
                 self.port_orders.put_uow_to_all(msg)
             yield self.timeout(5)
 

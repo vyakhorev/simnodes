@@ -1,6 +1,7 @@
 
 import model.nodes.metatypes as metatypes
 from model.nodes.classes.SimBase import cSimPort
+from model.nodes.classes.cMessage import cMessage
 import model.nodes.UoW as uows
 import simpy
 
@@ -25,10 +26,10 @@ class cPortUoWQueue(cSimPort):
         print('inited port with id : {} for class : {}'.format(self.nodeid, parent_node))
 
         # TODO: FilteredStore mechanics here noded
-        self.queue_in_neigh = metatypes.mtQueue()
-        self.queue_out_neigh = metatypes.mtQueue()
-        self.queue_in_node = metatypes.mtQueue()
-        self.queue_out_node = metatypes.mtQueue()
+        self.queue_in_neigh = metatypes.mtFilteredQueue()
+        self.queue_out_neigh = metatypes.mtFilteredQueue()
+        self.queue_in_node = metatypes.mtFilteredQueue()
+        self.queue_out_node = metatypes.mtFilteredQueue()
         parent_node.register_port(self)
         self.debug = False
 
@@ -56,15 +57,26 @@ class cPortUoWQueue(cSimPort):
         self.queue_out_node.put(msg)
         self.sent_log("[put_uow] put "+str(msg) +" to queue_out_node")
 
-    def put_uow_to_all(self, uow):
-        for port_id, neigh_port in self.connected_ports.items():
-            self.put_uow_to(uow, neigh_port)
+    def put_uow_to_all(self, msg):
+        # for port_id, neigh_port in self.connected_ports.items():
+        for budd in msg.receivers:
+            print(budd, '*****')
+            msg2 = cMessage(msg.uows, msg.sender, [budd])
+            print(msg2)
+            self.put_uow_to(msg2)
 
-    def put_uow_to(self, uow, port): # node calls port to send this uow
+
+    def put_uow_to(self, msg): # node calls port to send this uow
         # CALL THIS FROM NODE, NOT FROM OTHER PORT
-        msg = (self, uow, port)
+        # msg = (self, uow, port)
+        for port_id, neigh_port in self.connected_ports.items():
+            receiver = msg.receivers[0]
+            if neigh_port.parent_node == receiver:
+                self.sent_log('sending from {} to {}'.format(self, neigh_port.parent_node))
+                neigh_port.queue_in_node.put(msg)
+
         self.sent_log('trying to send {}'.format(msg))
-        self.queue_out_node.put(msg)
+        # self.queue_out_node.put(msg)
         # self.sent_log("[put_uow] put "+str(uow) +" to queue_out_node")
 
 
@@ -96,6 +108,9 @@ class cPortUoWQueue(cSimPort):
             self.sent_log("[gen_serve_receiving] put " + str(msg) + " to queue_in_node")
 
     def gen_serve_external_taking(self):
+        """
+            Overpowered method , gonna drop it
+        """
         while True:
             # Loop for all connected ports
             for port_id, neigh_i in self.connected_ports.items():

@@ -105,7 +105,7 @@ class mtFilteredQueue():
     _simulatable = True
 
     def __init__(self, *args):
-        self.proxylist = deque
+        self.proxylist = deque()
         for el in args:
             self.proxylist(el)
 

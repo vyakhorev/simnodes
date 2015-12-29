@@ -23,7 +23,12 @@ if __name__ == '__main__':
     node2 = cNodeEconAgent('node2')
     node3 = cNodeEconAgent('node3')
     node1.connect_buddies([node2, node3])
-    node1.send_msg_to(node3)
+    node2.connect_buddies([node3])
+    node2.send_msg()
+
+    # node1.send_msg_to(node3)
+    # node3.send_msg_to(node1)
+    # node2.send_msg_to(node3)
     the_model.addNodes([node1, node2, node3])
 
     # example
