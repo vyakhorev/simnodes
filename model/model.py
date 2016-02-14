@@ -27,6 +27,9 @@ class cNodeFieldModel():
         # test purposes
         self.NodeSystem.addOtherSimObj(new_obj)
 
+    def setItemNamespace(self, item_namespace):
+        self.NodeSystem.setItemNamespace(item_namespace)
+        
     def run_sim(self, start_date=None, until=100, seed = None):
         # There may be more logic here
         if start_date is None:

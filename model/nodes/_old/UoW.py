@@ -10,6 +10,7 @@ class cUnitOfWork(object):
     def add_trace(self, when, who, do_what):
         self.trace += [(when, who, do_what)]
 
+
 class cEconomicUoW(cUnitOfWork):
     """
         Supports CF and GF interfaces
@@ -49,8 +50,10 @@ class cFlow(object):
         self.active_whens = []
         self.is_sorted = 0
 
+
 class cCashFlow(cFlow):
     pass
+
 
 class cGoodsFlow(cFlow):
     pass
@@ -59,7 +62,7 @@ class cGoodsFlow(cFlow):
 # Actual implementations are below
 # *****************************
 
-class cGiveResource(cEconomicUoW):
+class cBuyGoodsUoW(cEconomicUoW):
     """
         Instruction to buy some goods
     """
@@ -77,3 +80,55 @@ class cGiveResource(cEconomicUoW):
     def get_value(self):
         return self.price * self.howmuch
 
+class cSellGoodsUoW(cEconomicUoW):
+    """
+        Instruction to sell some goods
+    """
+    job_type = "sell_goods"
+
+    def __init__(self, what, howmuch, price):
+        super().__init__()
+        self.what = what
+        self.howmuch = howmuch
+        self.price = price
+
+    def __repr__(self):
+        return self.job_type + " " + str(round(self.howmuch, 2)) + " of " + self.what + " for " + str(round(self.get_value(), 2))
+
+    def get_value(self):
+        return self.price * self.howmuch
+
+class cShipmentUoW(cEconomicUoW):
+    """
+        Instruction to buy some goods
+    """
+    job_type = "shipment"
+
+    def __init__(self, what, howmuch, price):
+        super().__init__()
+        self.what = what
+        self.howmuch = howmuch
+        self.price = price
+
+    def __repr__(self):
+        return self.job_type + " " + str(round(self.howmuch, 2)) + " of " + self.what + " for " + str(round(self.get_value(), 2))
+
+    def get_value(self):
+        return self.price * self.howmuch
+
+class cPaymentUoW(cEconomicUoW):
+    """
+        Instruction to buy some goods
+    """
+    job_type = "payment"
+
+    def __init__(self, what, howmuch):
+        super().__init__()
+        self.what = what
+        self.howmuch = howmuch
+
+    def __repr__(self):
+        return self.job_type + " " + str(round(self.howmuch, 2)) + " of " + self.what
+
+    def get_value(self):
+        return self.howmuch

@@ -26,6 +26,9 @@ class cNodeModel(object):
     def addOtherSimObj(self, otherObj):
         self.others += [otherObj]
 
+    def setItemNamespace(self, item_namespace):
+        self.item_namespace = item_namespace
+        
     def addNodes(self, nodesList):
         for n_i in nodesList:
             self.nodes += [n_i]

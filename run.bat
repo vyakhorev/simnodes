@@ -1,1 +1,2 @@
-E:\Python34\python.exe Main_Nodes.py
+python main_test_sim.py
+pause

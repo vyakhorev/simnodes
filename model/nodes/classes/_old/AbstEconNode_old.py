@@ -29,7 +29,7 @@ class cAbstEconNode(cSimNode):
     def connect_other_node(self, other_node):
         self.connected_nodes += [other_node]
         other_node.connected_nodes += [self]
-        self.the_port.connect_to_port(self.the_port)
+        self.the_port.connect_to_port(other_node.the_port)
 
     def spawn_item(self, item_name, item_qtty):
         self.item_wallet.spawn_item(item_name, item_qtty)
@@ -53,7 +53,7 @@ class cAbstEconNode(cSimNode):
         for list_i in self.listeners:
             self.as_process(list_i.my_generator())
         self.as_process(self.gen_sort_wrong_commitments())
-        self.as_process(self.gen_sort_wrong_commitments())
+        self.as_process(self.gen_recent_wrong_comm_queue())
         yield self.empty_event()
 
     def gen_sort_wrong_commitments(self):
@@ -400,3 +400,4 @@ class cPaymentCommitment(cCommitment):
     def set_commitment_params(self, money_amount, payment_delay):
         self.money_amount = money_amount
         self.payment_delay = payment_delay
+        
