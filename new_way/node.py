@@ -2,6 +2,8 @@ import asyncio
 import time
 from random import randint
 from itertools import chain
+import logging
+logging.basicConfig(level=logging.INFO)
 
 ALL_ITEMS = []
 
@@ -15,6 +17,7 @@ class BaseNode:
         self.inputs = inputs
         self.ouputs = outputs
         self._action = action
+        self.myqueue = asyncio.Queue(10)
 
     def run(self):
         """
@@ -74,6 +77,23 @@ class Node(BaseNode):
             return True
 
         return strange_func, dt
+
+    def port_listen(self):
+        for in_node in self.inputs:
+            loop = asyncio.get_event_loop()
+            # self.fetch_port(in_node)
+            loop.create_task(self.fetch_port(in_node))
+        while True:
+            yield from asyncio.sleep(1)
+            print('{} Inputs : {}'.format(self.name, self.inputs))
+
+    @asyncio.coroutine
+    def fetch_port(self, port):
+        print('{} ******** {} starting fetch from {}'.format(env_time(), self.name, port.name))
+        while True:
+            yield from asyncio.sleep(3)
+            got = yield from port.myqueue.get()
+            print('{} **** {} got {} from {}'.format(env_time(), self.name, got, port.name))
 
     @asyncio.coroutine
     def printer(self, par=None, chld=None):
@@ -138,21 +158,19 @@ class NodeSteve(BaseNode):
         torch_rec.fill_recipe(zip(items, qtty))
         print(torch_rec)
 
-        self.myqueue = asyncio.Queue(10)
+        # self.myqueue = asyncio.Queue(10)
 
     def get_action(self):
         return False
 
-    @asyncio.coroutine
+    # @asyncio.coroutine
     def strange_func(self):
         while True:
-            yield from asyncio.sleep(2)
-            yield from self.myqueue.put('test')
+            yield from asyncio.sleep(1)
+            yield from self.myqueue.put('test' + str(randint(1, 10)))
             print("{} what a good day - ({}) ".format(env_time(), self.name))
             print(self.myqueue)
         yield asyncio.sleep(0)
-
-
 
     @asyncio.coroutine
     def printer(self, par=None, chld=None):
@@ -195,6 +213,7 @@ class Graph():
     def start(self):
 
         event_loop = asyncio.get_event_loop()
+        event_loop.set_debug(True)
 
         # start clock
         # print('time now {}'.format(env_time()))
@@ -210,10 +229,18 @@ class Graph():
         tasks += [gg_task]
 
         for nd in self.nodes:
+
+            if not isinstance(nd, NodeSteve):
+                a_taks = event_loop.create_task(nd.port_listen())
+
             try:
                 func_on_fly, dt = nd.get_action()()
                 some_cor = self.make_cor_with_dt(func_on_fly, dt)
                 tasks += [event_loop.create_task(some_cor)]
+
+                # queues_cor = nd.port_listen()
+                # ques_printer = self.make_cor_with_dt(nd.port_listen,2)
+                # tasks += [event_loop.create_task(ques_printer)]
 
             except Exception as e:
                 print('[WARNING] Got a {}'.format(e))
@@ -221,6 +248,7 @@ class Graph():
             # print(nd.some_synchfunc())
 
             tasks += [event_loop.create_task(nd.printer())]
+            # print('TASKS : {}'.format(gg_task.get_stack()))
 
             if isinstance(nd, NodeSteve):
                 tasks += [event_loop.create_task(nd.strange_func())]
