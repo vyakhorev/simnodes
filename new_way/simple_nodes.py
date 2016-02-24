@@ -1,7 +1,29 @@
 import asyncio
 from random import randint, choice
+import time
 import inspect
 
+
+class TaskMonitor:
+    def __init__(self):
+        self.recipe_dict = []
+
+    def add_recipe(self, rec):
+        self.recipe_dict.append(rec)
+
+    @asyncio.coroutine
+    def status(self, delta):
+        while True:
+            print('---------------------------------')
+            print('TASKS IN SYSTEM {} : '.format(len(self.recipe_dict)))
+            # for i, item in enumerate(self.recipe_dict):
+            for i in range(len(self.recipe_dict)):
+                print('{:<8} | {:>8} | {} | {} '.format(str(self.recipe_dict[i]),
+                                                        str(self.recipe_dict[i].curState),
+                                                        str(self.recipe_dict[i]),
+                                                        str(self.recipe_dict[i].curState))
+            print('---------------------------------')
+            yield from asyncio.sleep(delta)
 
 class Message:
     def __init__(self, data=None, adress=None):
@@ -56,6 +78,9 @@ class StateMachine:
 
 
 class Recipe(StateMachine):
+    # Task monitor
+    tm = TaskMonitor()
+
     def __init__(self, name):
         self.name = name
         super(Recipe, self).__init__()
@@ -66,8 +91,9 @@ class Recipe(StateMachine):
         self.add_state('DONE', None, end_state=1)
         self.set_start('')
 
+        self.tm.add_recipe(self)
         # list of node which handle me
-        self.registry = []
+        # self.registry = []
 
         self.accepted = True
 
@@ -182,11 +208,14 @@ class Nodebase:
             yield from asyncio.sleep(0)
 
     @asyncio.coroutine
-    def reply(self, msg):
+    def reply(self):
         while True:
+            # print(Global_timer())
             for inp in self.input_list:
-                if msg.adress == inp:
+                msg = yield from self.repliesq.get()
+                if inp in msg.adress:
                     yield from inp.res_queue.put(msg)
+                    # yield from inp.act_queue.put(msg)
 
     @asyncio.coroutine
     def dumb_printer(self):
@@ -229,8 +258,10 @@ class TorchEater(Nodebase):
         while True:
             msg = yield from self.res_queue.get()
             print('got {}'.format(msg))
+            msg = msg.data
+
             if msg.curState == 'DONE':
-                print('{} : My request {} successfully complited :D'.format(self, msg))
+                print('{} : My request {} successfully completed :D'.format(self, msg))
             elif msg.curState == 'CANCELLED':
                 print('{} : My request {} got some issues... :X'.format(self, msg))
             else:
@@ -271,22 +302,42 @@ class CrateEater(Nodebase):
         for n in range(rand):
             self.recipe = Crate()
             self.recipe.set_start('PENDING')
+            my_message = Message(self.recipe, self)
 
-            yield from self.act_queue.put(self.recipe)
+            yield from self.act_queue.put(my_message)
             yield from asyncio.sleep(1)
             # print('lalal')
         print('PRODUCED {} tasks'.format(rand))
 
+    @asyncio.coroutine
+    def actions_listen(self):
+        while True:
+            msg = yield from self.res_queue.get()
+            print('got {}'.format(msg))
+            msg = msg.data
+
+            if msg.curState == 'DONE':
+                print('{} : My request {} successfully completed :D'.format(self, msg))
+            elif msg.curState == 'CANCELLED':
+                print('{} : My request {} got some issues... :X'.format(self, msg))
+            else:
+                yield from self.todo.put(msg)
+                print('{} todo : {}'.format(self, self.todo))
+
+            yield from asyncio.sleep(1)
+
     def make_task(self):
 
         # tasks = [self.gl_event_loop.create_task(self.dumb_printer()),
-        tasks = [self.gl_event_loop.create_task(self.actions_filler())]
+        tasks = [self.gl_event_loop.create_task(self.actions_filler()),
+                 self.gl_event_loop.create_task(self.actions_listen())]
 
 
 class CraftMan(Nodebase):
     def __init__(self, name, input_list=None, output_list=None):
         super(CraftMan, self).__init__(name, input_list, output_list)
         self.todo = asyncio.Queue()
+        self.repliesq = asyncio.Queue()
         self.succeed_items = []
         self.replies = []
 
@@ -296,7 +347,7 @@ class CraftMan(Nodebase):
     def actions_listen(self):
         while True:
             msg = yield from self.res_queue.get()
-            print('got {}'.format(msg))
+            print('{} got {}'.format(self, msg))
             yield from self.todo.put(msg)
             print('{} todo : {}'.format(self, self.todo))
             yield from asyncio.sleep(3)
@@ -316,6 +367,7 @@ class CraftMan(Nodebase):
             # crafted  = choice([True, False])
             msg = yield from self.todo.get()
 
+            print('MSGMSG : {}'.format(msg))
             item = msg.data
 
             success = item.run('spam')
@@ -325,7 +377,11 @@ class CraftMan(Nodebase):
                 self.succeed_items += [item]
 
             msg.add_adress(self)
-            self.replies += [msg]
+
+            self.reply_msg = msg
+            yield from self.repliesq.put(self.reply_msg)
+
+            # self.replies += [msg]
             print(30*'**')
             print('Managed to craft {} of {} items'.format(crafted_count, count))
             print('List of crafted items : {}'.format(self.succeed_items))
@@ -336,21 +392,26 @@ class CraftMan(Nodebase):
         # tasks = [self.gl_event_loop.create_task(self.dumb_printer()),
         tasks = [self.gl_event_loop.create_task(self.fetch_all_incomes()),
                  self.gl_event_loop.create_task(self.craft_it()),
-                 self.gl_event_loop.create_task(self.actions_listen())]
-                 # self.gl_event_loop.create_task(self.reply())]
+                 self.gl_event_loop.create_task(self.actions_listen()),
+                 self.gl_event_loop.create_task(self.reply())]
 
-def boomfunc():
-    f = Message('spam', 'hotkovo')
-    print(f.adress)
-    f.add_adress('mytishi')
-    print(f.adress)
+def env_time():
+    """
+    Better use of asynch.time() later
+    """
+    env_t = time.process_time()
+    env_t = round(env_t)
+    return env_t
 
 
 if __name__ == '__main__':
     torch1 = TorchEater('torch1')
-    # crate1 = CrateEater('shovel1')
+    crate1 = CrateEater('shovel1')
+
+    Global_timer = env_time
+
     # shovel1.alias = 'shovel'
-    craftman1 = CraftMan('craftman1', input_list=[torch1])
+    craftman1 = CraftMan('craftman1', input_list=[torch1, crate1])
     torch1.input_list = [craftman1]
     # crate1.input_list = [craftman1]
 
@@ -360,6 +421,10 @@ if __name__ == '__main__':
     a_graph = Graph(nodes)
     a_graph.propagate_loop(main_loop)
     a_graph.run()
+
+    # setup Monitor
+    TaskMonitor = Recipe.tm
+    main_loop.create_task(TaskMonitor.status(5))
 
     main_loop.run_forever()
 
