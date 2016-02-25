@@ -1,7 +1,12 @@
 import asyncio
 from random import randint, choice
 import time
+from collections import Counter
 import inspect
+from functools import partial
+
+TIMESTAMP = 0
+ALL_DONE = None
 
 
 class TaskMonitor:
@@ -14,16 +19,41 @@ class TaskMonitor:
     @asyncio.coroutine
     def status(self, delta):
         while True:
-            print('---------------------------------')
+            print('----------------------------------------------------')
             print('TASKS IN SYSTEM {} : '.format(len(self.recipe_dict)))
-            # for i, item in enumerate(self.recipe_dict):
-            for i in range(len(self.recipe_dict)):
-                print('{:<8} | {:>8} | {} | {} '.format(str(self.recipe_dict[i]),
-                                                        str(self.recipe_dict[i].curState),
-                                                        str(self.recipe_dict[i]),
-                                                        str(self.recipe_dict[i].curState))
-            print('---------------------------------')
-            yield from asyncio.sleep(delta)
+
+            count_dict = Counter({None: 0, 'Other': 0})
+            num = int(len(self.recipe_dict))
+
+            states = [n.curState for n in self.recipe_dict]
+            nones = states.count(None)
+            dones = states.count('DONE')
+            percent_nones = ((len(states) - nones)/len(states))*100
+            percent_dones = (dones/len(states))*100
+
+            shkala = '...................'
+            shkala_nones = shkala.replace('.', 'X', 2 * (int(percent_nones)//10))
+            shkala_dones = shkala.replace('.', 'X', 2 * (int(percent_dones)//10))
+
+            print('   Started tasks : [{0:>6.2f}%] {1:>24}'.format(percent_nones, shkala_nones))
+            print('   Done tasks    : [{0:>6.2f}%] {1:>24}'.format(percent_dones, shkala_dones))
+            for i in range(0, num, 2):
+                if i + 2 > num:
+                    print('   {:<8} | {:>10} '.format(str(self.recipe_dict[i]),
+                                                      str(self.recipe_dict[i].curState)))
+                else:
+                    print('   {:<8} | {:>10} || {:>12} | {:>10} '.format(
+                                                            str(self.recipe_dict[i]),
+                                                            str(self.recipe_dict[i].curState),
+                                                            str(self.recipe_dict[i+1]),
+                                                            str(self.recipe_dict[i+1].curState)))
+
+            print('----------------------------------------------------')
+
+            if percent_nones >= 100:
+                ALL_DONE.set_result('ALL DONE')
+            yield from asyncio.sleep(TIMESTAMP)
+
 
 class Message:
     def __init__(self, data=None, adress=None):
@@ -205,7 +235,7 @@ class Nodebase:
                     # print('QueueEmpty')
                     pass
 
-            yield from asyncio.sleep(0)
+            yield from asyncio.sleep(TIMESTAMP)
 
     @asyncio.coroutine
     def reply(self):
@@ -220,7 +250,7 @@ class Nodebase:
     @asyncio.coroutine
     def dumb_printer(self):
         while True:
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(TIMESTAMP)
             print('{} - im {}'.format(round(self.gl_event_loop.time()), self))
             print(self.act_queue)
 
@@ -268,7 +298,7 @@ class TorchEater(Nodebase):
                 yield from self.todo.put(msg)
                 print('{} todo : {}'.format(self, self.todo))
 
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(TIMESTAMP)
 
     @asyncio.coroutine
     def actions_filler(self):
@@ -279,7 +309,7 @@ class TorchEater(Nodebase):
             my_message = Message(self.recipe, self)
 
             yield from self.act_queue.put(my_message)
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(TIMESTAMP)
             # print('lalal')
         print('PRODUCED {} tasks'.format(rand))
 
@@ -305,7 +335,7 @@ class CrateEater(Nodebase):
             my_message = Message(self.recipe, self)
 
             yield from self.act_queue.put(my_message)
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(TIMESTAMP)
             # print('lalal')
         print('PRODUCED {} tasks'.format(rand))
 
@@ -324,7 +354,7 @@ class CrateEater(Nodebase):
                 yield from self.todo.put(msg)
                 print('{} todo : {}'.format(self, self.todo))
 
-            yield from asyncio.sleep(1)
+            yield from asyncio.sleep(TIMESTAMP)
 
     def make_task(self):
 
@@ -350,14 +380,14 @@ class CraftMan(Nodebase):
             print('{} got {}'.format(self, msg))
             yield from self.todo.put(msg)
             print('{} todo : {}'.format(self, self.todo))
-            yield from asyncio.sleep(3)
+            yield from asyncio.sleep(TIMESTAMP)
 
     # @asyncio.coroutine
     # def reply(self):
     #     while True:
     #         if self.replies:
     #             yield from self.act_queue.put(self.replies.pop(0))
-    #         yield from asyncio.sleep(0)
+    #         yield from asyncio.sleep(TIMESTAMP)
 
     @asyncio.coroutine
     def craft_it(self):
@@ -386,7 +416,7 @@ class CraftMan(Nodebase):
             print('Managed to craft {} of {} items'.format(crafted_count, count))
             print('List of crafted items : {}'.format(self.succeed_items))
             print(30*'**')
-            yield from asyncio.sleep(5)
+            yield from asyncio.sleep(TIMESTAMP)
 
     def make_task(self):
         # tasks = [self.gl_event_loop.create_task(self.dumb_printer()),
@@ -395,27 +425,46 @@ class CraftMan(Nodebase):
                  self.gl_event_loop.create_task(self.actions_listen()),
                  self.gl_event_loop.create_task(self.reply())]
 
+
+def exit(n, loop , future):
+    # cancelling all pending task
+    for tsk in asyncio.Task.all_tasks(loop):
+        tsk.cancel()
+
+    print('{}: future done: {}'.format(n, future.result()))
+
+
 def env_time():
     """
     Better use of asynch.time() later
     """
     env_t = time.process_time()
-    env_t = round(env_t)
+    # env_t = round(env_t)
     return env_t
 
 
-if __name__ == '__main__':
-    torch1 = TorchEater('torch1')
-    crate1 = CrateEater('shovel1')
+@asyncio.coroutine
+def check_time(Global_timer, end_time, loop):
+    while True:
+        # print(time.monotonic(), time.time())
+        if end_time <= Global_timer():
+            loop.stop()
+        yield from asyncio.sleep(TIMESTAMP)
 
+if __name__ == '__main__':
     Global_timer = env_time
 
+    torch1 = TorchEater('torch1')
+    crate1 = CrateEater('shovel1')
     # shovel1.alias = 'shovel'
     craftman1 = CraftMan('craftman1', input_list=[torch1, crate1])
     torch1.input_list = [craftman1]
     # crate1.input_list = [craftman1]
 
     main_loop = asyncio.get_event_loop()
+
+    # Stop loop after some time
+    # main_loop.create_task(check_time(Global_timer, 0.5, main_loop))
 
     nodes = Nodebase.all_nodes
     a_graph = Graph(nodes)
@@ -426,7 +475,10 @@ if __name__ == '__main__':
     TaskMonitor = Recipe.tm
     main_loop.create_task(TaskMonitor.status(5))
 
-    main_loop.run_forever()
+    # Callback to stop simulation
+    ALL_DONE = asyncio.Future()
+    ALL_DONE.add_done_callback(partial(exit, 1, main_loop))
+    main_loop.run_until_complete(ALL_DONE)
+    # main_loop.run_forever()
 
-    # boomfunc()
 

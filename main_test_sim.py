@@ -2,6 +2,7 @@ import datetime
 
 from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
+from model.nodes.classes.Node_func import cNone_func, cNone_agent, cNone_hub
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 
 
@@ -19,17 +20,19 @@ if __name__ == '__main__':
     # client2_supply_line.add_supply_line("bread", 10, 1, 4)
     # client2_supply_line.add_supply_line("pizza", 50, 1, 5)
 
+    '''
     node1 = cNodeEconAgent('node1')
     node2 = cNodeEconAgent('node2')
     node3 = cNodeEconAgent('node3')
     node1.connect_buddies([node2, node3])
     node2.connect_buddies([node3])
-    node2.send_msg()
+    # node2.send_msg()
 
-    # node1.send_msg_to(node3)
-    # node3.send_msg_to(node1)
-    # node2.send_msg_to(node3)
+    node1.send_msg_to(node3)
+    node3.send_msg_to(node1)
+    node2.send_msg_to(node3)
     the_model.addNodes([node1, node2, node3])
+    '''
 
     # example
     # consumer = cItemConsumer('hungry_man')
@@ -46,10 +49,27 @@ if __name__ == '__main__':
     #
     # the_model.addNodes([consumer, producer])
 
+    node1 = cNone_agent('MatFlow')
+    node2 = cNone_hub('CondNode')
+    node3 = cNone_func('ApplyPrice1')
+    node4 = cNone_func('ApplyPrice2')
+
+    node2.connect_nodes(inp_node=node1, out_nodes=[node3, node4])
+    # node2.connect_buddies([node1, node3, node4])
+
+    the_model.addNodes([node1, node2, node3, node4])
+
+    node1.activate()
+    node2.condition(urgent=node3, nonurgent=node4)
+    node2.activate()
+    # node1.send_msg_to(node2)
+    # node2.send_msg_to(node4)
+    # node2.send_msg_to(node3)
+
     print('********************************')
     print('********START SIMULATION********')
     print('********************************')
-    loganddata, runner = the_model.run_sim(datetime.date(2015, 11, 15), until=100, seed=555)
+    loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555)
 
     """
     log = loganddata['log_list']
