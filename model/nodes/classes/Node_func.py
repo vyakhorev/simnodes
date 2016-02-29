@@ -35,6 +35,8 @@ class cNode(cSimNode):
         self.msg_count = 0
         self.neighbours = None
         self.messages = []
+        self.items = []
+        self.items_ready_to_send = []
 
         # Pipeline logic
 
@@ -115,13 +117,13 @@ class cNode(cSimNode):
             for port in self.ports.values():
                 self.sent_log(port.queues)
 
-            cTask.tm.status()
+            # cTask.tm.status()
             yield self.timeout(self.debug_delta)
 
     # =====================================================
 
 
-class cNone_source(cNode):
+class cNode_source(cNode):
     """
         Source node, dont have inputs
     """
@@ -130,7 +132,7 @@ class cNone_source(cNode):
         super().__init__(name)
 
 
-class cNone_sink(cNode):
+class cNode_sink(cNode):
     """
         Sink node, dont have outputs
     """
@@ -138,7 +140,7 @@ class cNone_sink(cNode):
         super().__init__(name)
 
 
-class cNone_hub(cNode):
+class cNode_hub(cNode):
     """
         Hub node, controls flow of data
     """
@@ -182,12 +184,13 @@ class cNone_hub(cNode):
                 if temp_attr:
                     task.run('True')
                     msg = [task, self, [self.condition[attr]]]
+                    print('sent msg : {}'.format(msg))
                     self.messages.append(msg)
                 else:
                     task.set_state('NO-WAY')
                     msg = [task, self, [self]]
+                    print('sent msg : {}'.format(msg))
                     self.in_port.put_uow(cMessage(*msg))
-
 
     def my_generator(self):
         print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
@@ -209,6 +212,7 @@ class cNone_hub(cNode):
             self._action(task)
 
             for msg in self.messages:
+                print('START TIME {}'.format(msg[0].start_time))
                 msg_to_send = cMessage(*msg)
                 self.messages.remove(msg)
 
@@ -217,7 +221,7 @@ class cNone_hub(cNode):
             yield self.timeout(0)
 
 
-class cNone_agent(cNode):
+class cNode_agent(cNode):
     """
         Blue node, complex
     """
@@ -238,25 +242,32 @@ class cNone_agent(cNode):
 
         yield self.empty_event()
 
+    def set_tasks(self, tasks=None):
+        self.items = tasks
+
     def populate_tasks(self):
-        items = [cDelivery('matflow1', True), cDelivery('matflow2'),
-                 cDelivery('matflow3', True), cDelivery('matflow4'),
-                 cDelivery('matflow5'), cDelivery('matflow6', True),
-                 cDelivery('matflow7'), cDelivery('matflow8')]
+        while True:
+            [self.items_ready_to_send.append(tsk) for tsk in self.items if tsk.start_time == self.simpy_env.now]
 
-        [tsk.set_start('PENDING') for tsk in items]
+            print('populating... {}'.format(self.items_ready_to_send))
 
-        for el in items:
-            self.send_msg_to(el, self.connected_buddies[0])
+            [tsk.set_start('PENDING') for tsk in self.items_ready_to_send]
 
-        for msg in self.messages:
-            msg_to_send = cMessage(*msg)
-            self.port_orders.put_uow(msg_to_send)
+            for el in self.items_ready_to_send:
+                self.send_msg_to(el, self.connected_buddies[0])
+                self.items.remove(el)
 
-        yield self.timeout(0)
+            for msg in self.messages:
+                msg_to_send = cMessage(*msg)
+                self.port_orders.put_uow(msg_to_send)
+                self.messages = []
+
+            # clear buffer
+            self.items_ready_to_send = []
+            yield self.timeout(1)
 
 
-class cNone_func(cNode):
+class cNode_func(cNode):
     """
         Green node, simple in-time operations
     """

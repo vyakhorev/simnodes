@@ -2,7 +2,8 @@ import datetime
 
 from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
-from model.nodes.classes.Node_func import cNone_func, cNone_agent, cNone_hub
+from model.nodes.classes.Node_func import cNode_func, cNode_agent, cNode_hub
+from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
 
@@ -50,18 +51,28 @@ if __name__ == '__main__':
     #
     # the_model.addNodes([consumer, producer])
 
-    node1 = cNone_agent('MatFlow')
-    node2 = cNone_hub('CondNode')
-    node3 = cNone_func('ApplyPrice1')
-    node4 = cNone_func('ApplyPrice2')
+    node1 = cNode_agent('MatFlow')
+    node2 = cNode_hub('CondNode')
+    node3 = cNode_func('ApplyPrice1')
+    node4 = cNode_func('ApplyPrice2')
+    node5 = cNode_func('ApplyPrice3')
+    node6 = cNode_func('ApplyPrice4')
 
-    node2.connect_nodes(inp_node=node1, out_nodes=[node3, node4])
+    node2.connect_nodes(inp_node=node1, out_nodes=[node3, node4, node5])
     # node2.connect_buddies([node1, node3, node4])
+    # Set some tasks to start-up
+    items = [cDelivery('matflow1', True, start_time=15), cDelivery('matflow2'),
+             cDelivery('matflow3', True), cDelivery('matflow4'),
+             cDelivery('matflow5', late=True, start_time=8), cDelivery('matflow6', urgent=True),
+             cDelivery('matflow7'), cDelivery('matflow8'),
+             cTask('UrgentInfo', urgent=True), cDelivery('Gold', expertise=True),
+             cTask('Copper', expertise=True)]
+    node1.set_tasks(items)
 
-    the_model.addNodes([node1, node2, node3, node4])
+    the_model.addNodes([node1, node2, node3, node4, node5, node6])
 
     node1.activate()
-    node2.condition(urgent=node3, nonurgent=node4)
+    node2.condition(urgent=node3, expertise=node4, late=node5)
     node2.activate()
     # node1.send_msg_to(node2)
     # node2.send_msg_to(node4)
@@ -72,8 +83,11 @@ if __name__ == '__main__':
     print('********************************')
     loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)
 
+    # Plot processes
     pm = cProcessMonitor(runner.system.simpy_env, until=25)
-    pm.print_process()
+    # pm.plot_procs_groups()
+    # pm.print_process()
+
     """
     log = loganddata['log_list']
 

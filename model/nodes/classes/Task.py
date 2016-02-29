@@ -95,9 +95,13 @@ class cTask(StateMachine):
     # Task monitor
     tm = TaskMonitor()
 
-    def __init__(self, name='Task Base Class'):
+    def __init__(self, name='Task Base Class', **kwargs):
         self.name = name
+        self.start_time = 0
         super().__init__()
+
+        for key, val in kwargs.items():
+            setattr(self, key, val)
 
         self.add_state('PENDING', self.pending, 0)
         self.add_state('CRAFTING', self.craft, 0)
@@ -132,8 +136,8 @@ class cTask(StateMachine):
 
 
 class cDelivery(cTask):
-    def __init__(self, name, urgent=False):
-        super().__init__(name)
+    def __init__(self, name, urgent=False, **kwargs):
+        super().__init__(name, **kwargs)
         self.urgent = urgent
 
 
