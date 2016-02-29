@@ -80,13 +80,14 @@ class StrList(List):
 class mtQueue():
     _simulatable = True
 
-    def __init__(self, *args):
+    def __init__(self,parent, *args):
         """
             deque how-to:
             https://docs.python.org/2/library/collections.html#collections.deque
             FIFO - append(), pop()
             LIFO - appendleft(), popleft()
         """
+        self.parent = parent
         self.proxylist = deque()
         for el in args:
             self.proxylist.append(el)
@@ -99,6 +100,7 @@ class mtQueue():
         somestore = simpy.Store(simpy_env)
         for el in self.proxylist:
             somestore.put(el)
+        somestore.parent = self.parent
         return somestore
 
 class mtFilteredQueue():

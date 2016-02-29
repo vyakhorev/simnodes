@@ -5,6 +5,7 @@
 """
 
 from model.nodes.simulengin.simulengin import cDiscreteEventSystem, cSimulRunner
+from model.nodes.ProcessMonitor import cProcessMonitor, EnvPatched
 
 import simpy
 
@@ -40,9 +41,10 @@ class cNodeModel(object):
     def addObserver(self, new_observer):
         self.observers += [new_observer]
 
-    def run_sim(self, start_date, sim_until=100, seed=None):
+    def run_sim(self, start_date, sim_until=100, seed=None, debug=False):
         # Build a devs system
-        simpyenv = simpy.Environment()
+        # simpyenv = simpy.Environment()
+        simpyenv = EnvPatched(debug)
         running_devs = cDiscreteEventSystem(simpyenv, start_date)
         running_devs.set_seed(seed)
         # TODO: clone devs between each run
@@ -57,6 +59,13 @@ class cNodeModel(object):
             sim_manager.add_sim_observer(obs_i)
 
         sim_results = sim_manager.run_and_return_log(sim_until, print_console=True, print_to_list=None)
+
+        # Monitor results
+        # pm = cProcessMonitor(simpyenv, sim_until)
+        # pm.print_process()
+        # pm.plot_procs_groups()
+        # pm.plot_event_density()
+        # -----------------
         return [sim_results, sim_manager]
 
 

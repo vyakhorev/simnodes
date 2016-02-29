@@ -4,6 +4,7 @@ from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
 from model.nodes.classes.Node_func import cNone_func, cNone_agent, cNone_hub
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
+from model.nodes.ProcessMonitor import cProcessMonitor
 
 
 if __name__ == '__main__':
@@ -69,8 +70,10 @@ if __name__ == '__main__':
     print('********************************')
     print('********START SIMULATION********')
     print('********************************')
-    loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555)
+    loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)
 
+    pm = cProcessMonitor(runner.system.simpy_env, until=25)
+    pm.print_process()
     """
     log = loganddata['log_list']
 

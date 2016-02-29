@@ -27,11 +27,11 @@ class cNodeFieldModel():
         # test purposes
         self.NodeSystem.addOtherSimObj(new_obj)
 
-    def run_sim(self, start_date=None, until=100, seed = None):
+    def run_sim(self, start_date=None, until=100, seed = None, debug=False):
         # There may be more logic here
         if start_date is None:
             start_date = datetime.date.today()
-        sim_results = self.NodeSystem.run_sim(start_date=start_date, sim_until=until, seed=seed)
+        sim_results = self.NodeSystem.run_sim(start_date=start_date, sim_until=until, seed=seed, debug=debug)
         return sim_results
 
     def getNodes(self):
