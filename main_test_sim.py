@@ -19,7 +19,7 @@ if __name__ == '__main__':
     node3 = cAgentNode('Third')
     node4 = cAgentNode('Forth')
     node1.connect_buddies([node2, node3, node4])
-    node4.connect_buddies([node2])
+    # node4.connect_buddies([node2])
     # node2.connect_buddies([node3])
     node1.send_msg(cTask('1 to 2'), node2)
     node2.send_msg(cTask('2 to 1'), node1)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     # Plot processes
     pm = cProcessMonitor(runner.system.simpy_env, until=25)
-    # pm.plot_procs_groups()
+    pm.plot_procs_groups()
     # pm.plot_event_density()
     # pm.print_process()
 

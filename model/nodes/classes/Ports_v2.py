@@ -10,11 +10,32 @@ import simpy
 class cManytoOneQueue(cSimPort):
     """
     Many-to-one
+
+    This port consist of bunch of queues:
+        :attr queues_inputs: dict| dynamic dictionary which reflecting number of connected outside ports
+        :attr queue_fetch_incomes: mtQueue| Queue which holding all receiving messages from
+                                    outside nodes
+        :attr queue_local_jobs: mtQueue| collection of all messages referred to parent Node
+        :attr wrong_jobs: mtQueue| collection of all messages with bad receiver address
+
+        :scheme:
+                              (node_1)  (node_2) ...(node_n)
+                                 |          |         |
+        queues_inputs       {[mtQueue_1]  [mtQueue_2] [mtQueue_n] }
+                                 |          |         |
+                                 ----------------------
+                                            |
+        queue_fetch_incomes              [mtQueue]
+                                           |  |
+        queue_local_jobs       [mtQueue]<--   |
+        wrong_jobs                             --> wrong_jobs [mtQueue]
+
     """
 
     def __init__(self, parent_node=None):
         """
         Setup queues
+        :arg parent_node: cNode| which node created this port
         """
         super().__init__(parent_node)
         self.queues_inputs = {}
@@ -24,6 +45,9 @@ class cManytoOneQueue(cSimPort):
         self.wrong_jobs = metatypes.mtQueue(self)
 
     def make_input_queue(self, who):
+        """
+        Creating new queue for each connected one
+        """
         self.queues_inputs[who] = metatypes.mtQueue(self).give_sim_analog(self.simpy_env)
         self.as_process(self.gen_simple_waiter(self.queues_inputs[who]))
         return True
@@ -37,6 +61,9 @@ class cManytoOneQueue(cSimPort):
         return self._queue_output
 
     def get_fetch_queue(self, who_calls):
+        """
+        :return mtQueue: queue belongs to `who_calls` - cOnetoManyQueue instance
+        """
         if who_calls is self.queues_inputs:
             return self.queues_inputs[who_calls]
         else:
@@ -65,7 +92,9 @@ class cManytoOneQueue(cSimPort):
             yield self.timeout(0)
 
     def fetch_all_queues(self):
-
+        """
+        listening for self.queue_fetch_incomes queue and decide which message has wrong or correct address
+        """
         # todo maybe dont work
         for nodeport_i, queue_i in self.queues_inputs.items():
             self.sent_log('SPAWNED listener  for {}'.format(queue_i))
@@ -116,10 +145,13 @@ class cManytoOneQueue(cSimPort):
 
         return contains
 
-
+# Todo rename to not-queue
 class cOnetoManyQueue(cSimPort):
     """
     One-to-many
+    :attr port_to_place: mtQueue| place where node leave their own messages through 'cMessage' class
+    :attr wrong_jobs: mtQueue| if node do not connected to destination node messages automatically placing here
+
     """
     def __init__(self, parent_node=None):
         """
@@ -160,21 +192,26 @@ class cOnetoManyQueue(cSimPort):
             msg = yield self._queue_nonsorted_jobs.get()
             self.sent_log('im got {}'.format(msg))
 
-            print('Connected ports : {}'.format(self.connected_ports))
-            for port_id, neigh_i in self.connected_ports.items():
-                print('port_id, neigh_i', port_id, neigh_i)
-                if neigh_i.parent_node in msg.receivers:
-                    self.sent_log('msg.receivers : {}, neigh_i.parent_node : {}'.format(msg.receivers,
-                                                                                        neigh_i.parent_node))
-                    queue = neigh_i.get_fetch_queue(self)
-                    queue.put(msg)
-                    # print('queue', queue.items)
+            if msg.receivers[0] in [neigh_i.parent_node for neigh_i in self.connected_ports.values()]:
+                for port_id, neigh_i in self.connected_ports.items():
+                    print('port_id, neigh_i', port_id, neigh_i)
+                    if neigh_i.parent_node in msg.receivers:
+                        self.sent_log('msg.receivers : {}, neigh_i.parent_node : {}'.format(msg.receivers,
+                                                                                            neigh_i.parent_node))
+                        queue = neigh_i.get_fetch_queue(self)
+                        queue.put(msg)
+                        # print('queue', queue.items)
+            else:
+                self.sent_log('WRONG TASK : {}'.format(msg))
+                task = msg.uows
+                task.set_task_to_wrong()
+                self.wrong_jobs.put(msg)
 
-                else:
-                    self.sent_log('WRONG TASK : {}'.format(msg))
-                    task = msg.uows
-                    task.set_task_to_wrong()
-                    self.wrong_jobs.put(msg)
+                # else:
+                #     self.sent_log('WRONG TASK : {}'.format(msg))
+                #     task = msg.uows
+                #     task.set_task_to_wrong()
+                #     self.wrong_jobs.put(msg)
             yield self.empty_event()
 
     @property
