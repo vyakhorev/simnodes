@@ -1,0 +1,198 @@
+# -*- coding: utf-8 -*-
+__author__ = 'User'
+import model.nodes.metatypes as metatypes
+from model.nodes.classes.SimBase import cSimPort
+from model.nodes.classes.cMessage import cMessage
+
+from model.nodes.classes.SimBase import cSimNode
+import simpy
+
+class cManytoOneQueue(cSimPort):
+    """
+    Many-to-one
+    """
+
+    def __init__(self, parent_node=None):
+        """
+        Setup queues
+        """
+        super().__init__(parent_node)
+        self.queues_inputs = {}
+        self.queue_fetch_incomes = metatypes.mtQueue(self)
+        self._queue_output = metatypes.mtQueue(self)
+        self.queue_local_jobs = metatypes.mtQueue(self)
+        self.wrong_jobs = metatypes.mtQueue(self)
+
+    def make_input_queue(self, who):
+        self.queues_inputs[who] = metatypes.mtQueue(self).give_sim_analog(self.simpy_env)
+        self.as_process(self.gen_simple_waiter(self.queues_inputs[who]))
+        return True
+
+    @property
+    def port_to_listen(self):
+        """
+        Universal attribute
+        """
+        # self.sent_log('Providing port {}'.format(self._queue_output))
+        return self._queue_output
+
+    def get_fetch_queue(self, who_calls):
+        if who_calls is self.queues_inputs:
+            return self.queues_inputs[who_calls]
+        else:
+            self.make_input_queue(who_calls)
+            return self.queues_inputs[who_calls]
+
+    def init_sim(self):
+        super().init_sim()
+
+    def my_generator(self):
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
+        # if self.is_connected():
+        self.as_process(self.fetch_all_queues())
+
+        yield self.timeout(0)
+
+    def gen_simple_waiter(self, queue):
+        """
+        listen every input queue
+        """
+        while True:
+            msg = yield queue.get()
+            self.sent_log('im got msg {}'.format(msg))
+            self.sent_log(str(msg))
+            self.queue_fetch_incomes.put(msg)
+            yield self.timeout(0)
+
+    def fetch_all_queues(self):
+
+        # todo maybe dont work
+        for nodeport_i, queue_i in self.queues_inputs.items():
+            self.sent_log('SPAWNED listener  for {}'.format(queue_i))
+            self.as_process(self.gen_simple_waiter(queue_i))
+        # for port_id, neigh_i in self.connected_ports.items():
+        #     self.sent_log('neigh {} <=> port {}'.format(neigh_i, port_id))
+        #     self.as_process(self.gen_simple_waiter(neigh_i))
+
+        while True:
+            msg = yield self.queue_fetch_incomes.get()
+            if self.parent_node in msg.receivers:
+                self.queue_local_jobs.put(msg)
+                # self._queue_output.put(msg)
+                self.sent_log('[SUCCESS] got the {}'.format(msg))
+            else:
+                self.sent_log('[WARN] message {} have bad adress'.format(msg))
+                self.wrong_jobs.put(msg)
+        yield self.timeout(0)
+
+    @property
+    def queues(self):
+        i = 0
+        contains = "\nqueue_fetch_incomes: \n"
+        for it_i in self.queue_fetch_incomes.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "_queue_output: \n"
+        for it_i in self._queue_output.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "queue_local_jobs: \n"
+        for it_i in self.queue_local_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "wrong_jobs: \n"
+        for it_i in self.wrong_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        for queue in self.queues_inputs.values():
+            contains += "{}: \n".format(queue)
+            for it_i in queue.items:
+                i += 1
+                contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        return contains
+
+
+class cOnetoManyQueue(cSimPort):
+    """
+    One-to-many
+    """
+    def __init__(self, parent_node=None):
+        """
+        Setup queues
+        """
+        super().__init__(parent_node)
+        # self.queues_inputs = []
+        self._queue_nonsorted_jobs = metatypes.mtQueue(self)
+
+        self._queue_output = metatypes.mtQueue(self)
+        self.wrong_jobs = metatypes.mtQueue(self)
+
+    def init_sim(self):
+        super().init_sim()
+
+    def my_generator(self):
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
+        # if self.is_connected():
+        self.as_process(self.gen_sort_jobs(), repr='Sorting_Generator{} '.format(self.nodeid))
+
+        yield self.timeout(0)
+
+    @property
+    def port_to_place(self):
+        return self._queue_nonsorted_jobs
+
+    @property
+    def port_to_listen(self):
+        """
+        Universal attribute
+        """
+        # self.sent_log('Providing port {}'.format(self._queue_output))
+        return self._queue_output
+
+    def gen_sort_jobs(self):
+
+        while True:
+            msg = yield self._queue_nonsorted_jobs.get()
+            self.sent_log('im got {}'.format(msg))
+
+            print('Connected ports : {}'.format(self.connected_ports))
+            for port_id, neigh_i in self.connected_ports.items():
+                print('port_id, neigh_i', port_id, neigh_i)
+                if neigh_i.parent_node in msg.receivers:
+                    self.sent_log('msg.receivers : {}, neigh_i.parent_node : {}'.format(msg.receivers,
+                                                                                        neigh_i.parent_node))
+                    queue = neigh_i.get_fetch_queue(self)
+                    queue.put(msg)
+                    # print('queue', queue.items)
+
+                else:
+                    self.sent_log('WRONG TASK : {}'.format(msg))
+                    task = msg.uows
+                    task.set_task_to_wrong()
+                    self.wrong_jobs.put(msg)
+            yield self.empty_event()
+
+    @property
+    def queues(self):
+        i = 0
+        contains = "\n_queue_nonsorted_jobs: \n"
+        for it_i in self._queue_nonsorted_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "_queue_output: \n"
+        for it_i in self._queue_output.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "wrong_jobs: \n"
+        for it_i in self.wrong_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        return contains

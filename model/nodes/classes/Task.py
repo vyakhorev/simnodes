@@ -100,6 +100,8 @@ class cTask(StateMachine):
         self.start_time = 0
         super().__init__()
 
+        self.wrong = ''
+
         for key, val in kwargs.items():
             setattr(self, key, val)
 
@@ -131,8 +133,11 @@ class cTask(StateMachine):
             newState = 'CANCELLED'
         return newState, cargo
 
+    def set_task_to_wrong(self):
+        self.wrong = 'WRONG '
+
     def __repr__(self):
-        return 'Task : {}'.format(self.name)
+        return '{}Task : {}'.format(self.wrong, self.name)
 
 
 class cDelivery(cTask):

@@ -8,6 +8,7 @@ import random
 import sys
 import model.nodes.simulengin.statkeeper as statkeeper
 import model.nodes.meta
+import functools
 
 class cDiscreteEventSystem(object):
     # TODO: implement methods to cope with node structure during simulation
@@ -140,8 +141,30 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
     def sent_log(self, a_msg):
         self.devs.sent_log(self, a_msg)
 
-    def as_process(self, new_process):
-        self.simpy_env.process(new_process)
+    @staticmethod
+    def get_proc_repr(text):
+        """
+        Closure function, which create unbound method for outside class
+        :param text: str| text which will replace builtin
+        :return: func|
+        """
+        def proc_repr():
+            return text
+        return proc_repr
+
+    def as_process(self, new_process, repr=None):
+        """
+        :param new_process: generator| any generator function
+        :param repr: str| -optional, representation string to replace builtin
+        :return: process
+        """
+        self.sent_log('Making process {}'.format(new_process))
+
+        # monkey-patching process repr
+        proc = self.simpy_env.process(new_process)
+        if repr:
+            proc._desc = self.get_proc_repr(repr)
+        return proc
 
     def timeout(self, T):
         return self.simpy_env.timeout(T)

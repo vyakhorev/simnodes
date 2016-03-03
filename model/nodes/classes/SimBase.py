@@ -82,7 +82,7 @@ class cSimPort(simulengin.cConnToDEVS, model.nodes.meta.MetaStruct):
         self.connected_ports[another_port.port_id] = another_port
         another_port.connected_ports[self.port_id] = self
 
-        # print(self.connected_ports)
+        print(self.connected_ports)
 
     def is_connected(self):
         if len(self.connected_ports) == 0:

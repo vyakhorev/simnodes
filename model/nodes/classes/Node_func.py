@@ -145,12 +145,15 @@ class cNode_hub(cNode):
         Hub node, controls flow of data
     """
     def __init__(self, name, inp_node=None, out_nodes=None):
+
         super().__init__(name)
         self.input = inp_node
         self.out_nodes = out_nodes
 
         self.in_port = self.port_orders
         self.out_port = ports.cPortUoWQueue(self)
+
+        self.conditions_dict = {}
 
     def connect_nodes(self, inp_node, out_nodes):
         self.connected_buddies.append(inp_node)
@@ -174,23 +177,33 @@ class cNode_hub(cNode):
         self.pushing = True
 
     def condition(self, **kwargs):
-        self.condition = kwargs
+        self.conditions_dict = kwargs
 
     def _action(self, task):
-        for attr, node in self.condition.items():
-            if hasattr(task, attr):
-                temp_attr = getattr(task, attr)
-                print('TEMP ATTR', temp_attr)
-                if temp_attr:
-                    task.run('True')
-                    msg = [task, self, [self.condition[attr]]]
-                    print('sent msg : {}'.format(msg))
-                    self.messages.append(msg)
-                else:
-                    task.set_state('NO-WAY')
-                    msg = [task, self, [self]]
-                    print('sent msg : {}'.format(msg))
-                    self.in_port.put_uow(cMessage(*msg))
+        for attr_i in task.__dict__.keys():
+            print('attr_i ...', attr_i)
+            if attr_i in self.conditions_dict:
+                # if getattr(task, attr_i) == getattr(self, attr_i):
+                print('task {} and {} has common {} attribute'.format(task, self.conditions_dict, attr_i))
+                # task.run('True')
+                msg = [task, self, [self.conditions_dict[attr_i]]]
+                print('sent msg : {}'.format(msg))
+                self.messages.append(msg)
+
+        # for attr, node in self.conditions_dict.items():
+        #     if hasattr(task, attr):
+        #         temp_attr = getattr(task, attr)
+        #         print('TEMP ATTR', temp_attr)
+        #         if temp_attr:
+        #             task.run('True')
+        #             msg = [task, self, [self.conditions_dict[attr]]]
+        #             print('sent msg : {}'.format(msg))
+        #             self.messages.append(msg)
+        #         else:
+        #             task.set_state('NO-WAY')
+        #             msg = [task, self, [self]]
+        #             print('sent msg : {}'.format(msg))
+        #             self.in_port.put_uow(cMessage(*msg))
 
     def my_generator(self):
         print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
@@ -273,3 +286,6 @@ class cNode_func(cNode):
     """
     def __init__(self, name):
         super().__init__(name)
+        self.port_orders.set_one_way_mode()
+        print('33333333333333333333333333333333333333333333333')
+
