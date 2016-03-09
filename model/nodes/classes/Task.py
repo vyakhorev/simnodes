@@ -22,7 +22,9 @@ class StateMachine:
         self.curState = state
 
     def set_start(self, name):
+        print(self, 'START STATE', 'name : ', name)
         self.startState = name.upper()
+        self.curState = name.upper()
 
     def run(self, cargo):
         try:
@@ -74,10 +76,10 @@ class TaskMonitor:
                 print('   Done tasks    : [{0:>6.2f}%] {1:>34}'.format(percent_dones, shkala_dones))
                 for i in range(0, num, 2):
                     if i + 2 > num:
-                        print('   {:<8} | {:>10} '.format(str(self.task_dict[i]),
+                        print('   {:<18} | {:>10} '.format(str(self.task_dict[i]),
                                                           str(self.task_dict[i].curState)))
                     else:
-                        print('   {:<8} | {:>10} || {:>12} | {:>10} '.format(
+                        print('   {:<18} | {:>10} || {:>15} | {:>10} '.format(
                                                                 str(self.task_dict[i]),
                                                                 str(self.task_dict[i].curState),
                                                                 str(self.task_dict[i+1]),
@@ -109,7 +111,7 @@ class cTask(StateMachine):
         self.add_state('CRAFTING', self.craft, 0)
         self.add_state('CANCELLED', None, end_state=1)
         self.add_state('DONE', None, end_state=1)
-        self.set_start('')
+        self.set_start('PENDING')
 
         self.tm.add_task(self)
         # list of node which handle me
@@ -134,7 +136,8 @@ class cTask(StateMachine):
         return newState, cargo
 
     def set_task_to_wrong(self):
-        self.wrong = 'WRONG '
+        # self.wrong = 'WRONG '
+        self.set_state('WRONG DEST')
 
     def __repr__(self):
         return '{}Task : {}'.format(self.wrong, self.name)

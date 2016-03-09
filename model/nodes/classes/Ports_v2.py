@@ -28,7 +28,7 @@ class cManytoOneQueue(cSimPort):
         queue_fetch_incomes              [mtQueue]
                                            |  |
         queue_local_jobs       [mtQueue]<--   |
-        wrong_jobs                             --> wrong_jobs [mtQueue]
+        wrong_jobs                             --> [mtQueue]
 
     """
 
