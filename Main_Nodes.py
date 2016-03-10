@@ -16,16 +16,21 @@ from views.Main_Gui_v01 import c_MainView
 
 class c_App(QApplication):
 
-    def __init__(self, sys_argv):
+    def __init__(self, sys_argv, model):
         super(c_App, self).__init__(sys_argv)
-        self.model = cNodeFieldModel()
+        if model:
+            self.model = model
+        else:
+            self.model = cNodeFieldModel()
         self.main_view = c_MainView(self.model)
         self.main_cntrl = c_BaseNodes(self.model, self.main_view)
 
         self.main_view.show()
 
 
-
+def run(model=None):
+    app = c_App(sys.argv, model)
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
 

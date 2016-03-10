@@ -280,8 +280,10 @@ class c_ConLine(QGraphicsLineItem):
         self.setAcceptedMouseButtons(Qt.NoButton)
         self.source = sourceNode
         self.dest = destNode
+
         self.source.addCon(self)
         self.dest.addCon(self)
+
         self.adjust()
         print('arrow initlized')
 
@@ -433,11 +435,14 @@ class c_nodeAssembler():
         """
         # print(self.Tree.getTree())
         print('2nd method ', self.Tree.getNodes())
-        rootNode = None
         # for node in self.Tree.getTree():
+        # rootNode = None
+        rootNode = c_Node(self.Tree.getNodes()[1].name)
 
         for node in self.Tree.getNodes():
-            if node.parent == None:
+            print(node)
+            print(' !!! ', node.parent)
+            if node.parent is None:
                 rootNode = c_Node(node.name, node)
                 rootNode.my_setPos(100, 100+randint(0, 1)*120)
                 Nodegraph.addItem(rootNode)
@@ -445,8 +450,13 @@ class c_nodeAssembler():
                 some_node = c_Node(node.name, node)
                 some_node.my_setPos(100+randint(-200, 200), 100+randint(2, 3)*120)
                 Nodegraph.addItem(some_node)
-                Con = Nodegraph.connection(node2=rootNode, node1=some_node)
-                Nodegraph.addItem(Con)
+                print(' OOO {} , {}'.format(rootNode, some_node))
+                try:
+                    Con = Nodegraph.connection(node2=rootNode, node1=some_node)
+                    Nodegraph.addItem(Con)
+                except Exception as e:
+                    print('[Exception] {}'.format(e))
+
 
 
         '''

@@ -191,10 +191,9 @@ class cOnetoManyQueue(cSimPort):
         while True:
             msg = yield self._queue_nonsorted_jobs.get()
             self.sent_log('im got {}'.format(msg))
-
+            print('self.connected_ports', self.connected_ports)
             if msg.receivers[0] in [neigh_i.parent_node for neigh_i in self.connected_ports.values()]:
                 for port_id, neigh_i in self.connected_ports.items():
-                    print('port_id, neigh_i', port_id, neigh_i)
                     if neigh_i.parent_node in msg.receivers:
                         self.sent_log('msg.receivers : {}, neigh_i.parent_node : {}'.format(msg.receivers,
                                                                                             neigh_i.parent_node))
@@ -257,6 +256,13 @@ class cOnetoOneInpQueue(cSimPort):
         yield self.timeout(0)
 
     def get_fetch_queue(self, who_calls):
+        # for k, v in self.parent_node.__dict__.items():
+        #     print(k, ' : ', v)
+        print('=========================')
+        print(who_calls.parent_node.out_orders)
+        print(who_calls.parent_node.in_orders)
+        print('=========================')
+        self.sent_log('{} calls for my {} queue'.format(who_calls, self))
         return self.queue_fetch_incomes
 
     @property
@@ -333,7 +339,6 @@ class cOnetoOneOutQueue(cSimPort):
         while True:
             msg = yield self.port_to_place.get()
             neigh = list(self.connected_ports.values())[0]
-            print('neigh : ', neigh)
             queue = neigh.get_fetch_queue(self)
             queue.put(msg)
 

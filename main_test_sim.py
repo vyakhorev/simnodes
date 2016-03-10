@@ -8,7 +8,7 @@ from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
 
-
+import Main_Nodes
 
 if __name__ == '__main__':
     # Create a model, run simulation, print log + iterate over nodes
@@ -20,26 +20,35 @@ if __name__ == '__main__':
     node4 = cFuncNode('ApplyPrice2')
     node5 = cFuncNode('ApplyPrice3')
     node6 = cAgentNode('Consumer')
+    node7 = cFuncNode('Tagger')
 
     # Set some tasks to start-up
-    items = [cDelivery('matflow1', urgent=True, start_time=15), cDelivery('matflow2'),
-             cDelivery('matflow3', True), cDelivery('matflow4'), cTask('Unusual'),
-             cDelivery('matflow5', late=True, start_time=8), cDelivery('matflow6', urgent=True),
-             cDelivery('matflow7'), cDelivery('matflow8'),
-             cTask('UrgentInfo', urgent=True), cDelivery('Gold', expertise=True),
-             cTask('Copper', expertise=True)]
-    node1.set_tasks(items)
+    MatFlow_items = [cDelivery('matflow1', urgent=True, start_time=15), cDelivery('matflow2', start_time=11),
+                     cDelivery('matflow3', True), cDelivery('matflow4'), cTask('Unusual'),
+                     cDelivery('matflow5', late=True, start_time=8), cDelivery('matflow6', urgent=True),
+                     cDelivery('matflow7'), cDelivery('matflow8'),
+                     cTask('UrgentInfo', urgent=True), cDelivery('Gold', expertise=True),
+                     cTask('Copper', expertise=True)]
+    node1.set_tasks(MatFlow_items)
     node2.connect_nodes(inp_nodes=[node1], out_nodes=[node3, node4, node5])
+
+    Consumer_items = [cDelivery('Wanna_Drink', urgent=True, start_time=5, direct_address=node7)]
+    node6.set_tasks(Consumer_items)
     node6.connect_buddies([node3, node4, node5])
+    node7.connect_nodes(inp_node=node6, out_node=node1)
+
+    def _action(task):
+        task.tags = 'TROLOLOOLO'
+        return True
+
+    node7._action = _action
 
     cond_dict = {node3: 'urgent = True',
                  node4: 'expertise = True',
                  node5: 'start_time > 7'}
     node2.condition(cond_dict)
 
-    # node1.connect_buddies([node2, node3, node4])
-
-    the_model.addNodes([node1, node2, node3, node4, node5, node6])
+    the_model.addNodes([node1, node2, node3, node4, node5, node6, node7])
 
     #
     # client1_supply_line = cNodeClientSupplyLine("client1")
@@ -109,15 +118,22 @@ if __name__ == '__main__':
     # node1.send_msg_to(node2)
     # node2.send_msg_to(node4)
     # node2.send_msg_to(node3)
-
+    node2.parent = node1
+    node3.parent = node2
+    node4.parent = node2
+    node5.parent = node2
+    node7.parent = node6
+    node1.parent = node7
+    Main_Nodes.run(model=the_model)
+    # print(the_model.getNodes())
     print('********************************')
     print('********START SIMULATION********')
     print('********************************')
     loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)
 
     # Plot processes
-    pm = cProcessMonitor(runner.system.simpy_env, until=25)
-    pm.plot_procs_groups()
+    # pm = cProcessMonitor(runner.system.simpy_env, until=25)
+    # pm.plot_procs_groups()
     # pm.plot_event_density()
     # pm.print_process()
 

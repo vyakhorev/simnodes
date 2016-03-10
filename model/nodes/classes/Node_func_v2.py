@@ -39,6 +39,7 @@ class cNodeBase:
     def __init__(self, name):
         self.messages = []
         super(cNodeBase, self).__init__(name)
+        self.parent = None
 
     def send_msg(self, task, receiver):
         msg = [task, self, [receiver]]
@@ -100,15 +101,19 @@ class cAgentNode(cNodeBase, cSimNode):
         while True:
             [self.items_ready_to_send.append(tsk) for tsk in self.items if tsk.start_time == self.simpy_env.now]
 
-            print('populating... {}'.format(self.items_ready_to_send))
+            self.sent_log('populating... {}'.format(self.items_ready_to_send))
 
             # make additional state
             [tsk.set_start('PENDING') for tsk in self.items_ready_to_send]
 
             for el in self.items_ready_to_send:
                 # FIXME poor line... self.connected_buddies[0]
-                self.send_msg(el, self.connected_buddies[0])
-                self.items.remove(el)
+                if hasattr(el, 'direct_address'):
+                    print('ALOHA')
+                    self.send_msg(el, el.direct_address)
+                else:
+                    self.send_msg(el, self.connected_buddies[0])
+                    self.items.remove(el)
 
             for msg in self.messages:
                 msg_to_send = cMessage(*msg)
@@ -122,7 +127,6 @@ class cAgentNode(cNodeBase, cSimNode):
     def gen_push_messages(self):
         for msg in self.messages:
             msg = cMessage(*msg)
-            # print(msg)
             self.out_orders.port_to_place.put(msg)
         yield self.timeout(5)
 
@@ -269,7 +273,6 @@ class cHubNode(cNodeBase, cSimNode):
                 self.out_orders.wrong_jobs.put(msg)
 
             for msg in self.messages:
-                print('START TIME {}'.format(msg[0].start_time))
                 msg_to_send = cMessage(*msg)
                 self.messages.remove(msg)
 
