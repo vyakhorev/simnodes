@@ -110,7 +110,7 @@ class cManytoOneQueue(cSimPort):
                 # self._queue_output.put(msg)
                 self.sent_log('[SUCCESS] got the {}'.format(msg))
             else:
-                self.sent_log('[WARN] message {} have bad adress'.format(msg))
+                self.sent_log('[WARN] message {} have bad address'.format(msg))
                 self.wrong_jobs.put(msg)
         yield self.timeout(0)
 
@@ -224,6 +224,136 @@ class cOnetoManyQueue(cSimPort):
 
         contains += "_queue_output: \n"
         for it_i in self._queue_output.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "wrong_jobs: \n"
+        for it_i in self.wrong_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        return contains
+
+
+# TODO if no receivers, handle an error
+class cOnetoOneInpQueue(cSimPort):
+    def __init__(self, parent_node=None):
+        super().__init__(parent_node)
+
+        # self.queues_inputs = []
+        self.queue_fetch_incomes = metatypes.mtQueue(self)
+        self._queue_output = metatypes.mtQueue(self)
+
+        self.queue_local_jobs = metatypes.mtQueue(self)
+        self.wrong_jobs = metatypes.mtQueue(self)
+
+    def init_sim(self):
+        super().init_sim()
+
+    def my_generator(self):
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
+        # if self.is_connected():
+        self.as_process(self.gen_listen_input())
+        yield self.timeout(0)
+
+    def get_fetch_queue(self, who_calls):
+        return self.queue_fetch_incomes
+
+    @property
+    def port_to_place(self):
+        return self.queue_fetch_incomes
+
+    @property
+    def port_to_listen(self):
+        return self._queue_output
+
+    def gen_listen_input(self):
+        while True:
+            msg = yield self.queue_fetch_incomes.get()
+            if self.parent_node in msg.receivers:
+                self.queue_local_jobs.put(msg)
+                self.sent_log('[SUCCESS] got the {}'.format(msg))
+            else:
+                self.sent_log('[WARN] message {} have bad address'.format(msg))
+                self.wrong_jobs.put(msg)
+
+        yield self.timeout(0)
+
+    @property
+    def queues(self):
+        i = 0
+        contains = "\nqueue_fetch_incomes: \n"
+        for it_i in self.queue_fetch_incomes.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "_queue_output: \n"
+        for it_i in self._queue_output.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "queue_local_jobs: \n"
+        for it_i in self.queue_local_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "wrong_jobs: \n"
+        for it_i in self.wrong_jobs.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        return contains
+
+
+class cOnetoOneOutQueue(cSimPort):
+    def __init__(self, parent_node=None):
+        super().__init__(parent_node)
+
+        # self.queues_inputs = []
+        self.queue_fetch_incomes = metatypes.mtQueue(self)
+        self._queue_output = metatypes.mtQueue(self)
+
+        self.queue_local_jobs = metatypes.mtQueue(self)
+        self.wrong_jobs = metatypes.mtQueue(self)
+
+    def init_sim(self):
+        super().init_sim()
+
+    def my_generator(self):
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
+        # if self.is_connected():
+        self.as_process(self.gen_push_job())
+        yield self.timeout(0)
+
+    @property
+    def port_to_place(self):
+        return self._queue_output
+
+    def gen_push_job(self):
+        while True:
+            msg = yield self.port_to_place.get()
+            neigh = list(self.connected_ports.values())[0]
+            print('neigh : ', neigh)
+            queue = neigh.get_fetch_queue(self)
+            queue.put(msg)
+
+        yield self.empty_event()
+
+    @property
+    def queues(self):
+        i = 0
+        contains = "\nqueue_fetch_incomes: \n"
+        for it_i in self.queue_fetch_incomes.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "_queue_output: \n"
+        for it_i in self._queue_output.items:
+            i += 1
+            contains += "\t" + str(i) + ":" + str(it_i) + "\n"
+
+        contains += "queue_local_jobs: \n"
+        for it_i in self.queue_local_jobs.items:
             i += 1
             contains += "\t" + str(i) + ":" + str(it_i) + "\n"
 

@@ -76,14 +76,17 @@ class TaskMonitor:
                 print('   Done tasks    : [{0:>6.2f}%] {1:>34}'.format(percent_dones, shkala_dones))
                 for i in range(0, num, 2):
                     if i + 2 > num:
-                        print('   {:<18} | {:>10} '.format(str(self.task_dict[i]),
-                                                          str(self.task_dict[i].curState)))
+                        print('   {:<18}tags{:>25} | {:>10} '.format(str(self.task_dict[i]),
+                                                                       str(self.task_dict[i].tags),
+                                                                       str(self.task_dict[i].curState)))
                     else:
-                        print('   {:<18} | {:>10} || {:>15} | {:>10} '.format(
-                                                                str(self.task_dict[i]),
-                                                                str(self.task_dict[i].curState),
-                                                                str(self.task_dict[i+1]),
-                                                                str(self.task_dict[i+1].curState)))
+                        print('   {:<18}tags{:>25} | {:>10} || {:>17} tags{:>25} | {:>10} '.format(
+                                                                                str(self.task_dict[i]),
+                                                                                str(self.task_dict[i].tags),
+                                                                                str(self.task_dict[i].curState),
+                                                                                str(self.task_dict[i+1]),
+                                                                                str(self.task_dict[i+1].tags),
+                                                                                str(self.task_dict[i+1].curState)))
 
                 print('---------------------------------------------------------------')
 
@@ -116,6 +119,7 @@ class cTask(StateMachine):
         self.tm.add_task(self)
         # list of node which handle me
         # self.registry = []
+        self._tags = []
 
         self.accepted = True
 
@@ -138,6 +142,18 @@ class cTask(StateMachine):
     def set_task_to_wrong(self):
         # self.wrong = 'WRONG '
         self.set_state('WRONG DEST')
+
+    def set_tag(self, tag):
+        self.tags.append(tag)
+
+    @property
+    def tags(self):
+        return self._tags
+
+    @tags.setter
+    def tags(self, a_tag):
+        self._tags.append(a_tag)
+        print('Tag added {}'.format(a_tag))
 
     def __repr__(self):
         return '{}Task : {}'.format(self.wrong, self.name)

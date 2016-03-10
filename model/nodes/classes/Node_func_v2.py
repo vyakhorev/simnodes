@@ -3,13 +3,17 @@ import model.nodes.metatypes as metatypes
 # import model.nodes.classes.Ports as ports
 import model.nodes.classes.Ports_v2 as ports
 from model.nodes.classes.SimBase import cSimNode
-from itertools import chain
 import model.nodes.UoW as uows
 from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.cMessage import cMessage
 
+from model.nodes.utils.custom_operators import do_expression
+
+from itertools import chain
 from random import choice, randint
 from collections import namedtuple
+
+
 
 # Node types :
 class AgentType:
@@ -52,12 +56,6 @@ class cNodeBase:
 
             cTask.tm.status()
             yield self.timeout(2)
-
-    # def __eq__(self, another):
-    #     return hasattr(another, 'nodeid') and self.nodeid == another.nodeid
-    #
-    # def __hash__(self):
-    #     return hash(self.nodeid)
 
 
 class cAgentNode(cNodeBase, cSimNode):
@@ -108,6 +106,7 @@ class cAgentNode(cNodeBase, cSimNode):
             [tsk.set_start('PENDING') for tsk in self.items_ready_to_send]
 
             for el in self.items_ready_to_send:
+                # FIXME poor line... self.connected_buddies[0]
                 self.send_msg(el, self.connected_buddies[0])
                 self.items.remove(el)
 
@@ -228,28 +227,37 @@ class cHubNode(cNodeBase, cSimNode):
             self.conditions_dict[expression(attr, expr, val)] = node
 
     def _action(self, task):
-        print('ATTRS !!!')
-        print(self.conditions_dict)
         got_match = False
+        # TODO make attributes priority to solve multiple successful conditions
         for attr_i in task.__dict__.keys():
-            # TODO make eval for expression
-            # here we will eval expression
             for expression in self.conditions_dict.keys():
                 if attr_i == expression.attr:
-                    got_match = True
-                    self.sent_log('YEAH {} for expr {} for task {}'.format(attr_i, expression, task))
-                    self.sent_log('Gonna send task {} to receiver {}'.format(task, self.conditions_dict[expression]))
-                    receiver = self.conditions_dict[expression]
-                    print(type(receiver))
-                    msg = [task, self, [receiver]]
-                    self.messages.append(msg)
+                    print('CHECKING :{}, and  {} fulfill {} {}'.format(attr_i, expression.attr, expression.expr,
+                                                                       expression.val))
 
+                    # TODO solve duplicating...
+                    if expression.val in ['true', 'True', 'false', 'False']:
+                        if getattr(task, attr_i) == (expression.val in ['True', 'true']):
+                            got_match = True
+                            self.sent_log('Gonna send task {} to receiver {}'.format(task,
+                                                                                     self.conditions_dict[expression]))
+                            receiver = self.conditions_dict[expression]
+                            msg = [task, self, [receiver]]
+                            self.messages.append(msg)
+                    else:
+                        if do_expression(getattr(task, attr_i), expression.expr, expression.val):
+                            got_match = True
+                            self.sent_log('Gonna send task {} to receiver {}'.format(task,
+                                                                                     self.conditions_dict[expression]))
+                            receiver = self.conditions_dict[expression]
+                            msg = [task, self, [receiver]]
+                            self.messages.append(msg)
         if got_match:
             return True
         else:
             return False
 
-    # IN LOGIC
+    # IN / OUT LOGIC
     def gen_do_incoming_tasks(self):
         while True:
             msg = yield self.in_orders.queue_local_jobs.get()
@@ -269,6 +277,7 @@ class cHubNode(cNodeBase, cSimNode):
 
             yield self.empty_event()
 
+    # GENERATORS
     def my_generator(self):
         print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
 
@@ -277,5 +286,72 @@ class cHubNode(cNodeBase, cSimNode):
 
         if self.pushing:
             self.as_process(self.gen_do_incoming_tasks(), repr='FILTERING')
+
+        yield self.empty_event()
+
+
+class cFuncNode(cNodeBase, cSimNode):
+    """
+      input(1) ---> [FUNC] ---> output(1)
+    """
+    NodeType = FuncType
+
+    def __init__(self, name, inp_node=None, out_node=None):
+        self.input_node, self.out_node = inp_node, out_node
+
+        super().__init__(name)
+        # TODO add 'out' or 'in' to Queue repr
+        self.in_orders = ports.cOnetoOneInpQueue(self)
+        self.out_orders = ports.cOnetoOneOutQueue(self)
+        self.register_port(self.in_orders)
+        self.register_port(self.out_orders)
+
+        self.connected_buddies = []
+        self.debug_on = True
+        self.pushing = True
+
+    def connect_nodes(self, inp_node, out_node):
+        self.input_node, self.out_node = inp_node, out_node
+        self.connected_buddies += [inp_node, out_node]
+
+        self.in_orders.connect_to_port(inp_node.out_orders)
+        inp_node.connected_buddies += [self]
+
+        self.out_orders.connect_to_port(out_node.in_orders)
+        out_node.connected_buddies += [self]
+
+    def _action(self, task):
+        task.tags = '#I_was_in {}'.format(self.name)
+        return True
+
+    # IN LOGIC
+    def gen_do_incoming_tasks(self):
+        while True:
+            msg = yield self.in_orders.queue_local_jobs.get()
+            self.sent_log('Got {}'.format(msg))
+            tsk = msg.uows
+            success = self._action(tsk)
+            if success:
+                msg = [tsk, self, [self.connected_buddies[1]]]
+                self.messages.append(msg)
+            else:
+                self.out_orders.wrong_jobs.put(msg)
+
+            for msg in self.messages:
+                msg_to_send = cMessage(*msg)
+                self.messages.remove(msg)
+                self.out_orders.port_to_place.put(msg_to_send)
+
+        yield self.empty_event()
+
+    # GENERATORS
+    def my_generator(self):
+        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+
+        if self.debug_on:
+            self.as_process(self.gen_debug())
+
+        if self.pushing:
+            self.as_process(self.gen_do_incoming_tasks())
 
         yield self.empty_event()

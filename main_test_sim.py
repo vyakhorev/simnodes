@@ -3,7 +3,7 @@ import datetime
 from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
 from model.nodes.classes.Node_func import cNode_func, cNode_agent, cNode_hub
-from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode
+from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode
 from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
@@ -16,31 +16,30 @@ if __name__ == '__main__':
     the_model = cNodeFieldModel()
     node1 = cAgentNode('MatFlow')
     node2 = cHubNode('CondNode')
-    node3 = cAgentNode('ApplyPrice1')
-    node4 = cAgentNode('ApplyPrice2')
-    node5 = cAgentNode('ApplyPrice3')
+    node3 = cFuncNode('ApplyPrice1')
+    node4 = cFuncNode('ApplyPrice2')
+    node5 = cFuncNode('ApplyPrice3')
+    node6 = cAgentNode('Consumer')
 
     # Set some tasks to start-up
     items = [cDelivery('matflow1', urgent=True, start_time=15), cDelivery('matflow2'),
-             cDelivery('matflow3', True), cDelivery('matflow4'),
+             cDelivery('matflow3', True), cDelivery('matflow4'), cTask('Unusual'),
              cDelivery('matflow5', late=True, start_time=8), cDelivery('matflow6', urgent=True),
              cDelivery('matflow7'), cDelivery('matflow8'),
              cTask('UrgentInfo', urgent=True), cDelivery('Gold', expertise=True),
              cTask('Copper', expertise=True)]
     node1.set_tasks(items)
     node2.connect_nodes(inp_nodes=[node1], out_nodes=[node3, node4, node5])
+    node6.connect_buddies([node3, node4, node5])
 
-    some_dict = {node3: 'urgent == True',
-                 node4: 'expertise == True',
-                 node5: 'late == True'}
-    node2.condition(some_dict)
-    # node2.condition(node3='urgent == True',
-    #                 node4='expertise == True',
-    #                 node5='late == True')
+    cond_dict = {node3: 'urgent = True',
+                 node4: 'expertise = True',
+                 node5: 'start_time > 7'}
+    node2.condition(cond_dict)
 
     # node1.connect_buddies([node2, node3, node4])
 
-    the_model.addNodes([node1, node2, node3, node4, node5])
+    the_model.addNodes([node1, node2, node3, node4, node5, node6])
 
     #
     # client1_supply_line = cNodeClientSupplyLine("client1")
