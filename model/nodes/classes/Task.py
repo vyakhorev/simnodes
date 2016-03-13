@@ -50,6 +50,9 @@ class TaskMonitor:
     def __init__(self):
         self.task_dict = []
 
+    def reset_task_monitor(self):
+        self.task_dict = []
+
     def add_task(self, rec):
         self.task_dict.append(rec)
 

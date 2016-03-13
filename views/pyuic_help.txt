@@ -1,1 +1,4 @@
 C:\Ilua\Nodes\Nodes_v02\View>pyuic5.bat -o ui_v01_draft.py -x ui_v01.ui
+
+C:\Ilua\Nodes\Nodes_v02\View>c:\Python34\Lib\site-packages\PyQt5\pyuic5.bat  -o Main_Gui_v02_draft.py -x Main_Gui_v02.ui
+

@@ -338,9 +338,12 @@ class cOnetoOneOutQueue(cSimPort):
     def gen_push_job(self):
         while True:
             msg = yield self.port_to_place.get()
+            # FIXME causes error if no output nodes
+
             neigh = list(self.connected_ports.values())[0]
             queue = neigh.get_fetch_queue(self)
             queue.put(msg)
+
 
         yield self.empty_event()
 

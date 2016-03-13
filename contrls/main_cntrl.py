@@ -12,6 +12,12 @@ import math
 from random import randint
 from views.Main_Gui_v01 import c_MainView
 from model.model import cNodeFieldModel
+from open_file import open_nodes, run_sim
+
+from model.nodes.classes.Task import cTask
+from model.nodes.utils import project_parser
+
+import datetime
 
 
 class c_BaseNodes():
@@ -20,6 +26,7 @@ class c_BaseNodes():
         First , its instancing Scene object from Pyqt5
         Then making signals-slots connections and starting node assembler
     """
+    SIM_RUNS_TOTAL = 0
 
     def __init__(self, model, main_view):
 
@@ -37,10 +44,13 @@ class c_BaseNodes():
         self.set_scene(self.Nodegraph)
 
         # Data logic START ===========
-        self.assembler = c_nodeAssembler(model)
-        print(self.assembler)
+        # current project
+        self.current_proj = None
+
+        # self.assembler = c_nodeAssembler(model)
+        # print(self.assembler)
         # Drawing nodes on screen
-        self.assembler.draw(self.Nodegraph)
+        # self.assembler.draw(self.Nodegraph)
         # =============================
 
     def open_new_tab(self):
@@ -58,6 +68,58 @@ class c_BaseNodes():
         self.scene = scene
         self.view.set_scene(self.scene)
 
+    def resetNodeGraph(self):
+        """
+        Reset NodeGraph
+        """
+        # TODO check if old c_NodeGraph instance deleted
+        print('RESET NODEGRAPH')
+        self.Nodegraph = c_NodeGraph()
+
+        # Linking signals to controller
+        self.Nodegraph.node_doubletapped.connect(self.on_double_clicked)
+        self.set_scene(self.Nodegraph)
+        return True
+
+# Working with projects
+# ==================================================================
+    def open_project(self):
+        """
+        mocking file opening
+        """
+        self.project_model = open_nodes()
+        self.current_proj = self.project_model
+        self.assembler = c_nodeAssembler(self.project_model)
+        self.resetNodeGraph()
+        self.assembler.draw(self.Nodegraph)
+
+    def open_file(self):
+        file_string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
+        data = project_parser.parse_json(file_string)
+        Cg = project_parser.CodeGenerator(data)
+        nodes = Cg.make_objects()
+        Cg.connect_between(nodes)
+        Cg.setup_conditions(nodes)
+
+        self.model.addNodes(nodes)
+
+        self.current_proj = self.model
+        self.assembler = c_nodeAssembler(self.current_proj)
+        self.resetNodeGraph()
+        self.assembler.draw(self.Nodegraph)
+
+
+    def run_current_proj(self):
+        self.SIM_RUNS_TOTAL += 1
+        print('Going run simulation')
+        run_sim(self.current_proj)
+        print('Simulations number : {}'.format(self.SIM_RUNS_TOTAL))
+        # clear task monitor from old tasks
+        if cTask:
+            cTask.tm.reset_task_monitor()
+
+# ==================================================================
+
     # called from view class
     def change_running(self, checked):
         # put control logic here
@@ -71,14 +133,15 @@ class c_BaseNodes():
         """
         print('i managed to get signal from !!!' + str(node))
 
-        if node.name == 'DSM':
+        if node.name == 'MatFlow':
             self.node_pres = FactoryWidget(node)
 
         elif node.name == 'MTS':
             self.node_pres = ClientWidget(node)
 
         else:
-            self.node_pres = NodeBaseWidget(node)
+            self.node_pres = FactoryWidget(node)
+            # self.node_pres = NodeBaseWidget(node)
         self.view.new_tab(node.name, self.node_pres)
 
 
@@ -90,7 +153,6 @@ class c_NodeGraph(QGraphicsScene):
     """
     # Custom signals
     node_doubletapped = pyqtSignal(object)
-
 
     def __init__(self):
         self.elements = []
@@ -237,7 +299,6 @@ class c_Node(QGraphicsRectItem):
         return QGraphicsItem.itemChange(self, change, value)
 
 
-
 class c_Port(QGraphicsEllipseItem):
     """
         Port base class
@@ -305,8 +366,8 @@ class c_ConLine(QGraphicsLineItem):
         if not self.source or not self.dest:
             return
 
-        line = QLineF(self.mapFromItem(self.source, 0, 0),
-                self.mapFromItem(self.dest, 0, 0))
+        line = QLineF(self.mapFromItem(self.source, self.source.width/2, 3),
+                self.mapFromItem(self.dest, self.dest.width/2, -3))
         #print('map from {0} item : {1}'.format(self.source, self.mapFromItem(self.source, 0, 0)))
         #print('map from {0} item : {1}'.format(self.dest, self.mapFromItem(self.dest, 0, 0)))
         length = line.length()
@@ -399,13 +460,26 @@ class FactoryWidget(NodeBaseWidget):
             if key not in ['parent', 'name']:
                 fields[QLabel(key)] = val
 
-
         for label, lineedit in fields.items():
             print(label, lineedit)
             label.setAlignment(Qt.AlignTop)
-            # lineedit.setAlignment(Qt.AlignTop)
-            self.layout().addWidget(label)
-            self.layout().addWidget(QLineEdit(str(lineedit)))
+            label.setMinimumWidth(100)
+
+            second_field = QLineEdit(str(lineedit))
+            second_field.setMaximumWidth(650)
+
+            self.small_horiz_widget = QHBoxLayout()
+            self.small_horiz_widget.addWidget(label)
+            self.small_horiz_widget.addWidget(second_field)
+
+            self.hor_widget = QFrame()
+            self.hor_widget.setMaximumWidth(800)
+            self.hor_widget.setLayout(self.small_horiz_widget)
+
+            self.layout().addWidget(self.hor_widget)
+
+            # self.layout().addWidget(label)
+            # self.layout().addWidget(QLineEdit(str(lineedit)))
 
 
 class ClientWidget(NodeBaseWidget):
@@ -437,25 +511,51 @@ class c_nodeAssembler():
         print('2nd method ', self.Tree.getNodes())
         # for node in self.Tree.getTree():
         # rootNode = None
-        rootNode = c_Node(self.Tree.getNodes()[1].name)
+        datamodel_viewmodel_dict = {}
+
 
         for node in self.Tree.getNodes():
-            print(node)
-            print(' !!! ', node.parent)
-            if node.parent is None:
-                rootNode = c_Node(node.name, node)
-                rootNode.my_setPos(100, 100+randint(0, 1)*120)
-                Nodegraph.addItem(rootNode)
-            else:
-                some_node = c_Node(node.name, node)
-                some_node.my_setPos(100+randint(-200, 200), 100+randint(2, 3)*120)
-                Nodegraph.addItem(some_node)
-                print(' OOO {} , {}'.format(rootNode, some_node))
-                try:
-                    Con = Nodegraph.connection(node2=rootNode, node1=some_node)
-                    Nodegraph.addItem(Con)
-                except Exception as e:
-                    print('[Exception] {}'.format(e))
+            some_node = c_Node(node.name, node)
+            # print(node.name)
+            datamodel_viewmodel_dict[node.name] = some_node
+            some_node.my_setPos(100+randint(-300, 300), 100+randint(2, 4)*120)
+            Nodegraph.addItem(some_node)
+
+
+        for node in self.Tree.getNodes():
+            if hasattr(node, 'parent'):
+                if isinstance(node.parent, list):
+                    for par_i in node.parent:
+                        Con = Nodegraph.connection(node2=datamodel_viewmodel_dict[par_i.name],
+                                                   node1=datamodel_viewmodel_dict[node.name])
+                        Nodegraph.addItem(Con)
+                else:
+                    try:
+                        Con = Nodegraph.connection(node2=datamodel_viewmodel_dict[node.parent.name],
+                                                   node1=datamodel_viewmodel_dict[node.name])
+                        Nodegraph.addItem(Con)
+                    except Exception as e:
+                        print('[Exception] {}'.format(e))
+
+        # rootNode = c_Node(self.Tree.getNodes()[1].name)
+        #
+        # for node in self.Tree.getNodes():
+        #     print(node)
+        #     print(' !!! ', node.parent)
+        #     if node.parent is None:
+        #         rootNode = c_Node(node.name, node)
+        #         rootNode.my_setPos(100, 100+randint(0, 1)*120)
+        #         Nodegraph.addItem(rootNode)
+        #     else:
+        #         some_node = c_Node(node.name, node)
+        #         some_node.my_setPos(100+randint(-200, 200), 100+randint(2, 3)*120)
+        #         Nodegraph.addItem(some_node)
+        #         print(' OOO {} , {}'.format(rootNode, some_node))
+        #         try:
+        #             Con = Nodegraph.connection(node2=rootNode, node1=some_node)
+        #             Nodegraph.addItem(Con)
+        #         except Exception as e:
+        #             print('[Exception] {}'.format(e))
 
 
 
@@ -479,3 +579,17 @@ class c_nodeAssembler():
     # def __repr__(self):
     #     string = [(k, v) for k, v in self.Tree.getTree().items()]
     #     return str(string)
+
+
+if __name__ == '__main__':
+    file_string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
+    data = project_parser.parse_json(file_string)
+    Cg = project_parser.CodeGenerator(data)
+    nodes = Cg.make_objects()
+    Cg.connect_between(nodes)
+    Cg.setup_conditions(nodes)
+    model = cNodeFieldModel()
+
+    model.addNodes(nodes)
+
+    loganddata, runner = model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)

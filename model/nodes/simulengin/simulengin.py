@@ -166,6 +166,7 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
             proc._desc = self.get_proc_repr(repr)
         return proc
 
+
     def timeout(self, T):
         return self.simpy_env.timeout(T)
 

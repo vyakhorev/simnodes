@@ -13,10 +13,11 @@ import sys
 import math
 from random import randint
 # generated views
-from views.gen.Main_Gui_v01_draft import Ui_MainWindow
+from views.gen.Main_Gui_v02_draft import Ui_MainWindow
 
 
 class c_MainView(QMainWindow):
+    i = 0
 
     # properties to read/write widget value
     # Kinda this:
@@ -54,6 +55,7 @@ class c_MainView(QMainWindow):
 
         # self.ui.pushButton_running.clicked.connect(self.on_running)
 
+
     def set_scene(self, scene):
         self.ui.mainView.setScene(scene)
 
@@ -64,10 +66,15 @@ class c_MainView(QMainWindow):
         self.ui.wgMain.addTab(self.tab1, nodename)
 
     def connectSignals(self, main_ctrl):
-
+        self.i += 1
+        if self.i >= 2:
+            print('Cant connecnt many times! {}'.format(self.i))
         self.ui.butAddnode.clicked.connect(main_ctrl.addNode)
         self.ui.butConnect.clicked.connect(main_ctrl.connection)
+        # FIXME will raise error
         self.ui.butParam.clicked.connect(main_ctrl.open_new_tab)
+        self.ui.butOpen.clicked.connect(main_ctrl.open_file)
+        self.ui.butRunSim.clicked.connect(main_ctrl.run_current_proj)
 
     def wheelEvent(self, event):
         """

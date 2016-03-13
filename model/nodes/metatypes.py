@@ -103,11 +103,13 @@ class mtQueue():
         somestore.parent = self.parent
         return somestore
 
+
 class mtFilteredQueue():
     _simulatable = True
 
-    def __init__(self, *args):
+    def __init__(self, parent=None, *args):
         self.proxylist = deque()
+        self.parent = parent
         for el in args:
             self.proxylist(el)
 
@@ -117,9 +119,11 @@ class mtFilteredQueue():
     def give_sim_analog(self, simpy_env):
         """ Create Simpy.FilteredStore obj for self.proxylist"""
         somestore = simpy.FilterStore(simpy_env)
+        somestore.parent = self.parent
         for el in self.proxylist:
             somestore.put(el)
         return somestore
+
 
 class mtPile():
     _simulatable = True
@@ -141,6 +145,7 @@ class mtPile():
         if self.proxyLevel > 0:
             somePile.put(self.proxyLevel)
         return somePile
+
 
 class mtPileAccount():
     _simulatable = True
@@ -166,13 +171,16 @@ class mtPileAccount():
             new_accounts.accounts[dim] = val.give_sim_analog(simpy_env)
         return new_accounts
 
+
 class cSimPileAccount():
     def __init__(self, simpy_env):
         self.simpy_env = simpy_env
         self.accounts = {}
 
+
 class nQueue(Typed):
     _expected_type = simpy.Store
+
 
 class nPile(Typed):
     _expected_type = simpy.Container

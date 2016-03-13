@@ -1,0 +1,72 @@
+{
+"Root" : {
+	"directoty_path" : "C/...",
+	"graph_settings" : "HD"
+},
+
+"AgentType" : {
+	"name": "MatFlow",
+	"id" : "cAgentNode_1",
+	"pos" : [100, 100],
+	"buddies" : [],
+	"tasks" : {
+		"cDelivery" : {
+			"name" : "matflow1",
+			"urgent" : "True",
+			"start_time" : 15
+		},
+		"cTask" : {
+			"name" : "UrgentInfo" ,
+			"urgent" : "True"
+		},
+        "cDelivery2" : {
+			"name" : "OIL" ,
+			"expertise" : "True"
+		}
+
+	}
+},
+
+"HubType" : {
+  "name": "CondNode",
+  "id" : "cHubNode_1",
+  "pos": [180, 100],
+  "buddies": ["cAgentNode_1"],
+  "inp_nodes":["cAgentNode_1"],
+  "out_nodes":["cFuncNode_1","cFuncNode_2","cFuncNode_3"],
+  "conditions" :{
+      "cFuncNode_1" : "urgent = True",
+      "cFuncNode_2" : "expertise = True",
+      "cFuncNode_3" : "start_time > 7"
+  }
+},
+
+"FuncType" :{
+  "name": "ApplyPrice1",
+  "id" : "cFuncNode_1",
+  "pos": [100, 50],
+  "buddies": ["cHubNode_1"]
+
+},
+"FuncType1" :{
+  "name": "ApplyPrice2",
+  "id" : "cFuncNode_2",
+  "pos": [100, 50],
+  "buddies": ["cHubNode_1"]
+
+},
+"FuncType2" :{
+  "name": "ApplyPrice3",
+  "id" : "cFuncNode_3",
+  "pos": [100, 50],
+  "buddies": ["cHubNode_1"]
+
+},
+"AgentType2" :{
+	"name": "Consumer",
+	"id" : "cAgentNode_2",
+	"pos" : [200, 100],
+	"buddies" : ["cFuncNode_1","cFuncNode_2","cFuncNode_3"]
+}
+
+}

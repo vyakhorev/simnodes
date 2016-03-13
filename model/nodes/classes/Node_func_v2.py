@@ -13,25 +13,27 @@ from itertools import chain
 from random import choice, randint
 from collections import namedtuple
 
-
-
 # Node types :
-class AgentType:
-    type = 'Agent'
+class NodeType(type):
+    def __str__(cls):
+        return cls.mystr
 
-class HubType:
-    type = 'Hub'
+Registry = {}
+class AgentType(metaclass=NodeType):
+    mystr = 'AgentType'
 
-class FuncType:
-    type = 'Func'
+class HubType(metaclass=NodeType):
+    mystr = 'HubType'
 
-class SinkType:
-    type = 'Sink'
+class FuncType(metaclass=NodeType):
+    mystr = 'FuncType'
+
+class SinkType(metaclass=NodeType):
+    mystr = 'SinkType'
 
 node_types = {AgentType, HubType, FuncType, SinkType}
 
-
-class cNodeBase:
+class cNodeBase():
     """
     Node's type-free logic here.
     Compound class, don't call it directly
@@ -64,7 +66,7 @@ class cAgentNode(cNodeBase, cSimNode):
         Multiple inputs--->[AGENT]
                        <---
     """
-    NodeType = AgentType
+    myType = AgentType
 
     def __init__(self, name):
         super(cAgentNode, self).__init__(name)
@@ -84,6 +86,8 @@ class cAgentNode(cNodeBase, cSimNode):
     def connect_buddies(self, buddies):
         self.connected_buddies += buddies
         for bud in self.connected_buddies:
+            print(self.connected_buddies)
+            print(bud)
             bud.connected_buddies += [self]
             # TODO make one-one port in agent and connect many-one to one-one
             self.in_orders.connect_to_port(bud.out_orders)
@@ -178,7 +182,7 @@ class cHubNode(cNodeBase, cSimNode):
     """
         ?? 1 input--->[HUB]--->Multiple outputs
     """
-    NodeType = HubType
+    myType = HubType
 
     def __init__(self, name, inp_nodes=None, out_nodes=None):
         self.input_node = inp_nodes
@@ -194,6 +198,8 @@ class cHubNode(cNodeBase, cSimNode):
 
         self.connected_buddies = []
         self.debug_on = True
+
+        self.pushing = True
 
         self.conditions_dict = {}
 
@@ -297,7 +303,7 @@ class cFuncNode(cNodeBase, cSimNode):
     """
       input(1) ---> [FUNC] ---> output(1)
     """
-    NodeType = FuncType
+    myType = FuncType
 
     def __init__(self, name, inp_node=None, out_node=None):
         self.input_node, self.out_node = inp_node, out_node
@@ -315,13 +321,15 @@ class cFuncNode(cNodeBase, cSimNode):
 
     def connect_nodes(self, inp_node, out_node):
         self.input_node, self.out_node = inp_node, out_node
-        self.connected_buddies += [inp_node, out_node]
+        self.connected_buddies += [inp_node]
 
         self.in_orders.connect_to_port(inp_node.out_orders)
         inp_node.connected_buddies += [self]
 
-        self.out_orders.connect_to_port(out_node.in_orders)
-        out_node.connected_buddies += [self]
+        if out_node:
+            self.connected_buddies += [out_node]
+            self.out_orders.connect_to_port(out_node.in_orders)
+            out_node.connected_buddies += [self]
 
     def _action(self, task):
         task.tags = '#I_was_in {}'.format(self.name)
@@ -335,6 +343,7 @@ class cFuncNode(cNodeBase, cSimNode):
             tsk = msg.uows
             success = self._action(tsk)
             if success:
+                # FIXME bad
                 msg = [tsk, self, [self.connected_buddies[1]]]
                 self.messages.append(msg)
             else:
@@ -358,3 +367,7 @@ class cFuncNode(cNodeBase, cSimNode):
             self.as_process(self.gen_do_incoming_tasks())
 
         yield self.empty_event()
+
+node_types_dict = {'AgentType': cAgentNode,
+                   'HubType': cHubNode,
+                   'FuncType': cFuncNode}
