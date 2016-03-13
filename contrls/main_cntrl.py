@@ -100,6 +100,7 @@ class c_BaseNodes():
         nodes = Cg.make_objects()
         Cg.connect_between(nodes)
         Cg.setup_conditions(nodes)
+        Cg.color_maping(nodes)
 
         self.model.addNodes(nodes)
 
@@ -247,6 +248,7 @@ class c_Node(QGraphicsRectItem):
 
         self.ConList = []
 
+
         # Properties
         self.setFlags(self.ItemIsSelectable |
                       self.ItemIsMovable |
@@ -283,6 +285,23 @@ class c_Node(QGraphicsRectItem):
 
     def get_node_dim(self):
         return self.width, self.height
+
+    # def paint(self, painter, option, widget):
+    #     try:
+    #         self.setBrush(QBrush=Qt.red)
+    #         super(c_Node, self).paint(self, painter, option, widget)
+    #     except Exception as e:
+    #         print(e)
+
+    def set_Color(self, color):
+        if color.lower() == 'green':
+            qtcolor = QColor(84, 192, 58)
+        if color.lower() == 'blue':
+            qtcolor = QColor(26, 64, 134)
+        if color.lower() == 'orange':
+            qtcolor = QColor(250, 155, 100)
+        Brush = QBrush(qtcolor)
+        self.setBrush(Brush)
 
     def addCon(self, Con_nodes):
         self.ConList.append(Con_nodes)
@@ -405,7 +424,7 @@ class c_ConLine(QGraphicsLineItem):
         if line.length() == 0.0:
             return
 
-        painter.setPen(QPen(Qt.green, 2, Qt.SolidLine, Qt.RoundCap,
+        painter.setPen(QPen(Qt.black, 2, Qt.SolidLine, Qt.RoundCap,
                             Qt.RoundJoin))
         painter.drawLine(line)
 
@@ -513,14 +532,13 @@ class c_nodeAssembler():
         # rootNode = None
         datamodel_viewmodel_dict = {}
 
-
         for node in self.Tree.getNodes():
             some_node = c_Node(node.name, node)
             # print(node.name)
             datamodel_viewmodel_dict[node.name] = some_node
             some_node.my_setPos(100+randint(-300, 300), 100+randint(2, 4)*120)
+            some_node.set_Color(node.color)
             Nodegraph.addItem(some_node)
-
 
         for node in self.Tree.getNodes():
             if hasattr(node, 'parent'):

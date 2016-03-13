@@ -51,7 +51,6 @@ class CodeGenerator:
                         # looping for attributes
                         for attr_i, val_i in vals.items():
                             print(attr_i, val_i)
-                            # TODO add conditions
                             if attr_i == 'tasks':
                                 # unpacking tasks
                                 tasks_list = []
@@ -125,6 +124,14 @@ class CodeGenerator:
 
                 nd_i.condition(temp_dict)
 
+    def color_maping(self, nodes):
+        for nd_i in nodes:
+            if isinstance(nd_i, cHubNode):
+                nd_i.color = 'Green'
+            elif isinstance(nd_i, cAgentNode):
+                nd_i.color = 'Blue'
+            elif isinstance(nd_i, cFuncNode):
+                nd_i.color = 'Orange'
         """
         # TODO refactor this wrong function
         for nd_i in nodes:
@@ -166,6 +173,7 @@ if __name__ == '__main__':
     print('cg.nodes_alias_dict', cg.nodes_alias_dict)
     cg.connect_between(objects)
     cg.setup_conditions(objects)
+    cg.color_maping(objects)
     [print((nd.name, nd.connected_buddies)) for nd in objects]
     print(' -------- ')
     [pprint(vars(nd)) for nd in objects]
