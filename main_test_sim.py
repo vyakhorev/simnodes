@@ -3,7 +3,7 @@ import datetime
 from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
 from model.nodes.classes.Node_func import cNode_func, cNode_agent, cNode_hub
-from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode
+from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, Registry
 from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
@@ -118,13 +118,14 @@ if __name__ == '__main__':
     # node1.send_msg_to(node2)
     # node2.send_msg_to(node4)
     # node2.send_msg_to(node3)
-    node2.parent = node1
-    node3.parent = node2
-    node4.parent = node2
-    node5.parent = node2
-    node7.parent = node6
-    node1.parent = node7
-    Main_Nodes.run(model=the_model)
+    # node2.parent = node1
+    # node3.parent = node2
+    # node4.parent = node2
+    # node5.parent = node2
+    # node7.parent = node6
+    # node1.parent = node7
+    # node6.parent = [node3, node4, node5]
+    # Main_Nodes.run(model=the_model)
     # print(the_model.getNodes())
     print('********************************')
     print('********START SIMULATION********')
@@ -132,7 +133,8 @@ if __name__ == '__main__':
     loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)
 
     # Plot processes
-    # pm = cProcessMonitor(runner.system.simpy_env, until=25)
+    pm = cProcessMonitor(runner.system.simpy_env, until=25)
+    # print(id(runner.system.simpy_env))
     # pm.plot_procs_groups()
     # pm.plot_event_density()
     # pm.print_process()
