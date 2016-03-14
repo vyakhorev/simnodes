@@ -70,15 +70,15 @@ class CodeGenerator:
                                         new_task = cDelivery(name='None')
                                         # loop for task attributes
                                         for task_attr_name, task_attr_val in attrs_dict_i.items():
-                                            if task_attr_val in ['true', 'True', 'false', 'False']:
-                                                task_attr_val = Bool_dict[task_attr_val]
+                                            if task_attr_val in ['true', 'false', 'True', 'False']:
+                                                task_attr_val = Bool_dict[task_attr_val.lower()]
                                             setattr(new_task, task_attr_name, task_attr_val)
 
                                     if task_class_name_i == 'cTask':
                                         new_task = cTask(name='None')
                                         # loop for task attributes
                                         for task_attr_name, task_attr_val in attrs_dict_i.items():
-                                            if task_attr_val.lower() in ['true', 'false']:
+                                            if task_attr_val in ['true', 'false', 'True', 'False']:
                                                 task_attr_val = Bool_dict[task_attr_val.lower()]
                                             setattr(new_task, task_attr_name, task_attr_val)
 
@@ -171,7 +171,6 @@ if __name__ == '__main__':
     cg = CodeGenerator(data)
     the_model = cNodeFieldModel()
     # the_model.addNodes()
-    cg.set_model(the_model)
     objects = cg.make_objects()
     print('objects', objects)
     print('cg.nodes_alias_dict', cg.nodes_alias_dict)
