@@ -1,0 +1,59 @@
+{
+"Root" : {
+	"directory_path" : "C/...",
+	"graph_settings" : "HD"
+},
+
+"AgentType1" : {
+	"name": "MatFlow",
+	"id" : "cAgentNode_1",
+	"pos" : [100, 100],
+	"buddies" : ["cHubNode_1"],
+	"tasks" : {
+		"cDelivery1" : {
+			"name" : "matflow1",
+			"urgent" : "True",
+			"start_time" : 15
+		},
+		"cDelivery2" : {
+			"name" : "matflow2" ,
+			"start_time" : 11
+		},
+        "cDelivery3" : {
+			"name" : "OIL" ,
+			"expertise" : "True"
+		},
+	  	"cDelivery4": {
+		  	"name": "matflow6",
+		  	"urgent" : "True"
+		}
+
+	}
+},
+
+"AgentType2" :{
+	"name": "MatEat1",
+	"id" : "cAgentNode_2",
+	"pos" : [200, 100],
+	"buddies" : ["cHubNode_1"]
+},
+
+"AgentType3" :{
+	"name": "MatEat2",
+	"id" : "cAgentNode_3",
+	"pos" : [200, 100],
+	"buddies" : ["cHubNode_1"]
+},
+
+"HubType1": {
+    "name": "CondNode",
+    "id": "cHubNode_1",
+    "buddies": [],
+    "inp_nodes":["cAgentNode_1"],
+    "out_nodes":["cAgentNode_2","cAgentNode_3"],
+    "conditions" :{
+      "randomize" : "True"
+  }
+}
+
+}

@@ -322,6 +322,8 @@ class cOnetoOneOutQueue(cSimPort):
         self.queue_local_jobs = metatypes.mtQueue(self)
         self.wrong_jobs = metatypes.mtQueue(self)
 
+        # self.pinned_queue = None
+
     def init_sim(self):
         super().init_sim()
 
@@ -335,15 +337,32 @@ class cOnetoOneOutQueue(cSimPort):
     def port_to_place(self):
         return self._queue_output
 
+    def connect_to_port(self, another_port):
+        if another_port.port_id in self.connected_ports:
+            print('Failed to connect !! ')
+            return
+
+        elif len(self.connected_ports) > 0:
+            raise AttributeError('{} Coudnt connect to many ports'.format(self))
+
+        print('connecting {} with {} port_id to {} with {} port_id '.format(self, self.port_id, another_port,
+                                                                            another_port.port_id))
+
+        self.connected_ports[another_port.port_id] = another_port
+        another_port.connected_ports[self.port_id] = self
+
+        print(self.connected_ports)
+        return True
+
     def gen_push_job(self):
         while True:
             msg = yield self.port_to_place.get()
             # FIXME causes error if no output nodes
+            print('self.connected_ports.values()', self.connected_ports.values())
 
             neigh = list(self.connected_ports.values())[0]
             queue = neigh.get_fetch_queue(self)
             queue.put(msg)
-
 
         yield self.empty_event()
 

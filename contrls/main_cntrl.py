@@ -18,6 +18,7 @@ from model.nodes.classes.Task import cTask
 from model.nodes.utils import project_parser
 
 import datetime
+from pprint import pprint
 
 
 class c_BaseNodes():
@@ -40,6 +41,8 @@ class c_BaseNodes():
         # Linking signals to controller
         self.view.connectSignals(self)
         self.Nodegraph.node_doubletapped.connect(self.on_double_clicked)
+        # self.Nodegraph.nodegraph_rightclick.connect(self.on_right_click)
+
 
         self.set_scene(self.Nodegraph)
 
@@ -68,6 +71,10 @@ class c_BaseNodes():
         self.scene = scene
         self.view.set_scene(self.scene)
 
+    def openContextMenu(self, position):
+        mapped_pos = self.view.mapToGlobal(QPoint(position)+QPoint(21, 62))
+        menu = ContexMenu(mapped_pos)
+
     def resetNodeGraph(self):
         """
         Reset NodeGraph
@@ -94,12 +101,13 @@ class c_BaseNodes():
         self.assembler.draw(self.Nodegraph)
 
     def open_file(self):
-        file_string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
+        file_string = 'new_way/proj_file_4_agents.json'
         data = project_parser.parse_json(file_string)
         Cg = project_parser.CodeGenerator(data)
         nodes = Cg.make_objects()
         Cg.connect_between(nodes)
         Cg.setup_conditions(nodes)
+        Cg.convert_alias_to_nodeclass(nodes)
         Cg.color_maping(nodes)
 
         self.model.addNodes(nodes)
@@ -108,7 +116,6 @@ class c_BaseNodes():
         self.assembler = c_nodeAssembler(self.current_proj)
         self.resetNodeGraph()
         self.assembler.draw(self.Nodegraph)
-
 
     def run_current_proj(self):
         self.SIM_RUNS_TOTAL += 1
@@ -145,6 +152,10 @@ class c_BaseNodes():
             # self.node_pres = NodeBaseWidget(node)
         self.view.new_tab(node.name, self.node_pres)
 
+    @pyqtSlot()
+    def on_right_click(self, pos):
+        print('RIGHT Click Pos :', pos)
+        self.view.menu(pos)
 
 # QGraphics objects/classes here
 # ================================================================= #
@@ -154,6 +165,7 @@ class c_NodeGraph(QGraphicsScene):
     """
     # Custom signals
     node_doubletapped = pyqtSignal(object)
+    nodegraph_rightclick = pyqtSignal(object)
 
     def __init__(self):
         self.elements = []
@@ -230,6 +242,15 @@ class c_NodeGraph(QGraphicsScene):
         else:
             print('You didnt hit a node!')
 
+    # Right-click contex menu
+
+    def contextMenuEvent(self, event):
+        # pprint(event.__dir__())
+        posx, posy = event.scenePos().x(), event.scenePos().y()
+        print('Right Mouse Click @ x:{} y:{}'.format(posx, posy))
+
+        # self.nodegraph_rightclick.emit(QPoint(posx, posy))
+
     def __repr__(self):
         return 'elements :  ' + str(self.elements)
 
@@ -304,8 +325,8 @@ class c_Node(QGraphicsRectItem):
         if color.lower() == 'orange':
             qtcolor = QColor(250, 155, 100)
 
-        gradient.setColorAt(1, qtcolor)
-        gradient.setColorAt(0, qtcolor.darker(160))
+        gradient.setColorAt(0, qtcolor)
+        gradient.setColorAt(1, qtcolor.darker(160))
         Brush = QBrush(gradient)
         self.setBrush(Brush)
 
@@ -454,6 +475,7 @@ class c_ConLine(QGraphicsLineItem):
 
 # ================================================================= #
 # ===== Testing some Widgets here ================================= #
+
 class NodeBaseWidget(QWidget):
     def __init__(self, node):
         super().__init__(None)
@@ -471,6 +493,7 @@ class NodeBaseWidget(QWidget):
 
         # my_splitter = QSplitter()
         # self.layout().addWidget(my_splitter)
+
 
 class FactoryWidget(NodeBaseWidget):
     def __init__(self, node):
@@ -517,8 +540,14 @@ class ClientWidget(NodeBaseWidget):
 
 
 # ================================================================= #
-
-
+# Context Menu
+class ContexMenu(QMenu):
+    def __init__(self, position):
+        super().__init__()
+        self.addAction('Create AgentNode')
+        self.addAction('Create HubNode')
+        self.addAction('Create FuncNoe')
+        self.exec_(position)
 
 # Processing a model
 # ================================================================= #
@@ -543,7 +572,10 @@ class c_nodeAssembler():
             # print(node.name)
             datamodel_viewmodel_dict[node.name] = some_node
             some_node.my_setPos(100+randint(-300, 300), 100+randint(2, 4)*120)
-            some_node.set_Color(node.color)
+            try:
+                some_node.set_Color(node.color)
+            except Exception as e:
+                print('!!!!!!!', e)
             Nodegraph.addItem(some_node)
 
         for node in self.Tree.getNodes():
@@ -561,58 +593,16 @@ class c_nodeAssembler():
                     except Exception as e:
                         print('[Exception] {}'.format(e))
 
-        # rootNode = c_Node(self.Tree.getNodes()[1].name)
-        #
-        # for node in self.Tree.getNodes():
-        #     print(node)
-        #     print(' !!! ', node.parent)
-        #     if node.parent is None:
-        #         rootNode = c_Node(node.name, node)
-        #         rootNode.my_setPos(100, 100+randint(0, 1)*120)
-        #         Nodegraph.addItem(rootNode)
-        #     else:
-        #         some_node = c_Node(node.name, node)
-        #         some_node.my_setPos(100+randint(-200, 200), 100+randint(2, 3)*120)
-        #         Nodegraph.addItem(some_node)
-        #         print(' OOO {} , {}'.format(rootNode, some_node))
-        #         try:
-        #             Con = Nodegraph.connection(node2=rootNode, node1=some_node)
-        #             Nodegraph.addItem(Con)
-        #         except Exception as e:
-        #             print('[Exception] {}'.format(e))
-
-
-
-        '''
-        for Client, vars in sorted(self.Tree.getTree().items(), key=lambda x: x[1]):
-            if vars[1] is None:
-                # rootNode = Nodegraph.addNode(Client, px=100, py=100+vars[0]*120)
-                rootNode = c_Node(Client)
-                rootNode.my_setPos(100, 100+vars[0]*120)
-                Nodegraph.addItem(rootNode)
-            else:
-                # some_node = Nodegraph.addNode(Client, px=100, py=100+vars[0]*120)
-                some_node = c_Node(Client)
-                some_node.my_setPos(100, 100+vars[0]*120)
-                Nodegraph.addItem(some_node)
-                Con = Nodegraph.connection(node2=rootNode, node1=some_node)
-                Nodegraph.addItem(Con)
-
-        print('NodeGraph Items: {0}'.format(Nodegraph.items()))
-        '''
-    # def __repr__(self):
-    #     string = [(k, v) for k, v in self.Tree.getTree().items()]
-    #     return str(string)
-
 
 if __name__ == '__main__':
     # Testing model w/o Gui
-    file_string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
+    file_string = 'C:/Ilua/SimNodes_git/simnodes/new_way/proj_file_4_agents.json'
     data = project_parser.parse_json(file_string)
     Cg = project_parser.CodeGenerator(data)
     nodes = Cg.make_objects()
     Cg.connect_between(nodes)
     Cg.setup_conditions(nodes)
+    Cg.convert_alias_to_nodeclass(nodes)
     model = cNodeFieldModel()
 
     model.addNodes(nodes)

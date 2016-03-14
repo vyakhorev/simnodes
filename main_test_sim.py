@@ -2,17 +2,16 @@ import datetime
 
 from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
-from model.nodes.classes.Node_func import cNode_func, cNode_agent, cNode_hub
-from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, Registry
+# from model.nodes.classes.Node_func import cNode_func, cNode_agent, cNode_hub
+from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cAgentNodeSimple
 from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
 
 import Main_Nodes
 
-if __name__ == '__main__':
-    # Create a model, run simulation, print log + iterate over nodes
 
+def Test1():
     the_model = cNodeFieldModel()
     node1 = cAgentNode('MatFlow')
     node2 = cHubNode('CondNode')
@@ -49,6 +48,83 @@ if __name__ == '__main__':
     node2.condition(cond_dict)
 
     the_model.addNodes([node1, node2, node3, node4, node5, node6, node7])
+
+    return the_model
+
+
+def Test2():
+    """
+    Modeling wrong use of 1to1 port
+    """
+    the_model = cNodeFieldModel()
+    node1 = cAgentNodeSimple('Matflow')
+    node2 = cAgentNodeSimple('MatEat1')
+    node3 = cAgentNodeSimple('MatEat2')
+    # this will cause error
+    node1.connect_buddies([node2, node3])
+
+    node2.connect_buddies([node1])
+    node3.connect_buddies([node1])
+
+    MatFlow_items = [cDelivery('matflow1', urgent=True, start_time=15), cDelivery('matflow2', start_time=11)]
+    node1.set_tasks(MatFlow_items)
+
+    the_model.addNodes([node1, node2, node3])
+
+    return the_model
+
+
+def Test3():
+    the_model = cNodeFieldModel()
+    node1 = cAgentNodeSimple('Matflow')
+    node2 = cAgentNodeSimple('MatEat1')
+    node3 = cAgentNodeSimple('MatEat2')
+    node4 = cHubNode('CondNode')
+
+    node1.connect_buddies([node4])
+    node2.connect_buddies([node4])
+    node3.connect_buddies([node4])
+    node4.connect_nodes(inp_nodes=[node1], out_nodes=[node2, node3])
+
+    MatFlow_items = [cDelivery('matflow1', urgent=True, start_time=15), cDelivery('matflow2', start_time=11)]
+    node1.set_tasks(MatFlow_items)
+
+    cond_dict = {node2: 'urgent = True',
+                 node3: 'start_time < 12'}
+    node4.condition(cond_dict)
+
+    the_model.addNodes([node1, node2, node3, node4])
+
+    return the_model
+
+
+def Test4():
+    """
+    Introducing random condition to Hub node
+    """
+    the_model = cNodeFieldModel()
+    node1 = cAgentNodeSimple('Matflow')
+    node2 = cAgentNodeSimple('MatEat1')
+    node3 = cAgentNodeSimple('MatEat2')
+    node4 = cHubNode('CondNode')
+
+    node1.connect_buddies([node4])
+    node2.connect_buddies([node4])
+    node3.connect_buddies([node4])
+    node4.connect_nodes(inp_nodes=[node1], out_nodes=[node2, node3])
+
+    MatFlow_items = [cDelivery('matflow1', urgent=True, start_time=15), cDelivery('matflow2', start_time=11),
+                     cTask('UrgentInfo', urgent=True), cDelivery('matflow6', urgent=True)]
+    node1.set_tasks(MatFlow_items)
+
+    node4.condition(randomize=True)
+
+    the_model.addNodes([node1, node2, node3, node4])
+
+    return the_model
+if __name__ == '__main__':
+    the_model = Test4()
+    # Create a model, run simulation, print log + iterate over nodes
 
     #
     # client1_supply_line = cNodeClientSupplyLine("client1")

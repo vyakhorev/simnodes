@@ -55,7 +55,6 @@ class c_MainView(QMainWindow):
 
         # self.ui.pushButton_running.clicked.connect(self.on_running)
 
-
     def set_scene(self, scene):
         self.ui.mainView.setScene(scene)
 
@@ -74,7 +73,12 @@ class c_MainView(QMainWindow):
         # FIXME will raise error
         self.ui.butParam.clicked.connect(main_ctrl.open_new_tab)
         self.ui.butOpen.clicked.connect(main_ctrl.open_file)
+
         self.ui.butRunSim.clicked.connect(main_ctrl.run_current_proj)
+
+        # setting up context menu
+        self.ui.mainView.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.mainView.customContextMenuRequested.connect(main_ctrl.openContextMenu)
 
     def wheelEvent(self, event):
         """
@@ -84,8 +88,8 @@ class c_MainView(QMainWindow):
         delta = event.angleDelta().y()
         factor = 1.35 ** (delta / 240.0)
         self.ui.mainView.scale(factor, factor)
-    # =====================================================
 
+    # =====================================================
 
     def on_running(self):
         self.main_ctrl.change_running(self.running)

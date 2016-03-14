@@ -1,12 +1,14 @@
 import json
 from pprint import pprint
 
-from model.nodes.classes.Node_func_v2 import node_types, cAgentNode, cHubNode, cNodeBase, cFuncNode, node_types_dict
+from model.nodes.classes.Node_func_v2 import cAgentNodeSimple, node_types, cAgentNode, cHubNode, cFuncNode, node_types_dict
+
 from model.model import cNodeFieldModel
 from model.nodes.classes.Task import cTask, cDelivery
 
 # string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file.json'
-string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
+# string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
+string = 'C:/Ilua/SimNodes_git/simnodes/new_way/proj_file_4_agents.json'
 
 
 Bool_dict = {'true': True,
@@ -19,7 +21,8 @@ def parse_json(filepath):
     :param filepath: str| path to JSON file
     :return: dict| multidimensional dictionary
     """
-    with open(string) as data_file:
+    print('got {}'.format(filepath))
+    with open(filepath) as data_file:
         data = json.load(data_file)
     return data
 
@@ -39,7 +42,7 @@ class CodeGenerator:
         Parsing all arguments from input dictionary
         :return: list| list of nodes objects
         """
-        print(node_types_dict)
+        # print(node_types_dict)
         nodes = []
         for nodetype, vals in self.data_dict.items():
             # JSON doesn't let you have identical field names,
@@ -48,6 +51,7 @@ class CodeGenerator:
 
             # we know such type ?
             if nodetype in {'AgentType', 'HubType', 'FuncType'}:
+
                 # check node types and create objects
                 for n_type_i in node_types:
                     if nodetype == str(n_type_i):
@@ -58,13 +62,14 @@ class CodeGenerator:
                         nodes += [node]
                         # looping for attributes
                         for attr_i, val_i in vals.items():
-                            print(attr_i, val_i)
+                            # print(attr_i, val_i)
                             if attr_i == 'tasks':
                                 # unpacking tasks
                                 tasks_list = []
                                 for task_class_name_i, attrs_dict_i in val_i.items():
                                     task_class_name_i = \
                                         ''.join(char for char in task_class_name_i if not char.isdigit())
+
                                     # Looking for task type
                                     if task_class_name_i == 'cDelivery':
                                         new_task = cDelivery(name='None')
@@ -108,17 +113,27 @@ class CodeGenerator:
         :return: True
         """
         for nd_i in nodes:
-            if isinstance(nd_i, cAgentNode):
-                for node_neigh in nd_i.buddies:
-                    nd_i.connect_buddies([self.nodes_alias_dict[node_neigh]])
-                    nd_i.parent = self.nodes_alias_dict[node_neigh]
+
+            if isinstance(nd_i, cAgentNodeSimple):
+                buddies = nd_i.buddies
+                for node_neigh in buddies:
+                    try:
+                        nd_i.connect_buddies([self.nodes_alias_dict[node_neigh]])
+                        nd_i.parent = self.nodes_alias_dict[node_neigh]
+                    except Exception as e:
+                        print(['EXCEPTION'], e)
+
             elif isinstance(nd_i, cHubNode):
                 for node_neigh in nd_i.inp_nodes:
-                    nd_i.connect_nodes(inp_nodes=[self.nodes_alias_dict[node_neigh]], out_nodes=[])
+                    nd_i.connect_nodes(inp_nodes=[self.nodes_alias_dict[node_neigh]])
                     nd_i.parent = self.nodes_alias_dict[node_neigh]
+
+                nodes_to_add = []
                 for node_neigh in nd_i.out_nodes:
-                    nd_i.connect_nodes(inp_nodes=[], out_nodes=[self.nodes_alias_dict[node_neigh]])
+                    nodes_to_add += [self.nodes_alias_dict[node_neigh]]
                     nd_i.parent = self.nodes_alias_dict[node_neigh]
+                nd_i.connect_nodes(out_nodes=nodes_to_add)
+
             elif isinstance(nd_i, cFuncNode):
                 for node_neigh in nd_i.buddies:
                     nd_i.connect_nodes(inp_node=self.nodes_alias_dict[node_neigh], out_node=None)
@@ -138,21 +153,43 @@ class CodeGenerator:
                 temp_dict = {}
                 print('im hub Node!')
                 print(nd_i.conditions)
-                for nodeid_alias, expression in nd_i.conditions.items():
-                    temp_dict[self.nodes_alias_dict[nodeid_alias]] = expression
+                # checking randomize
+                if 'randomize' in nd_i.conditions:
+                    if nd_i.conditions['randomize'].lower():
+                        nd_i.condition(randomize=True)
 
-                nd_i.condition(temp_dict)
+                else:
+                    for nodeid_alias, expression in nd_i.conditions.items():
+
+                        temp_dict[self.nodes_alias_dict[nodeid_alias]] = expression
+
+                    nd_i.condition(temp_dict)
+        return True
+
+    def convert_alias_to_nodeclass(self, nodes):
+        """
+        Convert node alias to nodeclass, example : 'cAgentNode_3 ->> MeatFlow (node id cAgentNode_3)
+        :param nodes: list | list of nodes
+        :return: True
+        """
+        for nd_i in nodes:
+            if hasattr(nd_i, 'items'):
+                for item_i in nd_i.items:
+                    if hasattr(item_i, 'direct_address'):
+                        print('Converting alias {} to nodeclass'.format(item_i.direct_address))
+                        setattr(item_i, 'direct_address', self.nodes_alias_dict[item_i.direct_address])
+
         return True
 
     def color_maping(self, nodes, color_map=None):
         """
         Get color map and apply it to Qt node objects
         :param nodes: list | list of nodes
-        :param color_map
+        :param color_map dict |
         :return: True
         """
         color_map = {cHubNode: 'Green',
-                     cAgentNode: 'Blue',
+                     cAgentNodeSimple: 'Blue',
                      cFuncNode: 'Orange'
                      }
         # TODO proceed color_map
@@ -160,7 +197,7 @@ class CodeGenerator:
         for nd_i in nodes:
             if isinstance(nd_i, cHubNode):
                 nd_i.color = 'Green'
-            elif isinstance(nd_i, cAgentNode):
+            elif isinstance(nd_i, cAgentNodeSimple):
                 nd_i.color = 'Blue'
             elif isinstance(nd_i, cFuncNode):
                 nd_i.color = 'Orange'
@@ -180,9 +217,10 @@ if __name__ == '__main__':
     print('cg.nodes_alias_dict', cg.nodes_alias_dict)
     cg.connect_between(objects)
     cg.setup_conditions(objects)
+    cg.convert_alias_to_nodeclass(objects)
     cg.color_maping(objects)
-    [print((nd.name, nd.connected_buddies)) for nd in objects]
-    print(' -------- ')
+    # [print((nd.name, nd.connected_buddies)) for nd in objects]
+    # print(' -------- ')
     [pprint(vars(nd)) for nd in objects]
 
 
