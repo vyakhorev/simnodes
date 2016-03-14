@@ -10,27 +10,35 @@ string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
 
 
 Bool_dict = {'true': True,
-             'True': True,
              'false': False,
-             'False': False
              }
 
 def parse_json(filepath):
+    """
+    Convert JSON file into data dictionary
+    :param filepath: str| path to JSON file
+    :return: dict| multidimensional dictionary
+    """
     with open(string) as data_file:
         data = json.load(data_file)
     return data
 
 
 class CodeGenerator:
+    """
+    Class which convert data dictionary to object-wise structure
+    :param data: dict | input dict
+    """
     def __init__(self, data):
         self.data_dict = data
         self.model = None
         self.nodes_alias_dict = {}
 
-    def set_model(self, model):
-        self.model = model
-
     def make_objects(self):
+        """
+        Parsing all arguments from input dictionary
+        :return: list| list of nodes objects
+        """
         print(node_types_dict)
         nodes = []
         for nodetype, vals in self.data_dict.items():
@@ -70,8 +78,8 @@ class CodeGenerator:
                                         new_task = cTask(name='None')
                                         # loop for task attributes
                                         for task_attr_name, task_attr_val in attrs_dict_i.items():
-                                            if task_attr_val in ['true', 'True', 'false', 'False']:
-                                                task_attr_val = Bool_dict[task_attr_val]
+                                            if task_attr_val.lower() in ['true', 'false']:
+                                                task_attr_val = Bool_dict[task_attr_val.lower()]
                                             setattr(new_task, task_attr_name, task_attr_val)
 
                                     # filling tasks list
@@ -94,6 +102,11 @@ class CodeGenerator:
         return nodes
 
     def connect_between(self, nodes):
+        """
+        Search for connections between nodes and connect them
+        :param nodes: list | list of nodes
+        :return: True
+        """
         for nd_i in nodes:
             if isinstance(nd_i, cAgentNode):
                 for node_neigh in nd_i.buddies:
@@ -112,8 +125,14 @@ class CodeGenerator:
                     nd_i.parent = self.nodes_alias_dict[node_neigh]
             else:
                 print('WRONG')
+        return True
 
     def setup_conditions(self, nodes):
+        """
+        Search for cHubNode class objects and apply conditions attribute
+        :param nodes: list | list of nodes
+        :return: True
+        """
         for nd_i in nodes:
             if isinstance(nd_i, cHubNode):
                 temp_dict = {}
@@ -123,8 +142,17 @@ class CodeGenerator:
                     temp_dict[self.nodes_alias_dict[nodeid_alias]] = expression
 
                 nd_i.condition(temp_dict)
+        return True
 
-    def color_maping(self, nodes):
+    def color_maping(self, nodes, color_map=None):
+        """
+        Get color map and apply it to Qt node objects
+        :param nodes: list | list of nodes
+        :param color_map
+        :return: True
+        """
+        color_map = [(cHubNode, 'Green'), (cAgentNode, 'Blue'), (cFuncNode, 'Orange')]
+        # TODO proceed color_map
         for nd_i in nodes:
             if isinstance(nd_i, cHubNode):
                 nd_i.color = 'Green'
@@ -132,31 +160,7 @@ class CodeGenerator:
                 nd_i.color = 'Blue'
             elif isinstance(nd_i, cFuncNode):
                 nd_i.color = 'Orange'
-        """
-        # TODO refactor this wrong function
-        for nd_i in nodes:
-            for node_neigh in nd_i.buddies:
-                # TODO make one abst method ... this ugly
-                print(node_neigh)
-                if isinstance(nd_i, cAgentNode):
-                    # searching for buddy by node id
-                    for nd in nodes:
-                        if nd.nodeid == node_neigh:
-                            print('HELL YES')
-                            nd_i.connect_buddies([nd])
-                            nd_i.parent = nd
-
-
-                elif isinstance(nd_i, cHubNode):
-                    # FIXME inputs - outputs
-                    for nd in nodes:
-                        if nd.nodeid == node_neigh:
-                            print('HELL YES')
-                            nd_i.connect_nodes(inp_nodes=[nd], out_nodes=[])
-                            nd_i.parent = nd
-                else:
-                    print('WRONG')
-        """
+        return True
 
 
 if __name__ == '__main__':
