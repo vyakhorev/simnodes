@@ -261,6 +261,7 @@ class c_Node(QGraphicsRectItem):
 
         # Label
         self.label = QGraphicsTextItem(self.name, self)
+        self.label.setFont(QFont("Times", 16, QFont.Bold))
 
         self.setRect(0, 0, self.width, self.height)
         # self.setPos(self.width, self.height)
@@ -294,13 +295,18 @@ class c_Node(QGraphicsRectItem):
     #         print(e)
 
     def set_Color(self, color):
+        gradient = QLinearGradient(self.width/2, 0, self.width/2, self.height)
+
         if color.lower() == 'green':
             qtcolor = QColor(84, 192, 58)
         if color.lower() == 'blue':
-            qtcolor = QColor(26, 64, 134)
+            qtcolor = QColor(36, 80, 144)
         if color.lower() == 'orange':
             qtcolor = QColor(250, 155, 100)
-        Brush = QBrush(qtcolor)
+
+        gradient.setColorAt(1, qtcolor)
+        gradient.setColorAt(0, qtcolor.darker(160))
+        Brush = QBrush(gradient)
         self.setBrush(Brush)
 
     def addCon(self, Con_nodes):
@@ -600,6 +606,7 @@ class c_nodeAssembler():
 
 
 if __name__ == '__main__':
+    # Testing model w/o Gui
     file_string = 'G:/Cable/Git/Simnodes/simnodes/new_way/proj_file_2_agents.json'
     data = project_parser.parse_json(file_string)
     Cg = project_parser.CodeGenerator(data)

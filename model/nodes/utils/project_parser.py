@@ -151,8 +151,12 @@ class CodeGenerator:
         :param color_map
         :return: True
         """
-        color_map = [(cHubNode, 'Green'), (cAgentNode, 'Blue'), (cFuncNode, 'Orange')]
+        color_map = {cHubNode: 'Green',
+                     cAgentNode: 'Blue',
+                     cFuncNode: 'Orange'
+                     }
         # TODO proceed color_map
+
         for nd_i in nodes:
             if isinstance(nd_i, cHubNode):
                 nd_i.color = 'Green'
