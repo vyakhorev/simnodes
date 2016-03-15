@@ -43,8 +43,9 @@ class cNodeFieldModel():
         print(self.NodeSystem.getNodesList())
         return self.NodeSystem.getNodesList()
 
-    # def createTestNodes(self):
-    #     node_milka = cNodeProducer(1, 'Milka', 10.)
-    #     node_hungry_man = cNodeConsumer(2, 'HungryMan', 10., 1.)
-    #     node_milka.shipment_port.connect_to(node_hungry_man.consuming_port)
-    #     self.NodeSystem.addNodes([node_milka, node_hungry_man])
+    def build_json(self):
+        # grabbing json from two nodes representations
+        # for nd in getNodes:
+        #     nd._json()
+        #
+        pass

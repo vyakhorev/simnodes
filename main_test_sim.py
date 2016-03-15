@@ -3,7 +3,7 @@ import datetime
 from model.model import cNodeFieldModel
 from model.nodes.classes._old.NodeEconAgent import cNodeEconAgent
 # from model.nodes.classes.Node_func import cNode_func, cNode_agent, cNode_hub
-from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cAgentNodeSimple
+from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cAgentNodeSimple, cMarketNode
 from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
@@ -123,18 +123,34 @@ def Test4():
 
     return the_model
 
+
 def Test5():
     the_model = cNodeFieldModel()
     node1 = cAgentNodeSimple('Matflow')
     node2 = cAgentNodeSimple('MatEat1')
     node3 = cAgentNodeSimple('MatEat2')
-    node4 = cHubNode('CondNode')
+    node4 = cMarketNode('MarketNode')
+
+    node1.connect_buddies([node4])
+    node2.connect_buddies([node4])
+    node3.connect_buddies([node4])
+    node4.connect_nodes(inp_nodes=[node1, node2, node3], out_nodes=[node1, node2, node3])
 
     MatFlow_items = [cDelivery('matflow1', urgent=True, start_time=15),
-                     cDelivery('matflow2', offer=True, entity='Wood', volume=12, start_time=11),
-                     cTask('UrgentInfo', bid=True, entity='Wood', volume=5, urgent=True),
+                     cDelivery('matflow2', bid=True, entity='Wood', volume=12, price=80, start_time=11),
+                     cDelivery('matflow99', bid=True, entity='GLASS', volume=14, price=80, start_time=11),
                      cDelivery('matflow6', urgent=True)]
     node1.set_tasks(MatFlow_items)
+
+    MatFlow_items2 = [cTask('UrgentInfo', ask=True, entity='Wood', volume=5, price=70, urgent=True)]
+    node2.set_tasks(MatFlow_items2)
+
+    MatFlow_items3 = [cTask('UrgentInfo56', ask=True, entity='GLASS', volume=7, price=70, urgent=True)]
+    node3.set_tasks(MatFlow_items3)
+
+    the_model.addNodes([node1, node2, node3, node4])
+
+    return the_model
 
 if __name__ == '__main__':
     the_model = Test4()
