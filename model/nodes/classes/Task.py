@@ -167,4 +167,3 @@ class cDelivery(cTask):
         super().__init__(name, **kwargs)
         self.urgent = urgent
 
-
