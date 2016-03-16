@@ -7,6 +7,7 @@
 import datetime
 
 from model.nodes.node_model import cNodeModel
+from pprint import pprint
 
 class cNodeFieldModel():
     # TODO: all interaction with nodes creation / managing / coordinates / color is here
@@ -40,12 +41,30 @@ class cNodeFieldModel():
         """
             Method, called by controller sending list of nodes
         """
-        print(self.NodeSystem.getNodesList())
+        # print(self.NodeSystem.getNodesList())
         return self.NodeSystem.getNodesList()
+
+    def add_nodes_gui(self, nodes):
+        self.nodes_gui = nodes
+
+    def get_nodes_gui(self):
+        return self.nodes_gui
 
     def build_json(self):
         # grabbing json from two nodes representations
-        # for nd in getNodes:
-        #     nd._json()
-        #
-        pass
+        print('--------JSON GRABBING START------------')
+        for nd in self.getNodes():
+            pprint(nd._json())
+            print('--------------------------------------')
+        print('--------JSON GRABBING END--------------')
+
+        print('-------JSON GRABBING START(GUI)--------')
+        for nd in self.get_nodes_gui():
+            pprint(nd._json())
+            print('--------------------------------------')
+        print('--------JSON GRABBING END--------------')
+
+
+
+
+

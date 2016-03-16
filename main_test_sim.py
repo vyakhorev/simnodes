@@ -153,7 +153,8 @@ def Test5():
     return the_model
 
 if __name__ == '__main__':
-    the_model = Test4()
+    the_model = Test3()
+    the_model.build_json()
     # Create a model, run simulation, print log + iterate over nodes
 
     #

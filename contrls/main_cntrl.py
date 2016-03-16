@@ -9,6 +9,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 # Utils
 import math
+import sys
 from random import randint
 from views.Main_Gui_v01 import c_MainView
 from model.model import cNodeFieldModel
@@ -16,9 +17,21 @@ from open_file import open_nodes, run_sim
 
 from model.nodes.classes.Task import cTask
 from model.nodes.utils import project_parser
+from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cAgentNodeSimple, cMarketNode, \
+                                            node_types_dict
+from views.Node_dialog import AgentNodeWindow
 
 import datetime
 from pprint import pprint
+
+# Workaround to get exceptions from Qt
+sys._excepthook = sys.excepthook
+
+
+def exception_hook(exctype, value, traceback):
+    sys._excepthook(exctype, value, traceback)
+    sys.exit(1)
+sys.excepthook = exception_hook
 
 
 class c_BaseNodes():
@@ -46,6 +59,8 @@ class c_BaseNodes():
 
         self.set_scene(self.Nodegraph)
 
+        self.nodes_gui = []
+
         # Data logic START ===========
         # current project
         self.current_proj = None
@@ -61,11 +76,35 @@ class c_BaseNodes():
         print(focused)
         self.view.new_tab()
 
-    def addNode(self):
-        self.Nodegraph.addNode()
+    def addNode(self, nodetype=None):
+        nodetype = 'AgentType'
+        if nodetype in ['AgentType', 'FuncType', 'HubType']:
+            newnode = node_types_dict[nodetype](name='nodetype'+str(randint(1, 10)))
+            node_wind = self.view.open_node_window(newnode.name)
+            print(node_wind)
+            node_wind.keyPressEvent.connect(self.update_node_attribues)
+            pprint(vars(newnode))
+
+        else:
+            raise TypeError('Unknown node type!')
+
+        newnode.gui_repr = self.Nodegraph.addNode(name=newnode.name)
+        print('ADDING NODE to MODEL {}'.format(newnode.gui_repr))
+        self.nodes_gui += [newnode.gui_repr]
+
+    def update_node_attribues(self):
+        """
+        when node Widget close -> update node model
+        """
+        print('Updating node attributes...')
 
     def connection(self):
         self.Nodegraph.connection()
+
+    def export_scene(self):
+        # delegate nodes to model
+        self.model.add_nodes_gui(self.nodes_gui)
+        self.model.build_json()
 
     def set_scene(self, scene):
         self.scene = scene
@@ -118,6 +157,9 @@ class c_BaseNodes():
         self.assembler.draw(self.Nodegraph)
 
     def run_current_proj(self):
+        # FOR TEST JSON EXPORT ONLY
+        self.export_scene()
+
         self.SIM_RUNS_TOTAL += 1
         print('Going run simulation')
         run_sim(self.current_proj)
@@ -141,16 +183,18 @@ class c_BaseNodes():
         """
         print('i managed to get signal from !!!' + str(node))
 
-        if node.name == 'MatFlow':
-            self.node_pres = FactoryWidget(node)
 
-        elif node.name == 'MTS':
-            self.node_pres = ClientWidget(node)
-
-        else:
-            self.node_pres = FactoryWidget(node)
-            # self.node_pres = NodeBaseWidget(node)
-        self.view.new_tab(node.name, self.node_pres)
+        #
+        # if node.name == 'MatFlow':
+        #     self.node_pres = FactoryWidget(node)
+        #
+        # elif node.name == 'MTS':
+        #     self.node_pres = ClientWidget(node)
+        #
+        # else:
+        #     self.node_pres = FactoryWidget(node)
+        #     # self.node_pres = NodeBaseWidget(node)
+        # self.view.new_tab(node.name, self.node_pres)
 
     @pyqtSlot()
     def on_right_click(self, pos):
@@ -190,6 +234,7 @@ class c_NodeGraph(QGraphicsScene):
 
         print('placed Node in {0},{1} and port at {0},{1}'.format(self.x_coor, self.y_coor, self.x_coor+delta,
                                                                   self.y_coor))
+        return item
 
     def addPort(self, patient, x, y):
         port = c_Port()
@@ -287,7 +332,6 @@ class c_Node(QGraphicsRectItem):
         self.setRect(0, 0, self.width, self.height)
         # self.setPos(self.width, self.height)
 
-
     # May be usefull
     # def itemChange(self, change, variant):
     #     super(c_Node, self).itemChange(change, variant)
@@ -304,6 +348,10 @@ class c_Node(QGraphicsRectItem):
         lx = (self.width - lw) / 2
         ly = (self.height - lh) / 2
         self.label.setPos(lx, ly)
+
+    @property
+    def myPos(self):
+        return self.pos()
 
     def get_node_dim(self):
         return self.width, self.height
@@ -343,6 +391,17 @@ class c_Node(QGraphicsRectItem):
                 #print('{0} redrawing'.format(con))
                 con.adjust()
         return QGraphicsItem.itemChange(self, change, value)
+
+    def _json(self):
+        attrs_to_save = ['myPos', 'name', 'model_repr']
+        serializables = []
+
+        for attr_i in attrs_to_save:
+            try:
+                serializables += [getattr(self, attr_i)]
+            except AttributeError as e:
+                print(e)
+        return serializables
 
 
 class c_Port(QGraphicsEllipseItem):

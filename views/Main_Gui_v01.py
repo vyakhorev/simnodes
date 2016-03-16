@@ -14,6 +14,7 @@ import math
 from random import randint
 # generated views
 from views.gen.Main_Gui_v02_draft import Ui_MainWindow
+from views.Node_dialog import AgentNodeWindow
 
 
 class c_MainView(QMainWindow):
@@ -64,6 +65,13 @@ class c_MainView(QMainWindow):
 
         self.ui.wgMain.addTab(self.tab1, nodename)
 
+    def open_node_window(self, name):
+        new_modal = AgentNodeWindow(self, name)
+        new_modal.setWindowFlags(Qt.Window)
+        new_modal.setWindowModality(Qt.WindowModal)
+        new_modal.open_node()
+        return new_modal
+
     def connectSignals(self, main_ctrl):
         self.i += 1
         if self.i >= 2:
@@ -71,7 +79,8 @@ class c_MainView(QMainWindow):
         self.ui.butAddnode.clicked.connect(main_ctrl.addNode)
         self.ui.butConnect.clicked.connect(main_ctrl.connection)
         # FIXME will raise error
-        self.ui.butParam.clicked.connect(main_ctrl.open_new_tab)
+        self.ui.butParam.setObjectName('Export')
+        self.ui.butParam.clicked.connect(main_ctrl.export_scene)
         self.ui.butOpen.clicked.connect(main_ctrl.open_file)
 
         self.ui.butRunSim.clicked.connect(main_ctrl.run_current_proj)

@@ -63,15 +63,15 @@ class cNodeBase():
             yield self.timeout(2)
 
     def _json(self):
+        attrs_to_save = ['name', 'connected_buddies', 'nodeid', 'items', 'conditions_dict']
         serializables = []
-        if self.name:
-            serializables += [self.name]
-        if self.buddies:
-            serializables += [self.buddies]
-        if self.id:
-            serializables += [self.id]
-        if self.tasks:
-            serializables += [self.tasks]
+
+        for attr_i in attrs_to_save:
+            try:
+                serializables += [getattr(self, attr_i)]
+            except AttributeError as e:
+                print(e)
+        return serializables
 
 
 class cAgentNodeSimple(cNodeBase, cSimNode):

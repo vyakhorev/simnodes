@@ -20,8 +20,8 @@ class NodeWindow(QtWidgets.QWidget):
     Base window for node properties
     """
 
-    def __init__(self, name='BaseNode'):
-        super().__init__()
+    def __init__(self, parent,  name='BaseNode'):
+        super().__init__(parent)
         self.name = name
 
         self.initUI()
@@ -62,7 +62,7 @@ class NodeWindow(QtWidgets.QWidget):
         # Create tab widget
         self.tab_widget = QtWidgets.QWidget(self)
         # TODO remove when styling will done
-        self.tab_menu.setStyleSheet("background-color: lightgrey; ")
+        # self.tab_menu.setStyleSheet("background-color: lightgrey; ")
         self.tab_menu.addTab(self.tab_widget, 'Properties')
 
         # Buttons
@@ -75,6 +75,7 @@ class NodeWindow(QtWidgets.QWidget):
         return '<{}> type of {}'.format(self.name, str(super().__repr__()))
 
     def open_node(self):
+        # self.setWindowModality(QtCore.Qt.WindowModal)
         self.show()
 
     def accept(self):
@@ -94,14 +95,26 @@ class NodeWindow(QtWidgets.QWidget):
 
 
 class AgentNodeWindow(NodeWindow):
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, parent, name=None):
+        super().__init__(parent)
         # adding more tabs
+
+        if name:
+            self.setWindowTitle(name)
+
         self.tab_widget_add = TabPropitiesWidget()
+        # TODO dunno how to change widget on the fly...
         self.tab_menu.removeTab(0)
         self.tab_menu.addTab(self.tab_widget_add, 'Agent Properties')
 
+    def load_attributes(self):
+        pass
+
     def accept(self):
+        attributes = self.tab_widget_add.get_values_iter()
+        print('Set attributes : ')
+        for label_i, linedit_i in attributes:
+            print(label_i, linedit_i)
         self.close()
 
     def reject(self):
@@ -111,6 +124,8 @@ class AgentNodeWindow(NodeWindow):
 class TabPropitiesWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.attributes = []
+
         self.initUI()
 
     def initUI(self):
@@ -121,20 +136,35 @@ class TabPropitiesWidget(QtWidgets.QWidget):
         # Generating label - textedit for attributes
         self.attributes_layout = QtWidgets.QHBoxLayout()
         self.label = QtWidgets.QLabel('Name')
-        self.textedit = QtWidgets.QLineEdit()
+        self.lineedit = QtWidgets.QLineEdit()
         self.attributes_layout.addWidget(self.label)
-        self.attributes_layout.addWidget(self.textedit)
+        self.attributes_layout.addWidget(self.lineedit)
+        self.attributes.append((self.label, self.lineedit))
+
+        self.attributes_layout2 = QtWidgets.QHBoxLayout()
+        self.label2 = QtWidgets.QLabel('connected_buddies')
+        self.lineedit2 = QtWidgets.QLineEdit()
+        self.attributes_layout2.addWidget(self.label2)
+        self.attributes_layout2.addWidget(self.lineedit2)
+        self.attributes.append((self.label2, self.lineedit2))
 
         self.tab_vert_layout = QtWidgets.QVBoxLayout()
         self.tab_vert_layout.setAlignment(QtCore.Qt.AlignTop)
         self.my_frame.setLayout(self.tab_vert_layout)
 
         self.tab_vert_layout.addLayout(self.attributes_layout)
+        self.tab_vert_layout.addLayout(self.attributes_layout2)
 
         self.layout().addWidget(self.my_frame)
+
+    def get_values_iter(self):
+        # for label_i, linedit_i in self.attributes:
+
+        return ((label_i.text(), linedit_i.text()) for (label_i, linedit_i) in self.attributes)
+
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
-    ex = AgentNodeWindow(name='Agent')
+    ex = AgentNodeWindow(None, name='Agent')
     ex.open_node()
     sys.exit(app.exec_())
