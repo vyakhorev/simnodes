@@ -167,4 +167,8 @@ class cDelivery(cTask):
         super().__init__(name, **kwargs)
         self.urgent = urgent
 
+class cMarketTask(cTask):
+    def __init__(self, name, **kwargs):
+        super().__init__(name, **kwargs)
+
 
