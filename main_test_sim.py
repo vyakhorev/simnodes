@@ -122,6 +122,20 @@ def Test4():
     the_model.addNodes([node1, node2, node3, node4])
 
     return the_model
+
+def Test5():
+    the_model = cNodeFieldModel()
+    node1 = cAgentNodeSimple('Matflow')
+    node2 = cAgentNodeSimple('MatEat1')
+    node3 = cAgentNodeSimple('MatEat2')
+    node4 = cHubNode('CondNode')
+
+    MatFlow_items = [cDelivery('matflow1', urgent=True, start_time=15),
+                     cDelivery('matflow2', offer=True, entity='Wood', volume=12, start_time=11),
+                     cTask('UrgentInfo', bid=True, entity='Wood', volume=5, urgent=True),
+                     cDelivery('matflow6', urgent=True)]
+    node1.set_tasks(MatFlow_items)
+
 if __name__ == '__main__':
     the_model = Test4()
     # Create a model, run simulation, print log + iterate over nodes

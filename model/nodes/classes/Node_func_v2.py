@@ -506,6 +506,75 @@ class cFuncNode(cNodeBase, cSimNode):
 
         yield self.empty_event()
 
+
+class cMarketNode(cNodeBase, cSimNode):
+
+    def __init__(self, name, inp_nodes=None, out_nodes=None):
+        self.inp_nodes = inp_nodes
+        self.out_nodes = out_nodes
+
+        super().__init__(name)
+        # here we pull tasks
+        self.in_orders = ports.cManytoOneQueue(self)
+        # here we push tasks
+        self.out_orders = ports.cOnetoManyQueue(self)
+        self.register_port(self.in_orders)
+        self.register_port(self.out_orders)
+
+        # just two containers
+        self.bids = {}
+        self.offers = {}
+
+        self.connected_buddies = []
+        self.debug_on = True
+
+        self.pushing = True
+
+    def connect_nodes(self, inp_nodes=None, out_nodes=None):
+        if inp_nodes:
+            self.inp_nodes = inp_nodes
+            self.connected_buddies += inp_nodes
+            for bud in inp_nodes:
+                bud.connected_buddies += [self]
+                self.in_orders.connect_to_port(bud.out_orders)
+
+        if out_nodes:
+
+            self.out_nodes = out_nodes
+            self.connected_buddies += out_nodes
+            # inp_nodes.connected_buddies += [self]
+            for bud in out_nodes:
+                bud.connected_buddies += [self]
+                self.out_orders.connect_to_port(bud.in_orders)
+
+    # IN LOGIC
+    def gen_do_incoming_tasks(self):
+        while True:
+            msg = yield self.in_orders.queue_local_jobs.get()
+            tsk = msg.uows
+            if hasattr(tsk, 'bid'):
+                # e.g.  self.bids = {'wood': (5 , tsk)}
+                self.check_for_fullfill(tsk)
+                self.bids[tsk.entity] = (tsk.volume, tsk)
+            elif hasattr(tsk, 'offer'):
+                self.offers[tsk.entity] = (tsk.volume, tsk)
+            else:
+                self.out_orders.wrong_jobs.put(msg)
+
+        self.empty_event()
+
+    def check_for_fullfill(self, tsk):
+        if tsk.bid:
+            if tsk.entity in self.offers:
+                if tsk.volume <= self.offers[tsk.entity][0]:
+                    print('match bid {} to offer {}'.format(tsk, self.offers[tsk.entity]))
+        elif tsk.offer:
+            if tsk.entity in self.bids:
+                if tsk.volume >= self.bids[tsk.entity][0]:
+                    print('match offer {} to bid {}'.format(tsk, self.bids[tsk.entity]))
+        else:
+            return False
+
 node_types_dict = {'AgentType': cAgentNodeSimple,
                    'HubType': cHubNode,
                    'FuncType': cFuncNode}
