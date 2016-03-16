@@ -14,6 +14,7 @@ def exception_hook(exctype, value, traceback):
 sys.excepthook = exception_hook
 
 
+
 class NodeWindow(QtWidgets.QWidget):
     """
     Base window for node properties
