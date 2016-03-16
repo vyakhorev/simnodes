@@ -4,7 +4,7 @@ import model.nodes.metatypes as metatypes
 import model.nodes.classes.Ports_v2 as ports
 from model.nodes.classes.SimBase import cSimNode
 import model.nodes.UoW as uows
-from model.nodes.classes.Task import cTask, cDelivery, cMarketTask
+from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.cMessage import cMessage
 
 from model.nodes.utils.custom_operators import do_expression
@@ -61,17 +61,6 @@ class cNodeBase():
 
             cTask.tm.status()
             yield self.timeout(2)
-
-    def _json(self):
-        serializables = []
-        if self.name:
-            serializables += [self.name]
-        if self.buddies:
-            serializables += [self.buddies]
-        if self.id:
-            serializables += [self.id]
-        if self.tasks:
-            serializables += [self.tasks]
 
 
 class cAgentNodeSimple(cNodeBase, cSimNode):
@@ -532,11 +521,9 @@ class cMarketNode(cNodeBase, cSimNode):
         self.register_port(self.in_orders)
         self.register_port(self.out_orders)
 
-        self.deals_queue = metatypes.mtQueue(self)
         # just two containers
-        self.asks = {}
         self.bids = {}
-
+        self.offers = {}
 
         self.connected_buddies = []
         self.debug_on = True
@@ -560,114 +547,33 @@ class cMarketNode(cNodeBase, cSimNode):
                 bud.connected_buddies += [self]
                 self.out_orders.connect_to_port(bud.in_orders)
 
-    def get_node_index(self, node):
-        return self.out_nodes.index(node)
-
     # IN LOGIC
     def gen_do_incoming_tasks(self):
         while True:
             msg = yield self.in_orders.queue_local_jobs.get()
             tsk = msg.uows
-            if hasattr(tsk, 'ask'):
-                # e.g.  self.asks = {'wood': (5 , tsk)}
-                if not self.check_for_fullfill(tsk, msg.sender, ttype='ASK'):
-                    # if not match placing in internal dict
-                    self.asks[tsk.entity] = (tsk.volume, tsk, msg.sender)
-            elif hasattr(tsk, 'bid'):
-                if not self.check_for_fullfill(tsk, msg.sender, ttype='BID'):
-                    # if not match placing in internal dict
-                    self.bids[tsk.entity] = (tsk.volume, tsk, msg.sender)
+            if hasattr(tsk, 'bid'):
+                # e.g.  self.bids = {'wood': (5 , tsk)}
+                self.check_for_fullfill(tsk)
+                self.bids[tsk.entity] = (tsk.volume, tsk)
+            elif hasattr(tsk, 'offer'):
+                self.offers[tsk.entity] = (tsk.volume, tsk)
             else:
                 self.out_orders.wrong_jobs.put(msg)
 
         self.empty_event()
 
-    def check_for_fullfill(self, tsk, msg_sender, ttype):
-        deal_tuple = namedtuple('deal', 'ask_ca ask_sender bid_ca bid_sender')
-        if ttype == 'BID':
-            if tsk.entity in self.asks:
-                if tsk.volume >= self.asks[tsk.entity][0]:
-                    self.sent_log('[SUCCESS] match bid {} {} to ask {}'.format(tsk, tsk.volume, self.asks[tsk.entity]))
-                    tsk.tags = 'matched to ask in market'
-                    self.asks[tsk.entity][1].tags = 'matched to bid in market'
-                    deal = deal_tuple
-                    deal.ask_ca = self.asks[tsk.entity][1]
-                    deal.ask_sender = self.asks[tsk.entity][2]
-                    deal.bid_ca = tsk
-                    deal.bid_sender = msg_sender
-                    self.deals_queue.put(deal)
-                    self.asks.pop(tsk.entity)
-                    return True
-                else:
-                    self.sent_log('[WARN] not enough volume : \n {:>95} asked - {} offered'.format(
-                                  self.asks[tsk.entity][0], tsk.volume))
-
-            else:
-                self.sent_log('[WARN]Cant match')
-
-        elif ttype == 'ASK':
+    def check_for_fullfill(self, tsk):
+        if tsk.bid:
+            if tsk.entity in self.offers:
+                if tsk.volume <= self.offers[tsk.entity][0]:
+                    print('match bid {} to offer {}'.format(tsk, self.offers[tsk.entity]))
+        elif tsk.offer:
             if tsk.entity in self.bids:
-                if tsk.volume <= self.bids[tsk.entity][0]:
-                    self.sent_log('[SUCCESS] match ask {} {} to bid {}'.format(tsk, tsk.volume, self.bids[tsk.entity]))
-                    tsk.tags = 'matched to bid in market'
-                    self.bids[tsk.entity][1].tags = 'matched to ask in market'
-                    deal = deal_tuple
-                    deal.ask_ca = tsk
-                    deal.ask_sender = msg_sender
-                    deal.bid_ca = self.bids[tsk.entity][1]
-                    deal.bid_sender = self.bids[tsk.entity][2]
-                    self.deals_queue.put(deal)
-                    self.bids.pop(tsk.entity)
-                    return True
-                else:
-                    self.sent_log('[WARN] not enough volume : \n {:>95} asked - {} offered'.format(
-                                  tsk.volume, self.bids[tsk.entity][0]))
-            else:
-                self.sent_log('[WARN] Cant match')
+                if tsk.volume >= self.bids[tsk.entity][0]:
+                    print('match offer {} to bid {}'.format(tsk, self.bids[tsk.entity]))
         else:
             return False
-
-    # OUT LOGIC
-    def gen_make_deal(self):
-        while True:
-            deal = yield self.deals_queue.get()
-            self.sent_log('[DEAL] got {} {}'.format(deal.ask_ca, deal.bid_ca))
-
-            ask_ca_task = cMarketTask('Satisfied ask', entity=deal.bid_ca)
-            receiver_idx1 = self.get_node_index(deal.ask_sender)
-            print(receiver_idx1)
-            print(self.out_nodes[receiver_idx1])
-            receiver = self.out_nodes[receiver_idx1]
-            print('receiver', receiver)
-            self.send_msg(ask_ca_task, receiver)
-
-            bid_ca_task = cMarketTask('Satisfied bid', entity=deal.ask_ca)
-            receiver_idx2 = self.get_node_index(deal.bid_sender)
-            print(receiver_idx2)
-            receiver = self.out_nodes[receiver_idx2]
-            self.send_msg(bid_ca_task, receiver)
-
-            self.send_closed_deal()
-
-        self.empty_event()
-
-    def send_closed_deal(self):
-        for msg in self.messages:
-            print('MSG', msg)
-            self.out_orders.port_to_place.put(cMessage(*msg))
-
-    # GENERATORS
-    def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
-
-        if self.debug_on:
-            self.as_process(self.gen_debug())
-
-        if self.pushing:
-            self.as_process(self.gen_do_incoming_tasks(), repr='MarketProc')
-            self.as_process(self.gen_make_deal())
-
-        yield self.empty_event()
 
 node_types_dict = {'AgentType': cAgentNodeSimple,
                    'HubType': cHubNode,
