@@ -58,9 +58,11 @@ class cNodeFieldModel():
             print('--------------------------------------')
         print('--------JSON GRABBING END--------------')
 
+
         print('-------JSON GRABBING START(GUI)--------')
-        for nd in self.get_nodes_gui():
-            pprint(nd._json())
+        for nd in self.getNodes():
+            if hasattr(nd, 'gui_repr'):
+                pprint(nd.gui_repr._json())
             print('--------------------------------------')
         print('--------JSON GRABBING END--------------')
 

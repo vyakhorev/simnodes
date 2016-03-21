@@ -40,6 +40,9 @@ class cNodeBase():
     Node's type-free logic here.
     Compound class, don't call it directly
     """
+    attrs_to_save = ['name', 'connected_buddies', 'node_id', 'items', 'conditions_dict', 'randomize']
+    read_only_attrs = ['connected_buddies', 'node_id']
+
     def __init__(self, name):
         self.messages = []
         super(cNodeBase, self).__init__(name)
@@ -63,10 +66,10 @@ class cNodeBase():
             yield self.timeout(2)
 
     def _json(self):
-        attrs_to_save = ['name', 'connected_buddies', 'nodeid', 'items', 'conditions_dict']
+        # attrs_to_save
         serializables = []
 
-        for attr_i in attrs_to_save:
+        for attr_i in self.attrs_to_save:
             try:
                 serializables += [getattr(self, attr_i)]
             except AttributeError as e:
@@ -104,6 +107,7 @@ class cAgentNodeSimple(cNodeBase, cSimNode):
         self.pushing = True
 
     def set_tasks(self, tasks=None):
+        print('SETTING TASKS')
         self.items = tasks
 
     def gen_populate_tasks(self):

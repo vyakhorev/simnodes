@@ -15,7 +15,7 @@ from views.Main_Gui_v01 import c_MainView
 from model.model import cNodeFieldModel
 from open_file import open_nodes, run_sim
 
-from model.nodes.classes.Task import cTask
+from model.nodes.classes.Task import cTask, make_task_from_str
 from model.nodes.utils import project_parser
 from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cAgentNodeSimple, cMarketNode, \
                                             node_types_dict
@@ -26,7 +26,6 @@ from pprint import pprint
 
 # Workaround to get exceptions from Qt
 sys._excepthook = sys.excepthook
-
 
 def exception_hook(exctype, value, traceback):
     sys._excepthook(exctype, value, traceback)
@@ -63,7 +62,7 @@ class c_BaseNodes():
 
         # Data logic START ===========
         # current project
-        self.current_proj = None
+        self.current_proj = self.model
 
         # self.assembler = c_nodeAssembler(model)
         # print(self.assembler)
@@ -77,26 +76,23 @@ class c_BaseNodes():
         self.view.new_tab()
 
     def addNode(self, nodetype=None):
-        nodetype = 'AgentType'
+        # nodetype = 'HubType'
         if nodetype in ['AgentType', 'FuncType', 'HubType']:
-            newnode = node_types_dict[nodetype](name='nodetype'+str(randint(1, 10)))
-            node_wind = self.view.open_node_window(newnode.name)
-            print(node_wind)
-            node_wind.keyPressEvent.connect(self.update_node_attribues)
-            pprint(vars(newnode))
+            newnode = node_types_dict[nodetype](name=str(nodetype))
+            # Rename with index
+            newnode.name += str(newnode._nodeid)
+            node_wind = self.view.open_node_window(newnode)
+            self.model.addNodes([newnode])
 
         else:
             raise TypeError('Unknown node type!')
 
-        newnode.gui_repr = self.Nodegraph.addNode(name=newnode.name)
+        newnode.gui_repr = self.Nodegraph.addNode(name=newnode.name, model_repr=newnode)
         print('ADDING NODE to MODEL {}'.format(newnode.gui_repr))
         self.nodes_gui += [newnode.gui_repr]
 
-    def update_node_attribues(self):
-        """
-        when node Widget close -> update node model
-        """
-        print('Updating node attributes...')
+    def editNode(self, node):
+        node_wind = self.view.open_node_window(node)
 
     def connection(self):
         self.Nodegraph.connection()
@@ -113,6 +109,14 @@ class c_BaseNodes():
     def openContextMenu(self, position):
         mapped_pos = self.view.mapToGlobal(QPoint(position)+QPoint(21, 62))
         menu = ContexMenu(mapped_pos)
+        # setting actions
+        slotAgentLambda = lambda: self.addNode('AgentType')
+        menu.make_action(meth=slotAgentLambda, string='AgentNode')
+        slotFuncLambda = lambda: self.addNode('HubType')
+        menu.make_action(meth=slotFuncLambda, string='HubNode')
+        slotAgentLambda = lambda: self.addNode('FuncType')
+        menu.make_action(meth=slotAgentLambda, string='FuncNode')
+        menu.run()
 
     def resetNodeGraph(self):
         """
@@ -182,19 +186,7 @@ class c_BaseNodes():
             Slot which activated by doubletapping QGscene at any place
         """
         print('i managed to get signal from !!!' + str(node))
-
-
-        #
-        # if node.name == 'MatFlow':
-        #     self.node_pres = FactoryWidget(node)
-        #
-        # elif node.name == 'MTS':
-        #     self.node_pres = ClientWidget(node)
-        #
-        # else:
-        #     self.node_pres = FactoryWidget(node)
-        #     # self.node_pres = NodeBaseWidget(node)
-        # self.view.new_tab(node.name, self.node_pres)
+        self.editNode(node.model_repr)
 
     @pyqtSlot()
     def on_right_click(self, pos):
@@ -216,9 +208,9 @@ class c_NodeGraph(QGraphicsScene):
         super(c_NodeGraph, self).__init__()
         # self.x_coor, self.y_coor = randint(1, 100), randint(1, 100)
 
-    def addNode(self, name='Blank', px=100, py=100):
+    def addNode(self, name='Blank', px=100, py=100, model_repr=None):
         print('1111111111111111')
-        item = c_Node(name)
+        item = c_Node(name, model_repr)
         print('2222222222222222')
         self.elements += [item]
         # Random placing
@@ -246,6 +238,7 @@ class c_NodeGraph(QGraphicsScene):
         port.setParentItem(patient)
 
     def connection(self, node1=None, node2=None):
+
         for obj in self.selectedItems():
             print(obj.name)
 
@@ -265,6 +258,12 @@ class c_NodeGraph(QGraphicsScene):
             print('Too much selected nodes')
             return
 
+        # Connect in model
+        # FIXME connection between agent and hub
+        self.selectedItems()[0].model_repr.connect_buddies([self.selectedItems()[1].model_repr])
+        self.selectedItems()[1].model_repr.connect_buddies([self.selectedItems()[0].model_repr])
+
+        # Connect in GUI
         Con = c_ConLine(self.selectedItems()[0], self.selectedItems()[1])
         print('made con line, going to add')
         self.addItem(Con)
@@ -603,10 +602,24 @@ class ClientWidget(NodeBaseWidget):
 class ContexMenu(QMenu):
     def __init__(self, position):
         super().__init__()
-        self.addAction('Create AgentNode')
-        self.addAction('Create HubNode')
-        self.addAction('Create FuncNoe')
-        self.exec_(position)
+        self.position = position
+
+    def run(self):
+        self.exec_(self.position)
+
+
+    def make_action(self, meth, string):
+        """
+        :param meth: method connected to
+        :param string: text displaying in menu
+        """
+        print('OLA')
+        self.new_action = self.addAction(string)
+        self.new_action.triggered.connect(meth)
+
+
+
+
 
 # Processing a model
 # ================================================================= #

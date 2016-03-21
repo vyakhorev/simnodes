@@ -172,3 +172,12 @@ class cMarketTask(cTask):
         super().__init__(name, **kwargs)
 
 
+# Simple Task create function
+# cTask_name
+def make_task_from_str(a_string):
+    kls, name = a_string.split('_')
+    if kls == 'cTask':
+        a_task = cTask(name)
+        print('made', a_task)
+
+    return a_task

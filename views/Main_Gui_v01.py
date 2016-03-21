@@ -14,7 +14,7 @@ import math
 from random import randint
 # generated views
 from views.gen.Main_Gui_v02_draft import Ui_MainWindow
-from views.Node_dialog import AgentNodeWindow
+from views.Node_dialog import AgentNodeWindow, HubNodeWindow, FuncNodeWindow
 
 
 class c_MainView(QMainWindow):
@@ -65,8 +65,14 @@ class c_MainView(QMainWindow):
 
         self.ui.wgMain.addTab(self.tab1, nodename)
 
-    def open_node_window(self, name):
-        new_modal = AgentNodeWindow(self, name)
+    def open_node_window(self, node):
+        if node.node_id.startswith('cHubNode'):
+            new_modal = HubNodeWindow(self, node)
+        elif node.node_id.startswith('cAgentNode'):
+            new_modal = AgentNodeWindow(self, node)
+        elif node.node_id.startswith('cFuncNode'):
+            new_modal = FuncNodeWindow(self, node)
+
         new_modal.setWindowFlags(Qt.Window)
         new_modal.setWindowModality(Qt.WindowModal)
         new_modal.open_node()
