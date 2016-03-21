@@ -76,6 +76,7 @@ class c_BaseNodes():
         self.view.new_tab()
 
     def addNode(self, nodetype=None):
+        color_map = {'AgentType': 'blue', 'FuncType': 'green', 'HubType': 'orange'}
         # nodetype = 'HubType'
         if nodetype in ['AgentType', 'FuncType', 'HubType']:
             newnode = node_types_dict[nodetype](name=str(nodetype))
@@ -88,6 +89,8 @@ class c_BaseNodes():
             raise TypeError('Unknown node type!')
 
         newnode.gui_repr = self.Nodegraph.addNode(name=newnode.name, model_repr=newnode)
+        newnode.gui_repr.set_Color(color_map[nodetype])
+
         print('ADDING NODE to MODEL {}'.format(newnode.gui_repr))
         self.nodes_gui += [newnode.gui_repr]
 
