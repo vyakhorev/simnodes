@@ -40,8 +40,8 @@ class cNodeBase():
     Node's type-free logic here.
     Compound class, don't call it directly
     """
-    attrs_to_save = ['name', 'connected_buddies', 'node_id', 'items', 'conditions_dict', 'randomize']
-    read_only_attrs = ['connected_buddies', 'node_id']
+    attrs_to_save = ['name', 'connected_buddies', 'node_id', 'items', 'conditions_dict', 'randomize', 'out_nodes']
+    read_only_attrs = ['connected_buddies', 'node_id', 'out_nodes']
 
     def __init__(self, name):
         self.messages = []
@@ -53,6 +53,29 @@ class cNodeBase():
         self.messages.append(msg)
         if not self.pushing:
             self.pushing = True
+
+    def connect_to(self, to):
+        """
+        node-to-node direct connection
+        :param to: node|
+        """
+        # TODO make this as sub_class polymorh meth
+        if isinstance(self, cAgentNodeSimple) and isinstance(to, cAgentNodeSimple):
+            self.connect_buddies([to])
+        elif isinstance(self, cAgentNodeSimple) and isinstance(to, cHubNode):
+            self.connect_buddies([to])
+            to.connect_nodes(inp_nodes=[self])
+        elif isinstance(self, cHubNode) and isinstance(to, cAgentNodeSimple):
+            to.connect_buddies([self])
+            self.add_out_nodes([to])
+        elif isinstance(self, cAgentNodeSimple) and isinstance(to, cFuncNode):
+            pass
+        elif isinstance(self, cFuncNode) and isinstance(to, cAgentNodeSimple):
+            pass
+        elif isinstance(self, cHubNode) and isinstance(to, cFuncNode):
+            pass
+        elif isinstance(self, cFuncNode) and isinstance(to, cHubNode):
+            pass
 
     def init_sim(self):
         super().init_sim()
@@ -333,6 +356,8 @@ class cHubNode(cNodeBase, cSimNode):
         self.randomize = False
 
     def add_out_nodes(self, out_nodes):
+        if not self.out_nodes:
+            self.out_nodes = []
         self.out_nodes += out_nodes
         self.connected_buddies += out_nodes
         for bud in out_nodes:
@@ -384,7 +409,7 @@ class cHubNode(cNodeBase, cSimNode):
 
     def _randomaction(self, task):
         receiver = choice(self.out_nodes)
-        self.sent_log('Gonna send task {} to receiver {}'.format(task, receiver))
+        self.sent_log('Gonna send task {} to random receiver {}'.format(task, receiver))
         msg = [task, self, [receiver]]
         self.messages.append(msg)
         return True

@@ -146,8 +146,11 @@ class AgentNodeWindow(NodeWindow):
                 if label_i.text() == 'items':
                     # enter tasking
                     value = linedit_i.text()
-                    task = make_task_from_str(value)
-                    self.node.set_tasks([task])
+                    item_list = value.split(' ')
+                    tasks = []
+                    for item in item_list:
+                        tasks += [make_task_from_str(item)]
+                    self.node.set_tasks(tasks)
                 else:
                     print('CHANGING {}'.format(label_i.text()))
                     setattr(self.node, label_i.text(), linedit_i.text())
@@ -193,11 +196,14 @@ class HubNodeWindow(NodeWindow):
             print(label_i.text(), linedit_i.text())
             # TODO name changing -> change in Gui
             if linedit_i.changed:
-                if label_i.text() == 'items':
-                    # enter tasking
+                if label_i.text() == 'conditions_dict':
+                    # enter conditions
+                    print('****** SETTING CONDITIONS ')
                     value = linedit_i.text()
-                    task = make_task_from_str(value)
-                    self.node.set_tasks([task])
+                    #FIXME EVAL EXPLOIT !!!
+                    # cond_dict = eval("dict(%s)"%value.replace(" ", ","))
+                    cond_dict = eval("dict(%s)" % value)
+                    self.node.condition(**cond_dict)
                 else:
                     print('CHANGING {}'.format(label_i.text()))
                     setattr(self.node, label_i.text(), linedit_i.text())

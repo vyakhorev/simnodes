@@ -81,7 +81,7 @@ class c_MainView(QMainWindow):
     def connectSignals(self, main_ctrl):
         self.i += 1
         if self.i >= 2:
-            print('Cant connecnt many times! {}'.format(self.i))
+            print('Cant connect many times! {}'.format(self.i))
         self.ui.butAddnode.clicked.connect(lambda: main_ctrl.addNode('AgentType'))
         self.ui.butConnect.clicked.connect(main_ctrl.connection)
         # FIXME will raise error

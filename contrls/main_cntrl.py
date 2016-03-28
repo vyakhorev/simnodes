@@ -10,7 +10,10 @@ from PyQt5.QtWidgets import *
 # Utils
 import math
 import sys
+import datetime
+from pprint import pprint
 from random import randint
+
 from views.Main_Gui_v01 import c_MainView
 from model.model import cNodeFieldModel
 from open_file import open_nodes, run_sim
@@ -19,10 +22,9 @@ from model.nodes.classes.Task import cTask, make_task_from_str
 from model.nodes.utils import project_parser
 from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cAgentNodeSimple, cMarketNode, \
                                             node_types_dict
-from views.Node_dialog import AgentNodeWindow
 
-import datetime
-from pprint import pprint
+from model.nodes.utils.selected_stack import NodeStack
+
 
 # Workaround to get exceptions from Qt
 sys._excepthook = sys.excepthook
@@ -75,7 +77,7 @@ class c_BaseNodes():
         print(focused)
         self.view.new_tab()
 
-    def addNode(self, nodetype=None):
+    def addNode(self, nodetype=None, click_pos=None):
         color_map = {'AgentType': 'blue', 'FuncType': 'green', 'HubType': 'orange'}
         # nodetype = 'HubType'
         if nodetype in ['AgentType', 'FuncType', 'HubType']:
@@ -83,6 +85,7 @@ class c_BaseNodes():
             # Rename with index
             newnode.name += str(newnode._nodeid)
             node_wind = self.view.open_node_window(newnode)
+
             self.model.addNodes([newnode])
 
         else:
@@ -90,6 +93,8 @@ class c_BaseNodes():
 
         newnode.gui_repr = self.Nodegraph.addNode(name=newnode.name, model_repr=newnode)
         newnode.gui_repr.set_Color(color_map[nodetype])
+        if click_pos:
+            newnode.gui_repr.my_setPos(click_pos.x(), click_pos.y())
 
         print('ADDING NODE to MODEL {}'.format(newnode.gui_repr))
         self.nodes_gui += [newnode.gui_repr]
@@ -113,11 +118,11 @@ class c_BaseNodes():
         mapped_pos = self.view.mapToGlobal(QPoint(position)+QPoint(21, 62))
         menu = ContexMenu(mapped_pos)
         # setting actions
-        slotAgentLambda = lambda: self.addNode('AgentType')
+        slotAgentLambda = lambda: self.addNode('AgentType', click_pos=mapped_pos)
         menu.make_action(meth=slotAgentLambda, string='AgentNode')
-        slotFuncLambda = lambda: self.addNode('HubType')
+        slotFuncLambda = lambda: self.addNode('HubType', click_pos=mapped_pos)
         menu.make_action(meth=slotFuncLambda, string='HubNode')
-        slotAgentLambda = lambda: self.addNode('FuncType')
+        slotAgentLambda = lambda: self.addNode('FuncType', click_pos=mapped_pos)
         menu.make_action(meth=slotAgentLambda, string='FuncNode')
         menu.run()
 
@@ -205,6 +210,7 @@ class c_NodeGraph(QGraphicsScene):
     # Custom signals
     node_doubletapped = pyqtSignal(object)
     nodegraph_rightclick = pyqtSignal(object)
+    clicked_items_stack = NodeStack()
 
     def __init__(self):
         self.elements = []
@@ -261,15 +267,25 @@ class c_NodeGraph(QGraphicsScene):
             print('Too much selected nodes')
             return
 
+        # If first selected is self.selectedItems()[1]
+        if self.clicked_items_stack.index(self.selectedItems()[0]) \
+                < self.clicked_items_stack.index(self.selectedItems()[1]):
+
+            connection_from = self.selectedItems()[0]
+            connection_to = self.selectedItems()[1]
+        else:
+            connection_from = self.selectedItems()[1]
+            connection_to = self.selectedItems()[0]
+
         # Connect in model
-        # FIXME connection between agent and hub
-        self.selectedItems()[0].model_repr.connect_buddies([self.selectedItems()[1].model_repr])
-        self.selectedItems()[1].model_repr.connect_buddies([self.selectedItems()[0].model_repr])
+        print('CONNECTING {} to {}'.format(connection_from, connection_to))
+        connection_from.model_repr.connect_to(connection_to.model_repr)
 
         # Connect in GUI
-        Con = c_ConLine(self.selectedItems()[0], self.selectedItems()[1])
+        Con = c_ConLine(connection_to, connection_from)
         print('made con line, going to add')
         self.addItem(Con)
+
 
     # QGraphicsSceneMouseEvent
     def mouseMoveEvent(self, event):
@@ -386,6 +402,9 @@ class c_Node(QGraphicsRectItem):
 
     # Capture node movement
     def itemChange(self, change, value):
+        """
+        User drag node
+        """
         # print('Itemchange Callback')
 
         if change == QGraphicsItem.ItemPositionChange:
@@ -393,6 +412,18 @@ class c_Node(QGraphicsRectItem):
                 #print('{0} redrawing'.format(con))
                 con.adjust()
         return QGraphicsItem.itemChange(self, change, value)
+
+    def mousePressEvent(self, *args, **kwargs):
+        """
+        User click on node
+        """
+        current_scene = self.scene()
+        current_scene.clicked_items_stack.append(self)
+        print('{} CLICKED  \n selected stack : {} \n'.format(self, current_scene.clicked_items_stack))
+
+
+    def __repr__(self):
+        return '{} with model : {} at pos {}'.format(self.name, self.model_repr, self.myPos)
 
     def _json(self):
         attrs_to_save = ['myPos', 'name', 'model_repr']
@@ -616,12 +647,8 @@ class ContexMenu(QMenu):
         :param meth: method connected to
         :param string: text displaying in menu
         """
-        print('OLA')
         self.new_action = self.addAction(string)
         self.new_action.triggered.connect(meth)
-
-
-
 
 
 # Processing a model
