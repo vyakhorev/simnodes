@@ -2,6 +2,7 @@ __author__ = 'User'
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 from model.nodes.classes.Task import cTask, make_task_from_str
+from views.TasksMenu import TaskManager
 
 from pprint import pprint
 
@@ -15,7 +16,11 @@ sys.excepthook = exception_hook
 
 
 class MyLineEdit(QtWidgets.QLineEdit):
-    textModified = QtCore.pyqtSignal(str, str) # (before, after)
+    """
+    Capturing text changes
+    """
+    # (before, after)
+    textModified = QtCore.pyqtSignal(str, str)
 
     def __init__(self, contents='', parent=None):
         super(MyLineEdit, self).__init__(contents, parent)
@@ -30,6 +35,7 @@ class MyLineEdit(QtWidgets.QLineEdit):
             self.textModified.emit(self._before, self.text())
             self.changed = True
             self._before = self.text()
+
 
 class NodeWindow(QtWidgets.QWidget):
     """
@@ -121,6 +127,7 @@ class AgentNodeWindow(NodeWindow):
             self.setWindowTitle(name)
 
         self.tab_widget_add = TabPropitiesWidget()
+        self.task_setup = TaskManager()
         # Grab self.nodes attributes
         for attr_i, val_i in sorted(self.node.__dict__.items()):
             if attr_i in node.attrs_to_save:
@@ -134,6 +141,7 @@ class AgentNodeWindow(NodeWindow):
         # TODO dunno how to change widget on the fly...
         self.tab_menu.removeTab(0)
         self.tab_menu.addTab(self.tab_widget_add, 'Agent Properties')
+        self.tab_menu.addTab(self.task_setup, 'Tasks setup')
 
     def accept(self):
         # apply changed attributes
