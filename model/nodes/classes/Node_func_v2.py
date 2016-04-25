@@ -452,7 +452,8 @@ class cHubNode(cNodeBase, cSimNode):
             tsk = msg.uows
             success = self._action(tsk)
             if success:
-                tsk.run('True')
+                self.sent_log('GOT MATCH')
+                # tsk.run('True')
             else:
                 self.out_orders.wrong_jobs.put(msg)
 

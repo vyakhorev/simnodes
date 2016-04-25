@@ -7,6 +7,7 @@ from model.nodes.classes.Node_func_v2 import cAgentNode, cHubNode, cFuncNode, cA
 from model.nodes.classes.Task import cTask, cDelivery
 from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
+from model.nodes.classes.Market_model import cClient, cAgreement, cMarketPlace
 
 import Main_Nodes
 
@@ -152,8 +153,29 @@ def Test5():
 
     return the_model
 
+def Test6():
+    the_model = cNodeFieldModel()
+    node1 = cClient('ROZNICHNIY CLIENT')
+    node2 = cAgreement('DOGOVOR')
+    node3 = cMarketPlace('TORGOVAYA TOCHKA')
+    node4 = cHubNode('KUDA POSILAEM')
+
+    node1.connect_buddies([node2])
+    node2.connect_to([node4])
+    node4.connect_nodes(inp_nodes=[node2], out_nodes=[node1, node3])
+    node3.connect_to([node4])
+    node3.connect_buddies([node2])
+
+    cond_dict = {node1: 'urgent = True',
+                 node3: 'urgent = False'}
+    node4.condition(cond_dict)
+
+    the_model.addNodes([node1, node2, node3, node4])
+
+    return the_model
+
 if __name__ == '__main__':
-    the_model = Test3()
+    the_model = Test6()
     the_model.build_json()
     # Create a model, run simulation, print log + iterate over nodes
 

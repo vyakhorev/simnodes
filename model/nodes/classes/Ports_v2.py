@@ -44,6 +44,7 @@ class cManytoOneQueue(cSimPort):
         self.queue_local_jobs = metatypes.mtQueue(self)
         self.wrong_jobs = metatypes.mtQueue(self)
 
+
     def make_input_queue(self, who):
         """
         Creating new queue for each connected one
@@ -360,6 +361,7 @@ class cOnetoOneOutQueue(cSimPort):
             # FIXME causes error if no output nodes
             print('self.connected_ports.values()', self.connected_ports.values())
 
+            print('%%%%ALOAHAHAJHFBHFBLBFAEFAF',self.parent_node, list(self.connected_ports.values()) )
             neigh = list(self.connected_ports.values())[0]
             queue = neigh.get_fetch_queue(self)
             queue.put(msg)
