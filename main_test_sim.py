@@ -154,17 +154,22 @@ def Test5():
     return the_model
 
 def Test6():
+    """
+    Test, simulating Client-Agreement-Market relations.
+    Client generate 2 good requests , then another 2 on callbacks.
+    Market randomly deliver good to Client as answer to request.
+    """
     the_model = cNodeFieldModel()
     node1 = cClient('ROZNICHNIY CLIENT')
     node2 = cAgreement('DOGOVOR')
     node3 = cMarketPlace('TORGOVAYA TOCHKA')
     node4 = cHubNode('KUDA POSILAEM')
 
-    node1.connect_buddies([node2])
-    node2.connect_to([node4])
-    node4.connect_nodes(inp_nodes=[node2], out_nodes=[node1, node3])
-    node3.connect_to([node4])
-    node3.connect_buddies([node2])
+    node1.connect_node(node2)
+    node2.connect_node(node4)
+    node4.connect_nodes2(inp_nodes=[node2], out_nodes=[node1, node3])
+    # node3.connect_node(node4)
+    node3.connect_node(node2)
 
     cond_dict = {node1: 'urgent = True',
                  node3: 'urgent = False'}
@@ -264,7 +269,7 @@ if __name__ == '__main__':
     # Plot processes
     pm = cProcessMonitor(runner.system.simpy_env, until=25)
     # print(id(runner.system.simpy_env))
-    # pm.plot_procs_groups()
+    pm.plot_procs_groups()
     # pm.plot_event_density()
     # pm.print_process()
 

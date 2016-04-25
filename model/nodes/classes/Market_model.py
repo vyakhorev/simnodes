@@ -107,6 +107,21 @@ class BuyGood(newTask):
             self.statem.change_state('failed_state')
 
 
+class DeliverGood(newTask):
+
+    def __init__(self, name='Some deliver task'):
+        super().__init__(name)
+        self.statem.change_state('ready_state')
+        self.urgent = False
+
+    def subscribe(self, event, subscriber):
+        if isinstance(event, TaskEvent):
+            self.add_callback(event, subscriber)
+        else:
+            print('event : {} \n subscriber : {}'.format(event, subscriber))
+            print('nothing to subscribe')
+
+
 class cClient(cNodeBase, cSimNode):
     """
     many inputs - one output
@@ -117,7 +132,7 @@ class cClient(cNodeBase, cSimNode):
         self.out_orders = ports.cOnetoOneOutQueue(self)
         self.register_port(self.in_orders)
         self.register_port(self.out_orders)
-        self.connected_buddies = []
+        self.connected_nodes = []
         self.debug_on = True
 
         self.pushing = True
@@ -125,13 +140,15 @@ class cClient(cNodeBase, cSimNode):
         self.items_ready_to_send = []
         self.conferment_jobs = []
 
-    def connect_buddies(self, buddies):
-        self.connected_buddies += buddies
-        for bud in self.connected_buddies:
-            # bud.connected_buddies += [self]
-            # TODO make one-one port in agent and connect many-one to one-one
-            # self.in_orders.connect_to_port(bud.out_orders)
-            self.out_orders.connect_to_port(bud.in_orders)
+    def connect_node(self, node):
+        self.connected_nodes += [node]
+        self.out_orders.connect_to_port(node.in_orders)
+
+        # for bud in self.connected_buddies:
+        #     # bud.connected_buddies += [self]
+        #     # TODO make one-one port in agent and connect many-one to one-one
+        #     # self.in_orders.connect_to_port(bud.out_orders)
+        #     self.out_orders.connect_to_port(bud.in_orders)
 
     def someone_called_me(self, message=''):
         print('[{}] WHO CALLED MEH? with message {}'.format(self, message))
@@ -146,7 +163,7 @@ class cClient(cNodeBase, cSimNode):
         """
         yield self.timeout(when)
         task = BuyGood('Wanna_goods_C')
-        self.send_msg(task, self.connected_buddies[0])
+        self.send_msg(task, self.connected_nodes[0])
         print('[INFO]self.messages : ', self.messages)
         for msg in self.messages:
             msg = cMessage(*msg)
@@ -168,7 +185,7 @@ class cClient(cNodeBase, cSimNode):
         [tsk.subscribe(FAILED, self) for tsk in tasks]
 
         for tsk in tasks:
-            self.send_msg(tsk, self.connected_buddies[0])
+            self.send_msg(tsk, self.connected_nodes[0])
 
         for msg in self.messages:
             msg_to_send = cMessage(*msg)
@@ -180,7 +197,7 @@ class cClient(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        print("I'm {} with connected buddies : {}".format(self.name, self.connected_nodes))
 
         if self.pushing:
             self.as_process(self.gen_populate_tasks())
@@ -201,7 +218,7 @@ class cAgreement(cNodeBase, cSimNode):
         self.register_port(self.in_orders)
         self.register_port(self.out_orders)
 
-        self.connected_buddies = []
+        self.connected_nodes = []
         self.debug_on = True
 
         self.pushing = True
@@ -209,13 +226,17 @@ class cAgreement(cNodeBase, cSimNode):
         self.items_ready_to_send = []
         self.conferment_jobs = []
 
-    def connect_buddies(self, buddies):
-        self.connected_buddies += buddies
-        for bud in self.connected_buddies:
-            # bud.connected_buddies += [self]
-            # TODO make one-one port in agent and connect many-one to one-one
-            self.in_orders.connect_to_port(bud.out_orders)
-            self.out_orders.connect_to_port(bud.in_orders)
+
+    def connect_node(self, node):
+        self.connected_nodes += [node]
+        self.out_orders.connect_to_port(node.in_orders)
+    # def connect_buddies(self, buddies):
+    #     self.connected_buddies += buddies
+    #     for bud in self.connected_buddies:
+    #         # bud.connected_buddies += [self]
+    #         # TODO make one-one port in agent and connect many-one to one-one
+    #         self.in_orders.connect_to_port(bud.out_orders)
+    #         self.out_orders.connect_to_port(bud.in_orders)
 
     def someone_called_me(self, message=''):
         print('[{}] WHO CALLED MEH? with message {}'.format(self, message))
@@ -231,14 +252,14 @@ class cAgreement(cNodeBase, cSimNode):
             # Sub for done event
             tsk.subscribe(DONE, self)
 
-            msg_to_send = cMessage(tsk, self, [self.connected_buddies[0]])
+            msg_to_send = cMessage(tsk, self, [self.connected_nodes[0]])
             self.out_orders.port_to_place.put(msg_to_send)
 
             yield self.empty_event()
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        print("I'm {} with connected buddies : {}".format(self.name, self.connected_nodes))
 
         if self.pushing:
             self.as_process(self.gen_run_incoming_tasks())
@@ -257,7 +278,7 @@ class cMarketPlace(cNodeBase, cSimNode):
         self.out_orders = ports.cOnetoOneOutQueue(self)
         self.register_port(self.in_orders)
         self.register_port(self.out_orders)
-        self.connected_buddies = []
+        self.connected_nodes = []
         self.debug_on = True
 
         self.pushing = True
@@ -265,13 +286,16 @@ class cMarketPlace(cNodeBase, cSimNode):
         self.items_ready_to_send = []
         self.conferment_jobs = []
 
-    def connect_buddies(self, buddies):
-        self.connected_buddies += buddies
-        # for bud in self.connected_buddies:
-            # bud.connected_buddies += [self]
-            # TODO make one-one port in agent and connect many-one to one-one
-            # self.in_orders.connect_to_port(bud.out_orders)
-            # self.out_orders.connect_to_port(bud.in_orders)
+    def connect_node(self, node):
+        self.connected_nodes += [node]
+        self.out_orders.connect_to_port(node.in_orders)
+    # def connect_buddies(self, buddies):
+    #     self.connected_buddies += buddies
+    #     # for bud in self.connected_buddies:
+    #         # bud.connected_buddies += [self]
+    #         # TODO make one-one port in agent and connect many-one to one-one
+    #         # self.in_orders.connect_to_port(bud.out_orders)
+    #         # self.out_orders.connect_to_port(bud.in_orders)
 
     def someone_called_me(self, message=''):
         print('[{}] WHO CALLED MEH? with message {}'.format(self, message))
@@ -300,9 +324,14 @@ class cMarketPlace(cNodeBase, cSimNode):
             # Sub for done event
             # tsk.subscribe(DONE, self)
             # self.conferment_jobs.append(tsk)
-            print('KTO KTO ?', self.connected_buddies)
+            print('KTO KTO ?', self.connected_nodes)
             self.out_orders.wrong_jobs.put(msg)
             # todo make new Task to deliver goods if do_work succeed
+            if success:
+                deliver_task = DeliverGood('Take my goods')
+                deliver_task.urgent = True
+                msg_to_send = cMessage(deliver_task, self, [self.connected_nodes[0]])
+                self.out_orders.port_to_place.put(msg_to_send)
 
             # msg_to_send = cMessage(tsk, self, [self.connected_buddies[0]])
             # self.out_orders.port_to_place.put(msg_to_send)
@@ -313,7 +342,7 @@ class cMarketPlace(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        print("I'm {} with connected buddies : {}".format(self.name, self.connected_nodes))
 
         if self.pushing:
             self.as_process(self.gen_run_incoming_tasks())

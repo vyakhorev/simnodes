@@ -35,6 +35,48 @@ class SinkType(metaclass=NodeType):
 
 node_types = {AgentType, HubType, FuncType, SinkType}
 
+class cNodeBase2():
+    attrs_to_save = ['name', 'connected_buddies', 'node_id', 'items', 'conditions_dict', 'randomize', 'out_nodes']
+    read_only_attrs = ['connected_buddies', 'node_id', 'out_nodes']
+
+    def __init__(self, name):
+        self.messages = []
+        super(cNodeBase, self).__init__(name)
+        self.parent = None
+
+    def send_msg(self, task, receiver):
+        msg = [task, self, [receiver]]
+        self.messages.append(msg)
+        if not self.pushing:
+            self.pushing = True
+
+    def connect_to(self, to):
+        pass
+
+    def init_sim(self):
+        super().init_sim()
+
+    def gen_debug(self):
+        while True:
+            for port in self.ports.values():
+                self.sent_log(port.queues)
+
+            cTask.tm.status()
+            yield self.timeout(2)
+
+    def _json(self):
+        # attrs_to_save
+        serializables = []
+
+        for attr_i in self.attrs_to_save:
+            try:
+                serializables += [getattr(self, attr_i)]
+            except AttributeError as e:
+                print(e)
+        return serializables
+
+
+
 class cNodeBase():
     """
     Node's type-free logic here.
@@ -348,6 +390,7 @@ class cHubNode(cNodeBase, cSimNode):
         self.register_port(self.out_orders)
 
         self.connected_buddies = []
+        self.connected_nodes = []
         self.debug_on = True
 
         self.pushing = True
@@ -381,6 +424,24 @@ class cHubNode(cNodeBase, cSimNode):
                 bud.connected_buddies += [self]
                 self.out_orders.connect_to_port(bud.in_orders)
 
+    def connect_nodes2(self, inp_nodes=None, out_nodes=None):
+        # todo REMOVE Later
+        if inp_nodes:
+            self.inp_nodes = inp_nodes
+            self.connected_nodes += inp_nodes
+
+            for bud in inp_nodes:
+                # bud.connected_nodes += [self]
+                self.in_orders.connect_to_port(bud.out_orders)
+
+        if out_nodes:
+
+            self.out_nodes = out_nodes
+            self.connected_nodes += out_nodes
+            # inp_nodes.connected_buddies += [self]
+            for bud in out_nodes:
+                # bud.connected_nodes += [self]
+                self.out_orders.connect_to_port(bud.in_orders)
     # def condition(self, **kwargs):
     #     self.pushing = True
     #     expression = namedtuple('expression', 'attr expr val')
