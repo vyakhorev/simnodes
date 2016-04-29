@@ -37,6 +37,7 @@ class cBaseBlueAgent(cNodeBase, cSimNode):
     def connect_to_output(self, port_to_connect):
         self.out_orders.connect_to_port(port_to_connect)
 
+
 class cNodeTradeContract(cNodeBase, cSimNode):
     """
     Нода, взаимодействующая с двумя другими по поводу купли-продажи
@@ -71,9 +72,7 @@ class cNodeTradeContract(cNodeBase, cSimNode):
         self.in_party_seller.connect_to_port(out_port)
 
     def my_generator(self):
-
-
-    def gen_(self):
+        pass
 
 
 class cNodeAgentTrader(cBaseBlueAgent):
@@ -84,53 +83,74 @@ class cNodeAgentTrader(cBaseBlueAgent):
     def __init__(self, name):
         super().__init__(name)
 
-    def add_supply(self, item, price, qtty, freq):
-        # Добавляем предложение товара (для этого создаем демона)
-        # то, что нода будет активно предлагать
-
-    def add_demand(self, item, price, qtty, freq):
-        # Добавляем спрос товара (для этого создаем демона)
-        # то, что нода будет активно запрашивать
-
-    def init_supply_listener(self, item):
-        # Демон, готовый обрабатывать предложения на поставку
-        # (открывать договор на закупку)
-
-    def init_demand_listener(self, item):
-        # Демон, готовый обрабатывать запросы на закупку
-        # (открывать договор на поставку)
-
     def my_generator(self):
-
-
+        # пока по минимуму демонов
+        pass
 
 
 class cContractListDaemon(simulengin.cConnToDEVS):
     """
-    Create / destroy / manage multiple cContractTradeDaemon.
+    Отслеживает несколько контрактов и создает
+    новые по необходимости
     """
     def __init__(self, name):
         super().__init__(name)
+        self.price_list = {}
+        self.requests = metatypes.mtQueue(self)
+        self.active_contracts = [] #активные демоны
+
+    def add_conditions(self, item, price):
+        # Для товара назначим цену.
+        self.price_list[item] = price
+
+    def my_generator(self):
+        pass
+
+    def gen_get_request(self):
+        while 1:
+            next_req = yield self.requests.get()
+            # стартуем нового демона
 
 
 class cContractTradeDaemon(simulengin.cConnToDEVS):
     """
-    Trace and generate tasks within one contract.
+    Отвечает за исполнение конкретного контракта
     """
     def __init__(self, name):
         super().__init__(name)
 
 
+class cStateExecutor(simulengin.cConnToDEVS):
+    """
+    Фактически переход из стейта в стейт - команда одной
+    ноды другой. Команды должны выполняться универсально,
+    поэтому можно поробовать в отдельном классе реализовать
+    логику выполнения команды за ноду. Потом это можно
+    подмешать к ноде (фабрикой, например).
+    """
 
-def BuildItemBuyRequestTask(item, price, qtty):
+    def __init__(self, parent_node):
+        self.parent_node = parent_node
+
+    def do_task(self):
+        pass
 
 
-def BuildPaymentTask(paysum):
 
+def new_task_request_get_item(item, price, qtty):
+    # Так нода требует себе товар
+    new_task = cTask()
+    state_start = cTaskState("start")
+    state_get_item = cTaskState("get_item")
+    state_cancel = cTaskState("cancel")
 
-def BuildShipmentTask(item, qtty):
-
-
+def new_task_push_take_item(item, price, qtty):
+    # Так нода насильно отдаёт товар
+    # Ожидается в ответ на new_task_request_get_item
+    new_task = cTask()
+    state_start = cTaskState("start")
+    state_get_item = cTaskState("get_item")
+    state_cancel = cTaskState("cancel")
 
 
 class cTask:
