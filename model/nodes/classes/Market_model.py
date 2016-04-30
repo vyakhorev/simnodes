@@ -3,10 +3,12 @@ from model.nodes.classes.SimBase import cSimNode
 import model.nodes.classes.Ports_v2 as ports
 from model.nodes.classes.cMessage import cMessage
 from random import randint, choice
+from simpy.events import Event,AllOf,AnyOf
 
 class TaskEvent():
     """
     Base class for Tasks events
+    deprecated ???
     """
 
     def __init__(self, name='Event'):
@@ -16,9 +18,9 @@ class TaskEvent():
     def __repr__(self):
         return '<{} Event({})>'.format(self.name, self.trigger_count)
 
-READY = TaskEvent('READY')
-DONE = TaskEvent('DONE')
-FAILED = TaskEvent('FAILED')
+# READY = TaskEvent('READY')
+# DONE = TaskEvent('DONE')
+# FAILED = TaskEvent('FAILED')
 
 
 class StateMech():
@@ -31,8 +33,24 @@ class StateMech():
     def __init__(self, parent):
         self.curstate = None
         self.parent = parent
+        self.event_mapping = {}
+
+    def set_event_mapping(self, state, ev):
+        """
+        Set from tasks dictionary like : {finish_state: 'simpy.event' class, failed_state: 'simpy.event' class...}
+        :param state: str| key for mapping
+        :param ev: 'simpy.event'| event for mapping
+        """
+        if state not in self.STATES:
+            print('dont know about this state')
+        else:
+            self.event_mapping[state] = ev
 
     def change_state(self, to_state):
+        """
+        Changing self state and calling parent's notify method
+        :param to_state : str| string alias for pseudo-state
+        """
         """
         :param to_state | str, string alias for pseudo-state
         """
@@ -41,9 +59,12 @@ class StateMech():
             self.curstate = to_state
 
             if self.curstate == 'finish_state':
+                DONE = self.event_mapping[self.curstate]
                 self.parent.notify(DONE)
             elif self.curstate == 'failed_state':
-                self.parent.notify(FAILED)
+                pass
+                # FAILED = self.event_mapping[self.curstate]
+                # self.parent.notify(FAILED)
 
         else:
             print('i dont know {} state'.format(to_state))
@@ -55,14 +76,19 @@ class newTask():
     Non typed task , which have callback system to announce its subscribers
     """
 
-    def __init__(self, name):
+    def __init__(self, name, env):
         self.taskname = name
+        self.env = env
         self.statem = StateMech(self)
+        self.events_map = {}
 
         # dict like {event : [sub1, sub2...], ...}
         self.task_callbacks = {}
 
     def add_callback(self, event, subscriber):
+        """
+        Adding old-style callback
+        """
         self.task_callbacks.setdefault(event, []).append(subscriber)
 
     def remove_callback(self, event, subscriber):
@@ -71,46 +97,82 @@ class newTask():
         # self.task_callbacks.remove(cb)
 
     def notify(self, event):
+        """
+        Triggering signal for given event, and calling old-style callbacks
+        :param event : 'simpy.event' instance
+        """
+        # todo Error checking
         print('[{}] Notifing ... my dict : {}'.format(self, self.task_callbacks))
-        try:
-            subs = self.task_callbacks[event]
-            for sub_i in subs:
-                event.trigger_count += 1
-                sub_i.someone_called_me('{} event {} triggered'.format(self, event))
-        except KeyError as e:
-            print('Error :', e)
-            print('No-one to subscribe')
+        subs = self.task_callbacks[event]
+        print('subs {}'.format(subs))
+        event.succeed()
+        # this could be integrated in event callbacks
+        for sub_i in subs:
+            sub_i.someone_called_me('{} event {} triggered'.format(self, event))
+
+            # try:
+            #     subs = self.task_callbacks[event]
+            #     for sub_i in subs:
+            #         event.trigger_count += 1
+            #         if self.events_map[event]:
+            #             print('AAAAAAAAAAAAAAAAAAAAAAAAA', self.events_map)
+            #             print(self.events_map[event].callbacks)
+            #             self.events_map[event].succeed()
+            #             self.events_map[event] = self.env.event()
+            #         sub_i.someone_called_me('{} event {} triggered'.format(self, event))
+            #
+            # except KeyError as e:
+            #     print('Error :', e)
+            #     print('No-one to subscribe')
 
     def __repr__(self):
         return 'Task {}'.format(self.taskname)
 
 
 class BuyGood(newTask):
+    """
+    Concrete implementation of 'newTask'
+    :param name : str | name of 'BuyGood' instance
+    :param env : 'simpy.Enviroment' cls | delegated from node environment
+    """
 
-    def __init__(self, name='Some buy task'):
-        super().__init__(name)
+    def __init__(self, name='Some buy task', env=None):
+        super().__init__(name, env)
         self.statem.change_state('ready_state')
         self.urgent = False
 
     def subscribe(self, event, subscriber):
-        if isinstance(event, TaskEvent):
-            self.add_callback(event, subscriber)
+        """
+        Subscribing for event
+        :param event : 'simpy.event' | simpy event
+        :param subscriber : 'cNodeBase' instance | link to class which should have callback function
+        """
+        if event not in self.events_map.keys():
+            my_event = self.env.event()
+            self.events_map[event] = my_event
+            self.statem.set_event_mapping('finish_state', my_event)
+            self.add_callback(my_event, subscriber)
         else:
-            print('event : {} \n subscriber : {}'.format(event, subscriber))
-            print('nothing to subscribe')
-
-    def do_work(self):
-        success = choice([True, False])
-        if success:
-            self.statem.change_state('finish_state')
-        else:
-            self.statem.change_state('failed_state')
+            my_event = self.events_map[event]
+            self.statem.set_event_mapping('finish_state', my_event)
+            self.add_callback(my_event, subscriber)
+        return my_event
+        # # old
+        # if isinstance(event, TaskEvent):
+        #     self.add_callback(event, subscriber)
+        #     if self.env:
+        #         my_event = self.env.event()
+        #         self.events_map[event] = my_event
+        #         return my_event
+        # else:
+        #     print('event : {} \n subscriber : {}'.format(event, subscriber))
+        #     print('nothing to subscribe')
 
 
 class DeliverGood(newTask):
 
-    def __init__(self, name='Some deliver task'):
-        super().__init__(name)
+    def __init__(self, name='Some deliver task', env=None):
+        super().__init__(name, env)
         self.statem.change_state('ready_state')
         self.urgent = False
 
@@ -162,7 +224,7 @@ class cClient(cNodeBase, cSimNode):
         :param when: int| wait time until task will create
         """
         yield self.timeout(when)
-        task = BuyGood('Wanna_goods_C')
+        task = BuyGood('Wanna_goods_C', self.simpy_env)
         self.send_msg(task, self.connected_nodes[0])
         print('[INFO]self.messages : ', self.messages)
         for msg in self.messages:
@@ -179,10 +241,16 @@ class cClient(cNodeBase, cSimNode):
         self.as_process(self.gen_push_messages(when))
 
     def gen_populate_tasks(self):
-        tasks = [BuyGood('Wanna_goods_A'), BuyGood('Wanna_goods_B')]
+        tasks = [BuyGood('Wanna_goods_A', self.simpy_env), BuyGood('Wanna_goods_B', self.simpy_env)]
         # sub for Done and Failed events
-        [tsk.subscribe(DONE, self) for tsk in tasks]
-        [tsk.subscribe(FAILED, self) for tsk in tasks]
+        cb_events = [tsk.subscribe('DONE', self) for tsk in tasks]
+        print('EVENTSSSSSSSSSSSSSSSSSSSSSS', cb_events)
+        for ev in cb_events:
+            ev.callbacks.append(self.my_callback)
+        #     print(ev.triggered)
+        self.as_process(self.wait_for_callbacks_any(cb_events))
+        self.as_process(self.wait_for_callbacks_all(cb_events))
+        [tsk.subscribe('FAILED', self) for tsk in tasks]
 
         for tsk in tasks:
             self.send_msg(tsk, self.connected_nodes[0])
@@ -194,6 +262,21 @@ class cClient(cNodeBase, cSimNode):
 
         yield self.timeout(0)
 
+    def my_callback(self, event):
+        self.sent_log('Called back from {}'.format(event))
+
+    # Events working with Any and All conditions
+    # ###########################################
+    def wait_for_callbacks_any(self, events):
+        a = AnyOf(self.simpy_env, events)
+        yield a
+        print('ANY DONE SUCCESSFULLY !!!')
+
+    def wait_for_callbacks_all(self, events):
+        a = AllOf(self.simpy_env, events)
+        yield a
+        print('ALL DONE SUCCESSFULLY !!!')
+    # ###########################################
 
     # GENERATORS
     def my_generator(self):
@@ -250,7 +333,8 @@ class cAgreement(cNodeBase, cSimNode):
             msg = yield self.in_orders.queue_local_jobs.get()
             tsk = msg.uows
             # Sub for done event
-            tsk.subscribe(DONE, self)
+            # print('RRRRRRRR', tsk)
+            tsk.subscribe('DONE', self)
 
             msg_to_send = cMessage(tsk, self, [self.connected_nodes[0]])
             self.out_orders.port_to_place.put(msg_to_send)
