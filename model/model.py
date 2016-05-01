@@ -20,6 +20,10 @@ class cNodeFieldModel():
 
     def addNodes(self, nodes):
         self.NodeSystem.addNodes(nodes)
+        for n_i in nodes:
+            for attr_i in n_i.__dict__.values():
+                if attr_i.__class__.__name__ == 'cWallet':
+                    self.addOtherSimObj(attr_i)
 
     def addObserver(self, new_oberver):
         self.NodeSystem.addObserver(new_oberver)

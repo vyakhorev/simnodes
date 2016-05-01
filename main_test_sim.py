@@ -9,6 +9,7 @@ from model.nodes.classes.AbstEconNode import cNodeClientSupplyLine
 from model.nodes.ProcessMonitor import cProcessMonitor
 from model.nodes.classes.Market_model import cClient, cAgreement, cMarketPlace
 
+from model.nodes.classes.ClientShopSupplier import test1
 import Main_Nodes
 
 
@@ -179,8 +180,9 @@ def Test6():
 
     return the_model
 
+
 if __name__ == '__main__':
-    the_model = Test6()
+    the_model = test1()
     the_model.build_json()
     # Create a model, run simulation, print log + iterate over nodes
 
@@ -269,9 +271,9 @@ if __name__ == '__main__':
     # Plot processes
     pm = cProcessMonitor(runner.system.simpy_env, until=25)
     # print(id(runner.system.simpy_env))
-    pm.plot_procs_groups()
+    # pm.plot_procs_groups()
     # pm.plot_event_density()
-    # pm.print_process()
+    pm.print_process()
 
     """
     log = loganddata['log_list']

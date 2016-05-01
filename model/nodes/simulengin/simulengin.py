@@ -127,6 +127,7 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
     def __init__(self):
         super().__init__()
         self.is_simulation_running = False
+        self.debug_on = False
 
     def log_repr(self):
         return self.__repr__()
@@ -139,7 +140,8 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
             self.init_sim()
 
     def sent_log(self, a_msg):
-        self.devs.sent_log(self, a_msg)
+        if self.debug_on:
+            self.devs.sent_log(self, a_msg)
 
     @staticmethod
     def get_proc_repr(text):

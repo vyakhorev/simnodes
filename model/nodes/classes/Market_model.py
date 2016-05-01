@@ -334,7 +334,7 @@ class cAgreement(cNodeBase, cSimNode):
             tsk = msg.uows
             # Sub for done event
             # print('RRRRRRRR', tsk)
-            tsk.subscribe('DONE', self)
+            evdone = tsk.subscribe('DONE', self)
 
             msg_to_send = cMessage(tsk, self, [self.connected_nodes[0]])
             self.out_orders.port_to_place.put(msg_to_send)

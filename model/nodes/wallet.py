@@ -51,7 +51,7 @@ class cWallet(simulengin.cConnToDEVS):
     def __init__(self):
         super().__init__()
         self.res_all = {}
-        self.refused_queue = mtQueue()
+        self.refused_queue = mtQueue(self)
         self.my_pile = mtPile(level=100)
 
     def spawn_item(self, name, qtty):
@@ -113,12 +113,13 @@ class cWallet(simulengin.cConnToDEVS):
                 self.res_all[name].count.put('name')
 
     def gen_take_qtty(self, name, qtty):
-        # if name not in self.res_all:
-        #     self.sent_log('{} has not {} key'.format(type(self), name))
-        #     return False
+        if name not in self.res_all:
+            self.sent_log('{} has not {} key'.format(type(self), name))
+            return False
 
         if type(self.res_all[name]) == cPile:
-            print('value {} '.format(self.res_all[name].value.level))
+            if self.debug_on:
+                print('value {} '.format(self.res_all[name].value.level))
 
             if self.res_all[name].value.level < qtty:
                 self.sent_log("not enough value level ")
@@ -126,7 +127,8 @@ class cWallet(simulengin.cConnToDEVS):
             yield self.res_all[name].value.get(qtty)
 
         elif type(self.res_all[name]) == cItem:
-            print('count {} '.format(self.res_all[name]))
+            if self.debug_on:
+                print('count {} '.format(self.res_all[name]))
             if len(self.res_all[name].count.items()) <= 0:
                 self.sent_log("not enough items")
             yield self.res_all[name].value.get(qtty)
