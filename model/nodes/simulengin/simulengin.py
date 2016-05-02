@@ -11,6 +11,9 @@ import model.nodes.meta
 import functools
 import logging
 
+# to allow complicated filters (nodes/ports) a different logger is applied
+# to 'connected to devs' instances (including DEVS). Use 'DEVS' group.
+logger = logging.getLogger(__name__)
 
 class cDiscreteEventSystem(object):
     # TODO: implement methods to cope with node structure during simulation
@@ -96,7 +99,8 @@ class cDiscreteEventSystem(object):
         logname = 'DEVS.' + str(sender_instance.__class__.__name__) + '.' + str(sender_instance.name)
         logger = logging.getLogger(logname)
 
-        msg = "@{:<3} {:<75} : {:<15}".format(timestamp, sender_instance.name, msg_text)
+        msg = "@{}:\t{}".format(timestamp, msg_text)
+        #msg = "@{:<3} {:<75} : {:<15}".format(timestamp, sender_instance.name, msg_text)
 
         logger.log(level, msg)
 
@@ -212,7 +216,7 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
     def convert_to_simulatables(self, simpy_env):
         for attr, val in self.__dict__.items():
             if hasattr(val, '_simulatable'):
-                print("converted: " + str(attr) + " " + str(val))
+                logger.info("converted: " + str(attr) + " " + str(val))
                 new_val = val.give_sim_analog(simpy_env)
                 #setattr(self, "_nosim_", new_val) # delete ??
                 setattr(self, attr, new_val)

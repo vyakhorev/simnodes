@@ -4,6 +4,8 @@ import model.nodes.metatypes as metatypes
 import model.nodes.simulengin.simulengin as simulengin
 import simpy
 
+import logging
+logger = logging.getLogger('DEVS.'+ __name__)
 
 class cSimNode(simulengin.cConnToDEVS):
     """
@@ -28,7 +30,7 @@ class cSimNode(simulengin.cConnToDEVS):
         return str(self.name) + " (node id " + str(self.node_id) + ")"
 
     def register_port(self, new_port):
-        # print('registering {} {}'.format(new_port.port_id, self.ports))
+        logger.info('registering {} {}'.format(new_port.port_id, self.ports))
         if new_port.port_id in self.ports:
             pass
             # raise KeyError("already in the list!")
@@ -76,7 +78,7 @@ class cSimPort(simulengin.cConnToDEVS, model.nodes.meta.MetaStruct):
 
     def connect_to_port(self, another_port):
         if another_port.port_id in self.connected_ports:
-            #print('Failed to connect !! ')
+            logger.warning('Failed to connect !! ')
             # Already connected
             return
         self.connected_ports[another_port.port_id] = another_port

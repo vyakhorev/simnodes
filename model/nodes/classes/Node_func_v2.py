@@ -13,7 +13,9 @@ from itertools import chain
 from functools import partialmethod
 from random import choice, randint
 from collections import namedtuple
-from pprint import pprint
+
+import logging
+logger = logging.getLogger(__name__)
 
 # Node types :
 class NodeType(type):
@@ -72,7 +74,7 @@ class cNodeBase2():
             try:
                 serializables += [getattr(self, attr_i)]
             except AttributeError as e:
-                print(e)
+                logger.warning(e)
         return serializables
 
 
@@ -138,7 +140,7 @@ class cNodeBase():
             try:
                 serializables += [getattr(self, attr_i)]
             except AttributeError as e:
-                print(e)
+                logger.warning(e)
         return serializables
 
 
@@ -172,7 +174,7 @@ class cAgentNodeSimple(cNodeBase, cSimNode):
         self.pushing = True
 
     def set_tasks(self, tasks=None):
-        print('SETTING TASKS')
+        logger.info('SETTING TASKS')
         self.items = tasks
 
     def gen_populate_tasks(self):
@@ -187,7 +189,7 @@ class cAgentNodeSimple(cNodeBase, cSimNode):
             for el in self.items_ready_to_send:
                 # FIXME poor line... self.connected_buddies[0]
                 if hasattr(el, 'direct_address'):
-                    print('ALOHA')
+                    logger.info('ALOHA')
                     self.send_msg(el, el.direct_address)
                 else:
                     self.send_msg(el, self.connected_buddies[0])
@@ -240,7 +242,7 @@ class cAgentNodeSimple(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        logger.info("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
 
         if self.pushing:
             self.as_process(self.gen_populate_tasks())
@@ -275,12 +277,12 @@ class cAgentNode(cNodeBase, cSimNode):
         # self.messages = []
 
     def connect_buddies(self, buddies):
-        print('buddies : ', buddies)
+        logger.info('buddies : ', buddies)
         self.connected_buddies += buddies
         for bud in self.connected_buddies:
-            print('69696')
-            print(self.connected_buddies)
-            print(bud)
+            logger.info('69696')
+            logger.info(self.connected_buddies)
+            logger.info(bud)
             # bud.connected_buddies += [self]
             # TODO make one-one port in agent and connect many-one to one-one
             self.in_orders.connect_to_port(bud.out_orders)
@@ -306,7 +308,7 @@ class cAgentNode(cNodeBase, cSimNode):
             for el in self.items_ready_to_send:
                 # FIXME poor line... self.connected_buddies[0]
                 if hasattr(el, 'direct_address'):
-                    print('ALOHA')
+                    logger.info('ALOHA')
                     self.send_msg(el, el.direct_address)
                 else:
                     self.send_msg(el, self.connected_buddies[0])
@@ -359,7 +361,7 @@ class cAgentNode(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        logger.info("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
 
         if self.pushing:
             self.as_process(self.gen_populate_tasks())
@@ -458,7 +460,7 @@ class cHubNode(cNodeBase, cSimNode):
             expression = namedtuple('expression', 'attr expr val')
 
             for node, express in conds.items():
-                print(node)
+                logger.info(node)
                 attr, expr, val = express.split(' ')
                 self.conditions_dict[expression(attr, expr, val)] = node
         elif (not randomize) and (not conds):
@@ -481,7 +483,7 @@ class cHubNode(cNodeBase, cSimNode):
         for attr_i in task.__dict__.keys():
             for expression in self.conditions_dict.keys():
                 if attr_i == expression.attr:
-                    print('CHECKING :{}, and  {} fulfill {} {}'.format(attr_i, expression.attr, expression.expr,
+                    logger.info('CHECKING :{}, and  {} fulfill {} {}'.format(attr_i, expression.attr, expression.expr,
                                                                        expression.val))
 
                     # TODO solve duplicating...
@@ -528,7 +530,7 @@ class cHubNode(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        logger.info("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
 
         if self.debug_on:
             self.as_process(self.gen_debug())
@@ -598,7 +600,7 @@ class cFuncNode(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        logger.info("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
 
         if self.debug_on:
             self.as_process(self.gen_debug())
@@ -726,15 +728,15 @@ class cMarketNode(cNodeBase, cSimNode):
 
             ask_ca_task = cMarketTask('Satisfied ask', entity=deal.bid_ca)
             receiver_idx1 = self.get_node_index(deal.ask_sender)
-            print(receiver_idx1)
-            print(self.out_nodes[receiver_idx1])
+            logger.info(receiver_idx1)
+            logger.info(self.out_nodes[receiver_idx1])
             receiver = self.out_nodes[receiver_idx1]
-            print('receiver', receiver)
+            logger.info('receiver', receiver)
             self.send_msg(ask_ca_task, receiver)
 
             bid_ca_task = cMarketTask('Satisfied bid', entity=deal.ask_ca)
             receiver_idx2 = self.get_node_index(deal.bid_sender)
-            print(receiver_idx2)
+            logger.info(receiver_idx2)
             receiver = self.out_nodes[receiver_idx2]
             self.send_msg(bid_ca_task, receiver)
 
@@ -744,12 +746,12 @@ class cMarketNode(cNodeBase, cSimNode):
 
     def send_closed_deal(self):
         for msg in self.messages:
-            print('MSG', msg)
+            logger.info('MSG', msg)
             self.out_orders.port_to_place.put(cMessage(*msg))
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
+        logger.info("I'm {} with connected buddies : {}".format(self.name, self.connected_buddies))
 
         if self.debug_on:
             self.as_process(self.gen_debug())
