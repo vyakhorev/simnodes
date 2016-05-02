@@ -7,6 +7,7 @@ from model.nodes.utils.custom_operators import do_expression
 from collections import namedtuple
 from simpy.events import Event,AllOf,AnyOf
 from model.nodes.wallet import cWallet
+import logging
 
 class StatesContainer():
     """
@@ -28,7 +29,7 @@ class StatesContainer():
         :param ev: 'simpy.event'| event for mapping
         """
         if state not in self.STATES:
-            print('dont know about this state')
+            pass
         else:
             self.event_mapping[state] = ev
 
@@ -53,7 +54,6 @@ class StatesContainer():
             return True
 
         else:
-            print('i dont know {} state'.format(to_state))
             return False
 
 
@@ -114,7 +114,6 @@ class BaselogicTask(BaseTask):
 
     def setup(self, good, qtty):
         self.good, self.qtty = good, qtty
-        print('created task {} goods {} qtty {}'.format(self, self.good, self.qtty))
 
     def change_state(self, to_state):
         self.states.change_state(to_state)
@@ -180,17 +179,11 @@ class cClient(cNodeBase, cSimNode):
             msg = yield self.in_orders.queue_local_jobs.get()
             task = msg.uows
 
-            print('task',task)
             if isinstance(task, RequestMoney):
-                print('requested {}{}'.format(task.good, task.qtty))
                 self.as_process(self.gen_sent_money(task))
 
             elif isinstance(task, DeliveryGoods):
-                task.change_state('fulfilled')
                 self.item_wallet.add_items(task.good, task.qtty)
-
-            # msg_to_send = cMessage(tsk, self, [self.connected_nodes[0]])
-            # self.out_orders.port_to_place.put(msg_to_send)
 
             yield self.empty_event()
 
@@ -198,6 +191,7 @@ class cClient(cNodeBase, cSimNode):
     def sushi_buyer(self, timing):
         while True:
             yield self.timeout(timing)
+            self.sent_log('new request fro sushi',logging.DEBUG)
             # creating task
             sushi_request_task = RequestGoods('Sushi_request', self.simpy_env)
             good, qtty = 'Sushi', 5
@@ -212,7 +206,6 @@ class cClient(cNodeBase, cSimNode):
 
     def gen_sent_money(self, requester_task):
         # take 'from warehouse/wallet
-        print('-)',self.money_wallet.check_qtty('USD').level)
         yield self.as_process(self.money_wallet.gen_take_qtty(requester_task.good, requester_task.qtty))
 
         requester_task.change_state('fulfilled')
@@ -250,8 +243,6 @@ class cShop(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_nodes))
-
         if self.pushing:
             self.as_process(self.gen_run_incoming_tasks())
 
@@ -270,10 +261,6 @@ class cShop(cNodeBase, cSimNode):
                 self.as_process(self.gen_deliver_good(task))
             if isinstance(task, DeliveryMoney):
                 self.money_wallet.add_items(task.good, task.qtty)
-
-            # msg_to_send = cMessage(tsk, self, [self.connected_nodes[0]])
-            # self.out_orders.port_to_place.put(msg_to_send)
-
             yield self.empty_event()
 
     def gen_deliver_good(self, requester_task):
@@ -312,8 +299,6 @@ class cAgreement(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_nodes))
-
         if self.pushing:
             self.as_process(self.gen_run_incoming_tasks())
             # self.as_process()
@@ -350,9 +335,6 @@ class cAgreement(cNodeBase, cSimNode):
                 task.party = self.partyA
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
-
-            # msg_to_send = cMessage(tsk, self, [self.connected_nodes[0]])
-            # self.out_orders.port_to_place.put(msg_to_send)
 
             yield self.empty_event()
 
@@ -399,7 +381,6 @@ class cHubNode(cNodeBase, cSimNode):
                 self.in_orders.connect_to_port(bud.out_orders)
 
         if out_nodes:
-
             self.out_nodes = out_nodes
             self.connected_nodes += out_nodes
             # inp_nodes.connected_buddies += [self]
@@ -422,9 +403,6 @@ class cHubNode(cNodeBase, cSimNode):
         for attr_i in task.__dict__.keys():
             for expression in self.conditions_dict.keys():
                 if attr_i == expression.attr:
-                    self.sent_log('CHECKING :{}, and  {} fulfill {} {}'.format(attr_i, expression.attr, expression.expr,
-                                                                       expression.val))
-
                     # TODO solve duplicating...
                     if expression.val in ['true', 'True', 'false', 'False']:
                         if getattr(task, attr_i) == (expression.val in ['True', 'true']):
@@ -470,8 +448,6 @@ class cHubNode(cNodeBase, cSimNode):
 
     # GENERATORS
     def my_generator(self):
-        print("I'm {} with connected buddies : {}".format(self.name, self.connected_nodes))
-
         if self.debug_on:
             self.as_process(self.gen_debug())
 

@@ -9,6 +9,8 @@ import sys
 import model.nodes.simulengin.statkeeper as statkeeper
 import model.nodes.meta
 import functools
+import logging
+
 
 class cDiscreteEventSystem(object):
     # TODO: implement methods to cope with node structure during simulation
@@ -20,6 +22,7 @@ class cDiscreteEventSystem(object):
     def __init__(self, simpy_env, real_world_datetime_start):
         self.simpy_env = simpy_env
         self.logging_on = True
+        self.debug_on = False
         self.random_generator = None
         self.__real_world_datetime_start = real_world_datetime_start
         self.log_printers = []
@@ -60,13 +63,17 @@ class cDiscreteEventSystem(object):
         self.is_simulation_running = True
         self.build_system()
         for n_i in self.nodes:
+            n_i.debug_on = self.debug_on
             n_i.init_sim()
             self.simpy_env.process(n_i.my_generator())
             for port_i in n_i.ports.values():
+                port_i.debug_on = self.debug_on
                 port_i.init_sim()
                 self.simpy_env.process(port_i.my_generator())
+
         for oth_i in self.others:
             oth_i.init_sim()
+            oth_i.debug_on = self.debug_on
             self.simpy_env.process(oth_i.my_generator())
         yield empty_event(self.simpy_env) #Formality
 
@@ -81,12 +88,22 @@ class cDiscreteEventSystem(object):
     def build_system(self):
         pass
 
-    def sent_log(self, sender_instance, msg_text):
-        if self.logging_on:
-            sender_name = sender_instance.log_repr()
-            timestamp = self.nowsimtime()
-            for a_pr in self.log_printers:
-                a_pr.pr(timestamp, sender_name, msg_text)
+    def sent_log(self, sender_instance, msg_text, level=logging.INFO):
+        if not self.logging_on:
+            return
+        # sender_name = sender_instance.log_repr()
+        timestamp = self.nowsimtime()
+        logname = 'DEVS.' + str(sender_instance.__class__.__name__) + '.' + str(sender_instance.name)
+        logger = logging.getLogger(logname)
+
+        msg = "@{:<3} {:<75} : {:<15}".format(timestamp, sender_instance.name, msg_text)
+
+        logger.log(level, msg)
+
+        # if we want to see logs in the GUI, we may
+        # use printers concept
+        for a_pr in self.log_printers:
+            a_pr.pr(timestamp, sender_instance.name, msg_text)
 
     def add_printer(self, a_printer):
         self.log_printers += [a_printer]
@@ -127,7 +144,8 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
     def __init__(self):
         super().__init__()
         self.is_simulation_running = False
-        self.debug_on = False
+        self.name = ''
+        #self.debug_on = False
 
     def log_repr(self):
         return self.__repr__()
@@ -139,9 +157,17 @@ class cConnToDEVS(model.nodes.meta.MetaStruct):
             self.devs.simpy_env.process(self.my_generator())
             self.init_sim()
 
-    def sent_log(self, a_msg):
-        if self.debug_on:
-            self.devs.sent_log(self, a_msg)
+    def sent_log(self, a_msg, level=logging.INFO):
+        try:
+            self.devs.sent_log(self, a_msg, level)
+        except AttributeError:
+            # not during simulation
+            timestamp = -1
+            logname = 'DEVS.' + str(self.__class__.__name__) + '.' + str(self.name)
+            logger = logging.getLogger(logname)
+            msg = "@{:<3} {:<75} : {:<15}".format(timestamp, self.name, a_msg)
+            logger.log(level, msg)
+
 
     @staticmethod
     def get_proc_repr(text):
