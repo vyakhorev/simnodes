@@ -7,6 +7,16 @@ import matplotlib.patheffects as path_effects
 from functools import wraps
 from itertools import cycle
 
+import logging
+# a defaul logger (for infos, errors and e.t.c.)
+logger = logging.getLogger(__name__)
+# A special logger for processes
+proclogger = logging.getLogger(__name__ + '.' + 'PROC')
+handler_logging = logging.StreamHandler()
+formatter_logging = logging.Formatter('%(message)s') #nothing except the message itself
+handler_logging.setFormatter(formatter_logging)
+proclogger.addHandler(handler_logging)
+
 class OtherObject:
     pass
 
@@ -79,7 +89,7 @@ class cProcessMonitor:
                 # print('DEBUG')
                 return f(inst, *args, **kwargs)
             else:
-                print('[WARNING] Turn on debug attribute to call {}'.format(f))
+                logger.warning('[WARNING] Turn on debug attribute to call {}'.format(f))
                 return
         return wrapped
 
@@ -87,7 +97,7 @@ class cProcessMonitor:
     def _map_events_to_tuple(self):
         for an_event in sorted(self.env.event_set, key=lambda x: x[2]):
             self.events += [self.event_tuple(an_event[0], an_event[1], an_event[2], an_event[3], an_event[4:])]
-        print('<<NUMBER OF EVENTS>> :', len(self.events))
+        logger.debug('<<NUMBER OF EVENTS>> :', len(self.events))
 
     @_with_check
     def _map_event_tuple_to_proc_dict(self, ev_tuple):
@@ -108,21 +118,38 @@ class cProcessMonitor:
         Print local dictionaries in nice form
         """
         for k, v in self.proc_dict.items():
-            print('Process : {} \n Events :'.format(k))
+            proclogger.debug('Process : {} \n Events :'.format(k))
             for ev in v:
-                print(ev.start_time, ev.event)
-            print('---------------------------------------')
+                proclogger.debug(ev.start_time, ev.event)
+            proclogger.debug('---------------------------------------')
 
         for obj, proc in sorted(self.obj_proc_dict.items(), key=lambda t: len(str(t[0]))):
-            print('=========='*5)
-            print('Object : {} \n processes : {}'.format(obj, proc))
-            print('----------'*5)
+            proclogger.debug('=========='*5)
+            proclogger.debug('Object : {} \n processes : {}'.format(obj, proc))
+            proclogger.debug('----------'*5)
             for item in proc:
                 if long:
-                    print(self.proc_dict[item])
+                    proclogger.debug(self.proc_dict[item])
                 else:
-                    print('{:<65} :  {:<3} Events'.format(str(item), len(self.proc_dict[item])))
-            print('=========='*5)
+                    proclogger.debug('{:<65} :  {:<3} Events'.format(str(item), len(self.proc_dict[item])))
+            proclogger.debug('=========='*5)
+
+        # for k, v in self.proc_dict.items():
+        #     print('Process : {} \n Events :'.format(k))
+        #     for ev in v:
+        #         print(ev.start_time, ev.event)
+        #     print('---------------------------------------')
+        #
+        # for obj, proc in sorted(self.obj_proc_dict.items(), key=lambda t: len(str(t[0]))):
+        #     print('=========='*5)
+        #     print('Object : {} \n processes : {}'.format(obj, proc))
+        #     print('----------'*5)
+        #     for item in proc:
+        #         if long:
+        #             print(self.proc_dict[item])
+        #         else:
+        #             print('{:<65} :  {:<3} Events'.format(str(item), len(self.proc_dict[item])))
+        #     print('=========='*5)
 
     @_with_check
     def plot_event_density(self):

@@ -2,6 +2,8 @@ import simpy
 from random import randint
 from collections import deque
 
+import logging
+logger = logging.getLogger(__name__)
 
 # testing custom type
 class dynint(int):
@@ -30,7 +32,7 @@ class Typed(Descriptor):
 
     def __set__(self, instance, value):
         if not isinstance(value, self._expected_type):
-            print('value : {}'.format(value))
+            logger.error('value : {}'.format(value))
             raise TypeError('Expected ' + str(self._expected_type))
         super().__set__(instance, value)
 

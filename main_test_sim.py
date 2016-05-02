@@ -174,11 +174,8 @@ def Test6():
 
 
 if __name__ == '__main__':
-    import logging
-    from logging.config import fileConfig
-    # Можно прямо тут фильтры логера менять
-    fileConfig('logging_config.ini')
-    logging.basicConfig(filename='test.log', filemode='w', level=logging.DEBUG)
+    import lg
+    lg.config_logging(tofile='logs/test.log')
 
     from model.nodes.classes.ClientShopSupplier import test1
 
