@@ -58,7 +58,7 @@ class cNodeModel(object):
         for obs_i in self.observers:
             sim_manager.add_sim_observer(obs_i)
 
-        sim_results = sim_manager.run_and_return_log(sim_until, print_console=True, print_to_list=None)
+        sim_results = sim_manager.run_and_return_log(sim_until, print_console=False, print_to_list=None)
 
         # Monitor results
         # pm = cProcessMonitor(simpyenv, sim_until)

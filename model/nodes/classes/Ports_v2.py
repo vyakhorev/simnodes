@@ -75,8 +75,7 @@ class cManytoOneQueue(cSimPort):
         super().init_sim()
 
     def my_generator(self):
-        if self.debug_on:
-            self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
         # if self.is_connected():
         self.as_process(self.fetch_all_queues())
 
@@ -88,9 +87,8 @@ class cManytoOneQueue(cSimPort):
         """
         while True:
             msg = yield queue.get()
-            if self.debug_on:
-                self.sent_log('im got msg {}'.format(msg))
-                self.sent_log(str(msg))
+            self.sent_log('im got msg {}'.format(msg))
+            self.sent_log(str(msg))
             self.queue_fetch_incomes.put(msg)
             yield self.timeout(0)
 
@@ -100,8 +98,7 @@ class cManytoOneQueue(cSimPort):
         """
         # todo maybe dont work
         for nodeport_i, queue_i in self.queues_inputs.items():
-            if self.debug_on:
-                self.sent_log('SPAWNED listener  for {}'.format(queue_i))
+            self.sent_log('SPAWNED listener  for {}'.format(queue_i))
             self.as_process(self.gen_simple_waiter(queue_i))
         # for port_id, neigh_i in self.connected_ports.items():
         #     self.sent_log('neigh {} <=> port {}'.format(neigh_i, port_id))
@@ -174,9 +171,7 @@ class cOnetoManyQueue(cSimPort):
         super().init_sim()
 
     def my_generator(self):
-        if self.debug_on:
-            self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
-        # if self.is_connected():
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
         self.as_process(self.gen_sort_jobs(), repr='Sorting_Generator{} '.format(self.nodeid))
 
         yield self.timeout(0)
@@ -197,9 +192,7 @@ class cOnetoManyQueue(cSimPort):
 
         while True:
             msg = yield self._queue_nonsorted_jobs.get()
-            if self.debug_on:
-                self.sent_log('im got {}'.format(msg))
-            print('self.connected_ports', self.connected_ports)
+            self.sent_log('im got {}'.format(msg))
             if msg.receivers[0] in [neigh_i.parent_node for neigh_i in self.connected_ports.values()]:
                 for port_id, neigh_i in self.connected_ports.items():
                     if neigh_i.parent_node in msg.receivers:
@@ -260,21 +253,12 @@ class cOnetoOneInpQueue(cSimPort):
         super().init_sim()
 
     def my_generator(self):
-        if self.debug_on:
-            self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
-        # if self.is_connected():
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
         self.as_process(self.gen_listen_input())
         yield self.timeout(0)
 
     def get_fetch_queue(self, who_calls):
-        # for k, v in self.parent_node.__dict__.items():
-        #     print(k, ' : ', v)
-        if self.debug_on:
-            print('=========================')
-            print(who_calls.parent_node.out_orders)
-            print(who_calls.parent_node.in_orders)
-            print('=========================')
-            self.sent_log('{} calls for my {} queue'.format(who_calls, self))
+        self.sent_log('{} calls for my {} queue'.format(who_calls, self))
         return self.queue_fetch_incomes
 
     @property
@@ -290,11 +274,9 @@ class cOnetoOneInpQueue(cSimPort):
             msg = yield self.queue_fetch_incomes.get()
             if self.parent_node in msg.receivers:
                 self.queue_local_jobs.put(msg)
-                if self.debug_on:
-                    self.sent_log('[SUCCESS] got the {}'.format(msg))
+                self.sent_log('[SUCCESS] got the {}'.format(msg))
             else:
-                if self.debug_on:
-                    self.sent_log('[WARN] message {} have bad address'.format(msg))
+                self.sent_log('[WARN] message {} have bad address'.format(msg))
                 self.wrong_jobs.put(msg)
 
         yield self.timeout(0)
@@ -342,8 +324,7 @@ class cOnetoOneOutQueue(cSimPort):
         super().init_sim()
 
     def my_generator(self):
-        if self.debug_on:
-            self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
+        self.sent_log('CONNECTED ? {}'.format(self.is_connected()))
         # if self.is_connected():
         self.as_process(self.gen_push_job())
         yield self.timeout(0)
@@ -354,33 +335,23 @@ class cOnetoOneOutQueue(cSimPort):
 
     def connect_to_port(self, another_port):
         if another_port.port_id in self.connected_ports:
-            if self.debug_on:
-                print('Failed to connect !! ')
             return
 
         elif len(self.connected_ports) > 0:
             raise AttributeError('{} Coudnt connect to many ports'.format(self))
 
-        if self.debug_on:
-            print('connecting {} with {} port_id to {} with {} port_id '.format(self, self.port_id, another_port,
+        self.sent_log('connecting {} with {} port_id to {} with {} port_id '.format(self, self.port_id, another_port,
                                                                             another_port.port_id))
 
         self.connected_ports[another_port.port_id] = another_port
         another_port.connected_ports[self.port_id] = self
 
-        if self.debug_on:
-            print(self.connected_ports)
         return True
 
     def gen_push_job(self):
         while True:
             msg = yield self.port_to_place.get()
             # FIXME causes error if no output nodes
-            if self.debug_on:
-                print('self.connected_ports.values()', self.connected_ports.values())
-
-            if self.debug_on:
-                print('%%%%ALOAHAHAJHFBHFBLBFAEFAF',self.parent_node, list(self.connected_ports.values()) )
             neigh = list(self.connected_ports.values())[0]
             queue = neigh.get_fetch_queue(self)
             queue.put(msg)

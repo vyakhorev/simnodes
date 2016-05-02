@@ -8,6 +8,9 @@ import datetime
 
 from model.nodes.node_model import cNodeModel
 from pprint import pprint
+import logging
+
+logger = logging.getLogger(__name__)
 
 class cNodeFieldModel():
     # TODO: all interaction with nodes creation / managing / coordinates / color is here
@@ -56,19 +59,19 @@ class cNodeFieldModel():
 
     def build_json(self):
         # grabbing json from two nodes representations
-        print('--------JSON GRABBING START------------')
+        logger.info('--------JSON GRABBING START------------')
         for nd in self.getNodes():
             pprint(nd._json())
-            print('--------------------------------------')
-        print('--------JSON GRABBING END--------------')
+            logger.info('--------------------------------------')
+        logger.info('--------JSON GRABBING END--------------')
 
 
-        print('-------JSON GRABBING START(GUI)--------')
+        logger.info('-------JSON GRABBING START(GUI)--------')
         for nd in self.getNodes():
             if hasattr(nd, 'gui_repr'):
                 pprint(nd.gui_repr._json())
-            print('--------------------------------------')
-        print('--------JSON GRABBING END--------------')
+            logger.info('--------------------------------------')
+        logger.info('--------JSON GRABBING END--------------')
 
 
 

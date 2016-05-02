@@ -22,6 +22,7 @@ class cSimNode(simulengin.cConnToDEVS):
         self.node_id = self.nodeid
         self.name = name
         self.ports = {}
+        self.debug_on = False
 
     def __repr__(self):
         return str(self.name) + " (node id " + str(self.node_id) + ")"
@@ -69,20 +70,18 @@ class cSimPort(simulengin.cConnToDEVS, model.nodes.meta.MetaStruct):
             for k, v in self.connected_ports.items():
                 rpr += ' ' + str(k)
         else:
-            print('Not connected yet')
+            #print('Not connected yet')
+            pass
         return rpr
 
     def connect_to_port(self, another_port):
         if another_port.port_id in self.connected_ports:
-            print('Failed to connect !! ')
+            #print('Failed to connect !! ')
             # Already connected
             return
-        print('connecting {} with {} port_id to {} with {} port_id '.format(self, self.port_id, another_port,
-                                                                            another_port.port_id))
         self.connected_ports[another_port.port_id] = another_port
         another_port.connected_ports[self.port_id] = self
 
-        print(self.connected_ports)
 
     def is_connected(self):
         if len(self.connected_ports) == 0:
