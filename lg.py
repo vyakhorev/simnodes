@@ -57,7 +57,7 @@ def config_logging(level=logging.INFO, toconsole=True, tofile='', whitelist=None
 
     if toconsole:
         handler = logging.StreamHandler()
-        formatter_console = ColoredFormatter()
+        formatter_console = TableFormatter()
         handler.setFormatter(formatter_console)
         handlers += [handler]
 
@@ -92,26 +92,20 @@ class cBlacklist(cWhitelist):
     def filter(self, record):
         return not cWhitelist.filter(self, record)
 
-class ColoredFormatter(logging.Formatter):
-    spec_string = '%(levelname)-10s<~>%(name)-20s<~>%(message)s'  #has to be so for format method below
+class TableFormatter(logging.Formatter):
 
     def __init__(self, use_color = True):
-        logging.Formatter.__init__(self, self.spec_string)
+        logging.Formatter.__init__(self, '')
         self.use_color = use_color
 
     def format(self, record):
-        levelname = record.levelname
-        if self.use_color and levelname in COLORS:
-            levelname_color = COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ
-            record.levelname = levelname_color
-        # do some simple post-formatting to divide into columns
-        s = logging.Formatter.format(self, record)
-        lev, nam, msg = s.split('<~>') #DO NOT USE '<~>' INSIDE ANY LOGGING!
-        # lastnam = nam.split('.')[-1]
-        # if lastnam == '': lastnam = nam #in case one do not use ierarhy
-        s = '[' + lev +'][' + special_trunc(nam,30) +']\tMSG: ' + msg
+        lev, nam, msg = record.levelname, record.name, record.getMessage()
+        s = '[' + special_trunc(lev, 4) + '][' + special_trunc(nam, 30) + ']\tMSG: ' + msg
         return s
 
 def special_trunc(some_str, maxlen=30):
     # truncates a string to maxlen and fills it with spaces if needed
-    return some_str[0:maxlen]
+    s = some_str[0:maxlen]
+    while len(s) < maxlen:
+        s += ' '
+    return s
