@@ -28,18 +28,12 @@ logger.error('that is impossible!')
 
 import logging
 
-BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
-COLORS = {
-    'WARNING': YELLOW,
-    'INFO': WHITE,
-    'DEBUG': BLUE,
-    'CRITICAL': YELLOW,
-    'ERROR': RED
-}
-#These are the sequences need to get colored ouput
-RESET_SEQ = "\033[0m"
-COLOR_SEQ = "\033[1;%dm"
-BOLD_SEQ = "\033[1m"
+USE_ONLY_LAST_NAME = True # "DEVS.Node.Shop or just Shop" ?
+if USE_ONLY_LAST_NAME:    # max length for console logger name (should be higher if we use full name)
+    NAME_TRUNC = 15
+else:
+    NAME_TRUNC = 35
+LEVEL_TRUNC = 4           # max length for console level name truncate
 
 def config_logging(level=logging.INFO, toconsole=True, tofile='', whitelist=None, blacklist=None):
     """
@@ -94,13 +88,10 @@ class cBlacklist(cWhitelist):
 
 class TableFormatter(logging.Formatter):
 
-    def __init__(self, use_color = True):
-        logging.Formatter.__init__(self, '')
-        self.use_color = use_color
-
     def format(self, record):
         lev, nam, msg = record.levelname, record.name, record.getMessage()
-        s = '[' + special_trunc(lev, 4) + '][' + special_trunc(nam, 30) + ']\tMSG: ' + msg
+        if USE_ONLY_LAST_NAME: nam = hier_trunc(nam)
+        s = '[' + special_trunc(lev, LEVEL_TRUNC) + '][' + special_trunc(nam, NAME_TRUNC) + ']\tMSG: ' + msg
         return s
 
 def special_trunc(some_str, maxlen=30):
@@ -109,3 +100,14 @@ def special_trunc(some_str, maxlen=30):
     while len(s) < maxlen:
         s += ' '
     return s
+
+def hier_trunc(some_str):
+    # Exctracts "Shop" from "DEVS.Nodes.Shop" and "Que" from "DEVS.Que."
+    levels = some_str.split('.')
+    if len(levels) <= 1:
+        return some_str
+    if levels[-1] != '':
+        return levels[-1]
+    if len(levels) > 1:
+        return levels[-2]
+
