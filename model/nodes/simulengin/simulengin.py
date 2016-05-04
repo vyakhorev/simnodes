@@ -22,6 +22,7 @@ class cDiscreteEventSystem(object):
         1. Link to global system vars (random generator with preset seed, logger and so on)
         2. Nodes structure.
     """
+    IS_SIM_RUN = False
     def __init__(self, simpy_env, real_world_datetime_start):
         self.simpy_env = simpy_env
         self.logging_on = True
@@ -61,9 +62,14 @@ class cDiscreteEventSystem(object):
             seed = random.randint(0, 10000)
         self.random_generator = random.Random(seed)
 
+    @classmethod
+    def set_classattr_IS_SIM_RUN_to_True(cls):
+        cls.IS_SIM_RUN = True
+
     def my_generator(self):
         #Это самый первый генератор, куда мы заходим
         self.is_simulation_running = True
+        self.set_classattr_IS_SIM_RUN_to_True()
         self.build_system()
         for n_i in self.nodes:
             n_i.debug_on = self.debug_on
