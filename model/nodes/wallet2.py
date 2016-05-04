@@ -73,6 +73,7 @@ class cWallet(simulengin.cConnToDEVS):
         super().__init__()
         self.name = name
         self.res_all = {}
+        self.debug_on = True
 
     def init_sim(self):
         super().init_sim()
@@ -187,7 +188,6 @@ class cWallet(simulengin.cConnToDEVS):
             self.add_to_pile(name, qtty)
         else:
             raise AttributeError('Dont have such specie in base')
-
 
     def check_existence(self, name):
         """
@@ -317,6 +317,102 @@ class DumbNode(simulengin.cConnToDEVS):
         self.planned_processes.append(self.processes_tuple(self.put_process2, wallet, item, qtty, when))
 
 
+class Stock(simulengin.cConnToDEVS):
+    def __init__(self, name=None):
+        super().__init__()
+        self.name = name
+        self.wallet = cWallet('Stock_wallet')
+        self.reserve = cWallet('Reserve')
+
+    def init_sim(self):
+        super().init_sim()
+        self.wallet.spawn_pile('water', 1000)
+
+    def my_generator(self):
+        yield self.empty_event()
+
+    def purchase(self, which, amount):
+        # todo cancel ContainerGet event
+        container_getter = self.wallet.gen_take_qtty(which, amount)
+        container_getter_event = next(container_getter)
+        if container_getter_event.triggered:
+            self.sent_log('purchased {}'.format(container_getter_event.amount))
+            return container_getter_event.amount
+        else:
+            self.sent_log('cant purchase {}'.format(container_getter_event.amount))
+            container_getter_event.cancel()
+            return None
+
+    # def purchase_future(self, which, amount):
+    #     container_getter = self.wallet.gen_take_qtty(which, amount)
+    #     # container_getter_event = next(container_getter)
+    #     return container_getter
+
+    def purchase_and_deliver(self, which, amount, deliver_timedelta=None):
+
+        to_reserv = self.purchase(which, amount)
+
+        # if enough amount in stock
+        if to_reserv:
+            print(to_reserv)
+            self.reserve.add_to_pile(which, to_reserv)
+            self.sent_log('reserved {} of {}'.format(which, to_reserv))
+
+            yield self.timeout(deliver_timedelta)
+            self.sent_log('gonna deliver {} of {}'.format(which, to_reserv))
+
+            container_getter = self.reserve.gen_take_qtty(which, amount)
+            container_getter_event = next(container_getter)
+            if container_getter_event.triggered:
+                self.sent_log('delivered {}'.format(container_getter_event.amount))
+                return container_getter_event.amount
+            else:
+                self.sent_log('cant deliver {}'.format(container_getter_event.amount))
+                return None
+        yield self.empty_event()
+
+
+class Client(simulengin.cConnToDEVS):
+    def __init__(self, name=None):
+        super().__init__()
+        self.name = name
+        self.stock = None
+        self.wallet = cWallet('Client_wallet')
+
+    def init_sim(self):
+        super().init_sim()
+        self.wallet.spawn_pile('water', 0)
+
+    def my_generator(self):
+        self.as_process(self.purchase_good())
+        self.as_process(self.purchase_good_with_deliver())
+        yield self.empty_event()
+
+    def set_stock(self, stock):
+        self.stock = stock
+
+    def purchase_good(self):
+        yield self.timeout(8)
+        ret = self.stock.purchase('water', 300)
+        if ret:
+            self.wallet.add_to_pile('water', ret)
+        self.sent_log(ret)
+
+    def purchase_good_with_deliver(self):
+        yield self.timeout(10)
+        gen = self.stock.purchase_and_deliver('water', 600, deliver_timedelta=5)
+        proc = self.as_process(gen)
+        delivered = yield proc | self.simpy_env.timeout(8)
+        dict = delivered.todict()
+        self.sent_log(delivered.todict())
+        if proc in dict:
+            self.wallet.add_to_pile('water', dict[proc])
+            self.sent_log('added {}'.format(dict[proc]))
+
+        # todo interrupt purchase_and_deliver ...
+
+
+
 if __name__ == '__main__':
     import logging
 
@@ -329,39 +425,53 @@ if __name__ == '__main__':
     from model.model import cNodeFieldModel
     the_model = cNodeFieldModel()
 
-    wal_a = cWallet('wal_a')
-    wal_a.spawn_pile('rubles', 100)
+    def case1():
+        wal_a = cWallet('wal_a')
+        wal_a.spawn_pile('rubles', 100)
 
-    wal_b = cWallet('wal_b')
-    wal_b.spawn_item('gold ingots', 4)
+        wal_b = cWallet('wal_b')
+        wal_b.spawn_item('gold ingots', 4)
 
-    test_obj = DumbNode(name='test_obj')
-    test_obj.get_goods(wal_a, 'rubles', qtty=60, when=5)
-    test_obj.get_goods(wal_a, 'rubles', qtty=80, when=7)
-    test_obj.place_goods(wal_a, 'plumbum_ingots', qtty=130, when=14)
+        test_obj = DumbNode(name='test_obj')
+        test_obj.get_goods(wal_a, 'rubles', qtty=60, when=5)
+        test_obj.get_goods(wal_a, 'rubles', qtty=80, when=7)
+        test_obj.place_goods(wal_a, 'plumbum_ingots', qtty=130, when=14)
 
-    test_obj.place_goods(wal_b, 'ruble_packs', qtty=15, when=10)
+        test_obj.place_goods(wal_b, 'ruble_packs', qtty=15, when=10)
 
-    test_obj_2 = DumbNode(name='test_obj_2')
-    test_obj_2.get_goods(wal_a, 'rubles', qtty=60, when=5)
+        test_obj_2 = DumbNode(name='test_obj_2')
+        test_obj_2.get_goods(wal_a, 'rubles', qtty=60, when=5)
 
-    test_obj_3 = DumbNode(name='test_obj_3')
-    test_obj_3.get_goods(wal_a, 'rubles', qtty=60, when=5)
+        test_obj_3 = DumbNode(name='test_obj_3')
+        test_obj_3.get_goods(wal_a, 'rubles', qtty=60, when=5)
 
-    # HOW-TO get values from cWallet
-    logger.info(wal_a.get_item('rubles'))
-    logger.info(wal_b.get_item('gold ingots'))
+        # HOW-TO get values from cWallet
+        logger.info(wal_a.get_item('rubles'))
+        logger.info(wal_b.get_item('gold ingots'))
 
-    # the_model.addNodes([wal_a, wal_b])
-    the_model.addOtherSimObj(wal_a)
-    the_model.addOtherSimObj(wal_b)
+        # the_model.addNodes([wal_a, wal_b])
+        the_model.addOtherSimObj(wal_a)
+        the_model.addOtherSimObj(wal_b)
 
-    test_objs = DumbNode.ALL_DumbNode
-    # shuffle order
-    shuffle(test_objs)
-    for nd in test_objs:
-        the_model.addOtherSimObj(nd)
+        test_objs = DumbNode.ALL_DumbNode
+        # shuffle order
+        shuffle(test_objs)
+        for nd in test_objs:
+            the_model.addOtherSimObj(nd)
 
+    def case2():
+        a_stock = Stock('Stock')
+        a_client = Client('Client')
+        a_client.set_stock(a_stock)
+
+        the_model.addOtherSimObj(a_stock)
+        the_model.addOtherSimObj(a_client)
+        the_model.addOtherSimObj(a_stock.wallet)
+        the_model.addOtherSimObj(a_stock.reserve)
+        the_model.addOtherSimObj(a_client.wallet)
+
+
+    case2()
     logger.info('<<<<<<< STARTING SIMULATION !!! >>>>>>>>>')
     the_model.run_sim(datetime.date(2016, 5, 2), until=25, seed=555, debug=True)
     logger.info('>>>>>>> POST SIMULATION !!! <<<<<<<<<<')

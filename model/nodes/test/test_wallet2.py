@@ -22,7 +22,7 @@ def test_random_actions_to_wallet():
     the_model.addOtherSimObj(wal_a)
 
     test_objs = DumbNode.ALL_DumbNode
-    # shuffle order
+
     for nd in test_objs:
         the_model.addOtherSimObj(nd)
 
@@ -30,7 +30,6 @@ def test_random_actions_to_wallet():
 
     assert len(wal_a.res_all) == 2
     assert wal_a.res_all['rubles'].value.level == 40
-    print(wal_a.res_all['plumbum_ingots'].items_store.items)
     assert len(wal_a.res_all['plumbum_ingots'].items_store.items) == 130
 
 def test_pile_add_and_consume():
@@ -53,7 +52,7 @@ def test_pile_add_and_consume():
     the_model.addOtherSimObj(wal_a)
 
     test_objs = DumbNode.ALL_DumbNode
-    # shuffle order
+
     for nd in test_objs:
         the_model.addOtherSimObj(nd)
 
