@@ -24,19 +24,27 @@ class cSimNode(simulengin.cConnToDEVS):
         self.node_id = self.nodeid
         self.name = name
         self.ports = {}
+        self.wallets = {}
         self.debug_on = False
 
     def __repr__(self):
         return str(self.name) + " (node id " + str(self.node_id) + ")"
 
     def register_port(self, new_port):
-        logger.info('registering {} {}'.format(new_port.port_id, self.ports))
+        #logger.info('registering {} {}'.format(new_port.port_id, self.ports))
         if new_port.port_id in self.ports:
+            logger.warn('port already registered! {} {}'.format(new_port.port_id, self.ports))
             pass
             # raise KeyError("already in the list!")
 
         self.ports[new_port.port_id] = new_port
         setattr(self, str(new_port.port_id), new_port)
+
+    def register_wallet(self, new_wallet):
+        if new_wallet.wallet_id in self.wallets:
+            logger.warn('wallet already registered! {} {}'.format(new_wallet.wallet_id, self.ports))
+        self.wallets[new_wallet.wallet_id] = new_wallet
+        setattr(self, str(new_wallet.wallet_id), new_wallet)
 
     def get_connections(self):
         # todo make compr

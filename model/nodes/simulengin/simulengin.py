@@ -238,6 +238,7 @@ class cSimulRunner(object):
         self.system.simpy_env.process(self.system.my_generator())
         for obs_i in self.observers:
             obs_i.activate_in_env()
+        # Принтеры рядом с logging устаревают.
         if print_console:
             self.system.add_printer(console_log_printer())
         if print_to_list is not None:
@@ -245,9 +246,6 @@ class cSimulRunner(object):
         # Система собрана - запускаем!
         self.system.simpy_env.run(until = sim_until)
         return dict(log_list=print_to_list, dataframes=self.sim_results)
-
-    #def add_observer(self, observer_class, obs_name, freq):
-    #    self.observers += [observer_class(obs_name, self.system, self.sim_results, freq)]
 
     def add_sim_observer(self, new_observer):
         new_observer.set_system(self.system, self.sim_results)
@@ -275,29 +273,25 @@ class list_log_printer(object):
 class cAbstObserver():
     # Helps to observe and record statistics from the system
 
-    def __init__(self, obs_name, period = 1):
-        self.period = period
+    def __init__(self, obs_name):
         self.obs_name = obs_name
 
     def full_obs_name(self):
-        return "[each %d days] %s"% (self.period, self.obs_name)
+        return self.obs_name
 
     def set_system(self, system, sim_results):
         self.system = system
         self.sim_results = sim_results
 
     def my_generator(self):
-        while True:
-            self.cur_date = self.system.simpy_env.now
-            self.observe_data()
-            yield self.system.simpy_env.timeout(self.period)
+        self.cur_date = 0 # change this in implementations
+        raise NotImplementedError("There are two implementations: cAbstPeriodicObserver, cAbstEventObserver")
 
     def observe_data(self):
-        # Reimplement - you may record multiple ts
         ts_name = "abstract"
         ts_value = 0
         self.record_data(ts_name, ts_value)
-        raise NotImplementedError("implement please")
+        raise NotImplementedError("implement please (you may record multiple time series here)")
 
     def record_data(self, ts_name, ts_value):
         # Do not record the same data twice - they are aggregated in pandas, though.. Never tested.
@@ -306,13 +300,12 @@ class cAbstObserver():
     def activate_in_env(self):
         self.system.simpy_env.process(self.my_generator())
 
-
-class old_cAbstObserver():
-    # Helps to observe and record statistics from the system
-    def __init__(self, obs_name, system, sim_results, period = 1):
-        self.obs_name = obs_name
-        self.system = system
-        self.sim_results = sim_results
+class cAbstPeriodicObserver(cAbstObserver):
+    """
+        Do records according to self.observe_data() each self.period
+    """
+    def __init__(self, obs_name, period=1):
+        super().__init__(obs_name)
         self.period = period
 
     def full_obs_name(self):
@@ -324,16 +317,21 @@ class old_cAbstObserver():
             self.observe_data()
             yield self.system.simpy_env.timeout(self.period)
 
-    def observe_data(self):
-        # Reimplement - you may record multiple ts
-        ts_name = "abstract"
-        ts_value = 0
-        self.record_data(ts_name, ts_value)
-        raise NotImplementedError("implement please")
+# class cAbstEventObserver(cAbstObserver):
+#     """
+#         Each time an event in event_bus (simpy.store) is triggered
+#         run observation routine (self.observe_data)
+#     """
+#     def __init__(self, obs_name, event_bus):
+#         super().__init__(obs_name)
+#         self.event_bus = event_bus
+#
+#     def full_obs_name(self):
+#         return "[each %d days] %s"% (self.period, self.obs_name)
+#
+#     def my_generator(self):
+#         while True:
+#             self.cur_date = self.system.simpy_env.now
+#             self.observe_data()
+#             yield self.system.simpy_env.timeout(self.period)
 
-    def record_data(self, ts_name, ts_value):
-        # Do not record the same data twice - they are aggregated in pandas, though.. Never tested.
-        self.sim_results.add_ts_point(self.full_obs_name(), ts_name, self.cur_date, ts_value)
-
-    def activate_in_env(self):
-        self.system.simpy_env.process(self.my_generator())

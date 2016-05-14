@@ -5,6 +5,7 @@ from pprint import pprint
 from random import shuffle
 from collections import namedtuple
 from model.nodes.simulengin.simulengin import cDiscreteEventSystem
+import model
 
 class cValuedResource(simulengin.cConnToDEVS):
 
@@ -55,7 +56,7 @@ class cPile(cValuedResource):
             return str(self.name) + " : " + str(self.value.proxyLevel)
 
 
-class cWallet(simulengin.cConnToDEVS):
+class cWallet(simulengin.cConnToDEVS, model.nodes.meta.MetaStruct):
     """
     cWallet provide container facilities, where you could place 'Items' as objects or 'Piles' as homogeneous matter
     You can manipulate Wallet before, in-between and after
@@ -71,6 +72,7 @@ class cWallet(simulengin.cConnToDEVS):
         :param name: str| Wallet name
         """
         super().__init__()
+        self.wallet_id = self.nodeid
         self.name = name
         self.res_all = {}
         self.debug_on = True
@@ -92,6 +94,14 @@ class cWallet(simulengin.cConnToDEVS):
         """
         res.s_set_devs(self.devs)
         res.init_sim()
+
+    # returns levels for all items
+    # TODO: more cases here
+    def check_inventory(self):
+        inventory = {}
+        for name_i, res_i in self.res_all.items():
+            yield (name_i, self.get_item(name_i)) #TODO: можно быстрей
+
 
     # debug generator
     def gen_dumb_printer(self):
@@ -470,12 +480,12 @@ class Client(simulengin.cConnToDEVS):
 
 
 if __name__ == '__main__':
+    import lg
     import logging
 
-    logging.basicConfig(level=logging.INFO)
+    lg.config_logging(logging.INFO)
+
     logger = logging.getLogger(__name__)
-    # from logging.config import fileConfig
-    # fileConfig('logging_config.ini')
 
     import datetime
     from model.model import cNodeFieldModel

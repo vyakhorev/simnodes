@@ -185,18 +185,17 @@ if __name__ == '__main__':
     loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)
 
     # Plot processes
-    #pm = cProcessMonitor(runner.system.simpy_env, until=25)
-    # print(id(runner.system.simpy_env))
+    # pm = cProcessMonitor(runner.system.simpy_env, until=25)
+    # #print(id(runner.system.simpy_env))
     # pm.plot_procs_groups()
     # pm.plot_event_density()
-    #pm.print_process()
+    # pm.print_process()
 
-    # log = loganddata['log_list']
-    #
-    # for obs_name, var_name in runner.sim_results.get_available_names():
-    #     data_frame = runner.sim_results.get_dataframe_for_epochvar(obs_name, var_name)
-    #     data_frame.plot()
-    #     print(data_frame)
-    # matplotlib.pyplot.show()
+    import matplotlib
+    for obs_name, var_name in runner.sim_results.get_available_names():
+        data_frame = runner.sim_results.get_dataframe_for_epochvar(obs_name, var_name)
+        data_frame.plot()
+        #print(data_frame)
+    matplotlib.pyplot.show()
 
 

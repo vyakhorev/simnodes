@@ -6,8 +6,15 @@ from random import randint, choice
 from model.nodes.utils.custom_operators import do_expression
 from collections import namedtuple
 from simpy.events import Event,AllOf,AnyOf
-from model.nodes.wallet import cWallet
-import logging
+from model.nodes.wallet2 import cWallet
+
+import model.nodes.simulengin.simulengin as simulengin
+
+import logging # each node has it's own logger
+
+# ######################################
+# Tasks
+# ######################################
 
 class StatesContainer():
     """
@@ -56,7 +63,6 @@ class StatesContainer():
         else:
             return False
 
-
 class BaseTask():
     """
     Non typed task , which have callback system to announce its subscribers
@@ -82,7 +88,6 @@ class BaseTask():
 
     def __repr__(self):
         return 'Task {}'.format(self.taskname)
-
 
 class BaselogicTask(BaseTask):
     """
@@ -130,10 +135,9 @@ class RequestMoney(BaselogicTask):
 class DeliveryMoney(BaselogicTask):
     pass
 
-
+# ######################################
 # Nodes
 # ######################################
-
 
 # Client (Blue Node)
 class cClient(cNodeBase, cSimNode):
@@ -148,7 +152,9 @@ class cClient(cNodeBase, cSimNode):
         self.pushing = True
 
         self.item_wallet = cWallet()
+        self.register_wallet(self.item_wallet)
         self.money_wallet = cWallet()
+        self.register_wallet(self.money_wallet)
 
     def connect_node(self, node):
         self.connected_nodes += [node]
@@ -215,7 +221,6 @@ class cClient(cNodeBase, cSimNode):
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
 
-
 # Shop(Blue Node)
 class cShop(cNodeBase, cSimNode):
 
@@ -229,7 +234,9 @@ class cShop(cNodeBase, cSimNode):
         self.pushing = True
 
         self.item_wallet = cWallet()
+        self.register_wallet(self.item_wallet)
         self.money_wallet = cWallet()
+        self.register_wallet(self.money_wallet)
 
     def connect_node(self, node):
         self.connected_nodes += [node]
@@ -347,7 +354,6 @@ class cAgreement(cNodeBase, cSimNode):
         self.out_orders.port_to_place.put(msg_to_send)
 
 # Hub (Orange Node)
-
 class cHubNode(cNodeBase, cSimNode):
     """
         ?? 1 input--->[HUB]--->Multiple outputs
@@ -456,8 +462,26 @@ class cHubNode(cNodeBase, cSimNode):
 
         yield self.empty_event()
 
+# Observers
+class cPeriodicWalletObserver(simulengin.cAbstPeriodicObserver):
+    def __init__(self, wallet, period=1):
+        obs_name = "wallet" #compose from wallet
+        super().__init__(obs_name, period)
+        self.wallet = wallet
 
-# System setup
+    def observe_data(self):
+        for name_i, level_i in self.wallet.check_inventory():
+            ts_name = name_i
+            self.record_data(ts_name, level_i)
+
+def create_wallet_observers(a_node):
+    # Scans a node for wallets and creates observers for them
+    obs = []
+    for wal_i in a_node.wallets.values():
+        obs += [cPeriodicWalletObserver(wal_i)]
+    return obs
+
+
 def test1():
     from model.model import cNodeFieldModel
     the_model = cNodeFieldModel()
@@ -474,6 +498,13 @@ def test1():
     cond_dict = {node1: 'party = 0',
                  node3: 'party = 1'}
     node4.condition(cond_dict)
+
+    # create and add observers
+    obs = []
+    obs += create_wallet_observers(node1)
+    obs += create_wallet_observers(node3)
+    for obs_i in obs:
+        the_model.addObserver(obs_i)
 
     the_model.addNodes([node1, node2, node3, node4])
 
