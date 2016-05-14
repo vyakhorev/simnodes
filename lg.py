@@ -30,7 +30,7 @@ import logging
 
 USE_ONLY_LAST_NAME = True # "DEVS.Node.Shop or just Shop" ?
 if USE_ONLY_LAST_NAME:    # max length for console logger name (should be higher if we use full name)
-    NAME_TRUNC = 15
+    NAME_TRUNC = 25
 else:
     NAME_TRUNC = 35
 LEVEL_TRUNC = 4           # max length for console level name truncate

@@ -67,12 +67,13 @@ class cWallet(simulengin.cConnToDEVS, model.nodes.meta.MetaStruct):
     # holding known resource species
     glob_res_map = {}
 
-    def __init__(self, name=None):
+    def __init__(self, parent_node, name=None):
         """
         :param name: str| Wallet name
         """
         super().__init__()
         self.wallet_id = self.nodeid
+        self.parent_node = parent_node
         self.name = name
         self.res_all = {}
         self.debug_on = True

@@ -1,3 +1,4 @@
+
 from model.nodes.classes.Node_func_v2 import cNodeBase
 from model.nodes.classes.SimBase import cSimNode
 import model.nodes.classes.Ports_v2 as ports
@@ -151,9 +152,9 @@ class cClient(cNodeBase, cSimNode):
         self.connected_nodes = []
         self.pushing = True
 
-        self.item_wallet = cWallet()
+        self.item_wallet = cWallet(self)
         self.register_wallet(self.item_wallet)
-        self.money_wallet = cWallet()
+        self.money_wallet = cWallet(self)
         self.register_wallet(self.money_wallet)
 
     def connect_node(self, node):
@@ -186,9 +187,12 @@ class cClient(cNodeBase, cSimNode):
             task = msg.uows
 
             if isinstance(task, RequestMoney):
+                self.sent_log('[gen_run_incoming_tasks] handling RequestMoney')
                 self.as_process(self.gen_sent_money(task))
 
             elif isinstance(task, DeliveryGoods):
+                self.sent_log('[gen_run_incoming_tasks] handling DeliveryGoods')
+                task.change_state('fulfilled') # fast solution
                 self.item_wallet.add_items(task.good, task.qtty)
 
             yield self.empty_event()
@@ -197,7 +201,7 @@ class cClient(cNodeBase, cSimNode):
     def sushi_buyer(self, timing):
         while True:
             yield self.timeout(timing)
-            self.sent_log('new request fro sushi',logging.DEBUG)
+            self.sent_log('new request for sushi', logging.DEBUG)
             # creating task
             sushi_request_task = RequestGoods('Sushi_request', self.simpy_env)
             good, qtty = 'Sushi', 5
@@ -212,10 +216,13 @@ class cClient(cNodeBase, cSimNode):
 
     def gen_sent_money(self, requester_task):
         # take 'from warehouse/wallet
+        self.sent_log('[gen_sent_money] taking money')
         yield self.as_process(self.money_wallet.gen_take_qtty(requester_task.good, requester_task.qtty))
+        self.sent_log('[gen_sent_money] money are taken, sending')
 
         requester_task.change_state('fulfilled')
-        delivery_task = DeliveryMoney('USD', self.simpy_env)
+
+        delivery_task = DeliveryMoney('DeliveryMoney', self.simpy_env)
         delivery_task.setup(requester_task.good, requester_task.qtty)
         delivery_event = delivery_task.subscribe('fulfilled')
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
@@ -233,9 +240,9 @@ class cShop(cNodeBase, cSimNode):
         self.connected_nodes = []
         self.pushing = True
 
-        self.item_wallet = cWallet()
+        self.item_wallet = cWallet(self)
         self.register_wallet(self.item_wallet)
-        self.money_wallet = cWallet()
+        self.money_wallet = cWallet(self)
         self.register_wallet(self.money_wallet)
 
     def connect_node(self, node):
@@ -265,18 +272,22 @@ class cShop(cNodeBase, cSimNode):
             msg = yield self.in_orders.queue_local_jobs.get()
             task = msg.uows
             if isinstance(task, RequestGoods):
+                self.sent_log('[gen_run_incoming_tasks] handling RequestGoods')
                 self.as_process(self.gen_deliver_good(task))
             if isinstance(task, DeliveryMoney):
+                self.sent_log('[gen_run_incoming_tasks] handling DeliveryMoney')
                 self.money_wallet.add_items(task.good, task.qtty)
             yield self.empty_event()
 
     def gen_deliver_good(self, requester_task):
         # take from warehouse/wallet
+        self.sent_log('[gen_deliver_good] getting items from wallet')
         yield self.as_process(self.item_wallet.gen_take_qtty(requester_task.good, requester_task.qtty))
+        self.sent_log('[gen_deliver_good] items taken, delivering')
 
         requester_task.change_state('fulfilled')
+
         delivery_task = DeliveryGoods('DeliveryGoods', self.simpy_env)
-        delivery_task.setup('Sushi', self.simpy_env)
         delivery_task.setup(requester_task.good, requester_task.qtty)
         delivery_event = delivery_task.subscribe('fulfilled')
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
@@ -284,8 +295,8 @@ class cShop(cNodeBase, cSimNode):
 
 # Agreement (Blue Node)
 class cAgreement(cNodeBase, cSimNode):
-    partyA = 0
-    partyB = 1
+    partyA = 0  # client
+    partyB = 1  # supplier
 
     def __init__(self, name):
         super().__init__(name)
@@ -323,12 +334,14 @@ class cAgreement(cNodeBase, cSimNode):
             task = msg.uows
             # check if task is request
             if isinstance(task, RequestGoods):
+                self.sent_log('[gen_run_incoming_tasks] handling RequestGoods')
                 evdone = task.subscribe('fulfilled')
                 task.party = self.partyB
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
             elif isinstance(task, DeliveryGoods):
+                self.sent_log('[gen_run_incoming_tasks] handling DeliveryGoods')
                 evdone = task.subscribe('fulfilled')
                 money_sum = task.qtty * self.price_dict[task.good]
                 self.as_process(self.gen_ask_money(evdone, money_sum), repr='ask_money')
@@ -338,15 +351,18 @@ class cAgreement(cNodeBase, cSimNode):
                 self.out_orders.port_to_place.put(msg_to_send)
 
             elif isinstance(task, DeliveryMoney):
+                self.sent_log('[gen_run_incoming_tasks] handling DeliveryMoney')
                 evdone = task.subscribe('fulfilled')
-                task.party = self.partyA
+                task.party = self.partyB
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
             yield self.empty_event()
 
     def gen_ask_money(self, event_delivered, money_sum):
+        self.sent_log('[gen_ask_money] waiting for item delivery')
         yield event_delivered
+        self.sent_log('[gen_ask_money] item delivered, requesting money')
         task = RequestMoney('RequestMoney', self.simpy_env)
         task.setup(good='USD', qtty=money_sum)
         task.party = self.partyA
@@ -436,16 +452,17 @@ class cHubNode(cNodeBase, cSimNode):
     def gen_do_incoming_tasks(self):
         while True:
             msg = yield self.in_orders.queue_local_jobs.get()
+            self.sent_log('handling new message: ' + str(msg))
             tsk = msg.uows
             success = self._action(tsk)
             if success:
                 pass
-                # tsk.run('True')
             else:
                 self.sent_log('DID NOT MATCH')
                 self.out_orders.wrong_jobs.put(msg)
 
             for msg in self.messages:
+                self.sent_log('sending new message: ' + str(msg))
                 msg_to_send = cMessage(*msg)
                 self.messages.remove(msg)
                 self.out_orders.port_to_place.put(msg_to_send)
@@ -471,7 +488,7 @@ class cPeriodicWalletObserver(simulengin.cAbstPeriodicObserver):
 
     def observe_data(self):
         for name_i, level_i in self.wallet.check_inventory():
-            ts_name = name_i
+            ts_name = name_i + ' @ ' + self.wallet.parent_node.name
             self.record_data(ts_name, level_i)
 
 def create_wallet_observers(a_node):

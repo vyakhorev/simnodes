@@ -175,8 +175,11 @@ def Test6():
 
 if __name__ == '__main__':
     import lg
-    lg.config_logging(tofile='logs/test.log')
-
+    WL = ['DEVS.cClient', 'DEVS.cShop', 'DEVS.cAgreement', 'DEVS.cHubNode']
+    lg.config_logging(tofile='logs/test.log',
+                      whitelist = [WL[3]],
+                      level=lg.logging.DEBUG)
+    #lg.config_logging(tofile='logs/test.log', level = lg.logging.DEBUG)
     from model.nodes.classes.ClientShopSupplier import test1
 
     the_model = test1()
@@ -194,8 +197,8 @@ if __name__ == '__main__':
     import matplotlib
     for obs_name, var_name in runner.sim_results.get_available_names():
         data_frame = runner.sim_results.get_dataframe_for_epochvar(obs_name, var_name)
-        data_frame.plot()
-        #print(data_frame)
-    matplotlib.pyplot.show()
+        print(data_frame)
+    #     data_frame.plot()
+    # matplotlib.pyplot.show()
 
 

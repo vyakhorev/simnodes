@@ -102,7 +102,12 @@ class cDiscreteEventSystem(object):
             return
         # sender_name = sender_instance.log_repr()
         timestamp = self.nowsimtime()
-        logname = 'DEVS.' + str(sender_instance.__class__.__name__) + '.' + str(sender_instance.name)
+        logname = 'DEVS.' + str(sender_instance.__class__.__name__)
+        # hotfix
+        if hasattr(sender_instance, 'parent_node'):
+            logname += '@' + str(sender_instance.parent_node.name)
+        else:
+            logname += '.' + str(sender_instance.name)
         logger = logging.getLogger(logname)
 
         msg = "@{}:\t{}".format(timestamp, msg_text)
