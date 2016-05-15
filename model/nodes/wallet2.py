@@ -179,6 +179,7 @@ class cWallet(simulengin.cConnToDEVS):
         :param qtty: int | resource quantity or volume
         :return: None
         """
+        # todo fix
 
         if name in self.glob_res_map[cItem]:
             self.sent_log('found {} in cItem'.format(name))
@@ -196,6 +197,7 @@ class cWallet(simulengin.cConnToDEVS):
         :return: Bool
         """
         return name in self.res_all
+
 
     def get_item(self, name):
         """
@@ -241,7 +243,6 @@ class cWallet(simulengin.cConnToDEVS):
 
     def gen_take_qtty(self, name, qtty):
         # todo adapt from wallet.py
-
         if name not in self.res_all:
             self.sent_log('{} has not {} key'.format(type(self), name))
             return False
@@ -267,6 +268,21 @@ class cWallet(simulengin.cConnToDEVS):
             yield self.res_all[name].value.get(qtty)
 
         yield self.empty_event()
+
+    def take_asap(self, name, qtty):
+        if self.check_existence(name):
+
+            if type(self.res_all[name]) == cPile:
+
+                if self.res_all[name].value.level < qtty:
+                    self.sent_log("not enough value level ")
+
+                return self.res_all[name].value.get(qtty)
+
+        else:
+            self.sent_log('{} has not {} key'.format(self, name))
+            return False
+
 
 
 class DumbNode(simulengin.cConnToDEVS):
@@ -330,11 +346,13 @@ class Stock(simulengin.cConnToDEVS):
 
     def my_generator(self):
         yield self.empty_event()
+        # long-time ressupling
+        self.as_process(self.long_time_ressupling())
 
     def purchase(self, which, amount):
-        # todo cancel ContainerGet event
         container_getter = self.wallet.gen_take_qtty(which, amount)
         container_getter_event = next(container_getter)
+
         if container_getter_event.triggered:
             self.sent_log('purchased {}'.format(container_getter_event.amount))
             return container_getter_event.amount
@@ -371,6 +389,23 @@ class Stock(simulengin.cConnToDEVS):
                 return None
         yield self.empty_event()
 
+    def long_time_ressupling(self):
+        yield self.timeout(16)
+        self.wallet.add_to_pile('water', 1000)
+
+    def purchase_and_deliver2(self, which, amount, deliver_timedelta=None):
+        container_getter = self.wallet.take_asap(which, amount)
+        try:
+            # could we take to reserve ?
+            yield container_getter
+            # yes
+            self.sent_log('managed to get {} of {}'.format(container_getter.amount, which))
+            return container_getter.amount
+
+        except simpy.Interrupt as i:
+            self.sent_log('{} interrupted coz of {}'.format(self, i))
+            container_getter.cancel()
+
 
 class Client(simulengin.cConnToDEVS):
     def __init__(self, name=None):
@@ -379,13 +414,17 @@ class Client(simulengin.cConnToDEVS):
         self.stock = None
         self.wallet = cWallet('Client_wallet')
 
+    def __repr__(self):
+        return str(self.name)
+
     def init_sim(self):
         super().init_sim()
         self.wallet.spawn_pile('water', 0)
 
     def my_generator(self):
         self.as_process(self.purchase_good())
-        self.as_process(self.purchase_good_with_deliver())
+        # self.as_process(self.purchase_good_with_deliver())
+        self.as_process(self.purchase_good_with_delay())
         yield self.empty_event()
 
     def set_stock(self, stock):
@@ -398,7 +437,24 @@ class Client(simulengin.cConnToDEVS):
             self.wallet.add_to_pile('water', ret)
         self.sent_log(ret)
 
+    def purchase_good_with_delay(self):
+        yield self.timeout(10)
+        proc = self.as_process(self.stock.purchase_and_deliver2('water', 1600, deliver_timedelta=5))
+        delivered_or_timeout = yield proc | self.timeout(6)
+
+        print(proc.__dir__())
+        print(proc.triggered)
+        if proc in delivered_or_timeout.todict():
+            self.sent_log('Nice , ive {} deliver finally'.format(proc))
+            got = delivered_or_timeout.todict()[proc]
+            self.sent_log('{} got {}'.format(self, got))
+            self.wallet.add_to_pile('water', got)
+        else:
+            self.sent_log('Ouch, too long to wait, drop it'.format(proc))
+            proc.interrupt('Cancelled from client {}'.format(self))
+
     def purchase_good_with_deliver(self):
+        # 1st probe
         yield self.timeout(10)
         gen = self.stock.purchase_and_deliver('water', 600, deliver_timedelta=5)
         proc = self.as_process(gen)
