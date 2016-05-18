@@ -348,8 +348,8 @@ class Stock(simulengin.cConnToDEVS):
     def __init__(self, name=None):
         super().__init__()
         self.name = name
-        self.wallet = cWallet('Stock_wallet')
-        self.reserve = cWallet('Reserve')
+        self.wallet = cWallet(self, 'Stock_wallet')
+        self.reserve = cWallet(self, 'Reserve')
 
     def init_sim(self):
         super().init_sim()
@@ -414,6 +414,7 @@ class Stock(simulengin.cConnToDEVS):
             return container_getter.amount
 
         except simpy.Interrupt as i:
+            print(container_getter.triggered)
             self.sent_log('{} interrupted coz of {}'.format(self, i))
             container_getter.cancel()
 
@@ -423,7 +424,7 @@ class Client(simulengin.cConnToDEVS):
         super().__init__()
         self.name = name
         self.stock = None
-        self.wallet = cWallet('Client_wallet')
+        self.wallet = cWallet(self, 'Client_wallet')
 
     def __repr__(self):
         return str(self.name)
@@ -451,10 +452,10 @@ class Client(simulengin.cConnToDEVS):
     def purchase_good_with_delay(self):
         yield self.timeout(10)
         proc = self.as_process(self.stock.purchase_and_deliver2('water', 1600, deliver_timedelta=5))
-        delivered_or_timeout = yield proc | self.timeout(6)
+        delivered_or_timeout = yield proc | self.timeout(8)
 
-        print(proc.__dir__())
-        print(proc.triggered)
+        # print(proc.__dir__())
+        # print(proc.triggered)
         if proc in delivered_or_timeout.todict():
             self.sent_log('Nice , ive {} deliver finally'.format(proc))
             got = delivered_or_timeout.todict()[proc]
@@ -463,6 +464,7 @@ class Client(simulengin.cConnToDEVS):
         else:
             self.sent_log('Ouch, too long to wait, drop it'.format(proc))
             proc.interrupt('Cancelled from client {}'.format(self))
+
 
     def purchase_good_with_deliver(self):
         # 1st probe

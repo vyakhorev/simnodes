@@ -68,12 +68,16 @@ class BaseTask():
     """
     Non typed task , which have callback system to announce its subscribers
     """
+    CLS_ID = 0
 
     def __init__(self, name, env):
         self.taskname = name
         self.env = env
         self.states = StatesContainer(self)
         self.events_map = {}
+
+        self.id = BaseTask.CLS_ID
+        BaseTask.CLS_ID += 1
 
         # dict like {event : [sub1, sub2...], ...}
         self.task_callbacks = {}
@@ -88,7 +92,7 @@ class BaseTask():
         event.succeed()
 
     def __repr__(self):
-        return 'Task {}'.format(self.taskname)
+        return 'Task id_{} {}'.format(self.id, self.taskname)
 
 class BaselogicTask(BaseTask):
     """
@@ -157,6 +161,8 @@ class cClient(cNodeBase, cSimNode):
         self.money_wallet = cWallet(self)
         self.register_wallet(self.money_wallet)
 
+        self.list_of_unknown_req = []
+
     def connect_node(self, node):
         self.connected_nodes += [node]
         self.out_orders.connect_to_port(node.in_orders)
@@ -194,6 +200,9 @@ class cClient(cNodeBase, cSimNode):
                 self.sent_log('[gen_run_incoming_tasks] handling DeliveryGoods')
                 task.change_state('fulfilled') # fast solution
                 self.item_wallet.add_items(task.good, task.qtty)
+
+            elif isinstance(task, RequestGoods):
+                self.list_of_unknown_req.append(task)
 
             yield self.empty_event()
 
@@ -336,7 +345,10 @@ class cAgreement(cNodeBase, cSimNode):
             if isinstance(task, RequestGoods):
                 self.sent_log('[gen_run_incoming_tasks] handling RequestGoods')
                 evdone = task.subscribe('fulfilled')
-                task.party = self.partyB
+                # task.party = self.partyB
+                task.party = 'Client'
+                task.is_client = True
+                # print(self.connected_nodes)
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
@@ -434,6 +446,7 @@ class cHubNode(cNodeBase, cSimNode):
                             receiver = self.conditions_dict[expression]
                             msg = [task, self, [receiver]]
                             self.messages.append(msg)
+
                     else:
                         if do_expression(getattr(task, attr_i), expression.expr, expression.val):
                             got_match = True
@@ -455,9 +468,7 @@ class cHubNode(cNodeBase, cSimNode):
             self.sent_log('handling new message: ' + str(msg))
             tsk = msg.uows
             success = self._action(tsk)
-            if success:
-                pass
-            else:
+            if not success:
                 self.sent_log('DID NOT MATCH')
                 self.out_orders.wrong_jobs.put(msg)
 

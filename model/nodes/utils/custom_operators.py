@@ -17,7 +17,13 @@ def get_operator_fn(op):
 
 def do_expression(op1, operator, op2):
     if isinstance(op1, str):
-        op1 = int(op1)
+        try:
+            op1 = int(op1)
+        except ValueError:
+            pass
     if isinstance(op2, str):
-        op2 = int(op2)
+        try:
+            op2 = int(op2)
+        except ValueError:
+            pass
     return get_operator_fn(operator)(op1, op2)
