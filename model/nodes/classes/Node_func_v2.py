@@ -93,6 +93,7 @@ class cNodeBase():
         self.parent = None
 
     def send_msg(self, task, receiver):
+        # todo add to trace
         msg = [task, self, [receiver]]
         self.messages.append(msg)
         if not self.pushing:
@@ -469,6 +470,7 @@ class cHubNode(cNodeBase, cSimNode):
         else:
             self.randomize = True
             self._action = self._randomaction
+
 
     def _randomaction(self, task):
         receiver = choice(self.out_nodes)

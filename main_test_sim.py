@@ -180,7 +180,8 @@ if __name__ == '__main__':
                       whitelist = None,
                       level=lg.logging.DEBUG)
     #lg.config_logging(tofile='logs/test.log', level = lg.logging.DEBUG)
-    from model.nodes.classes.ClientShopSupplier import test1
+    # from model.nodes.classes.ClientShopSupplier import test1
+    from model.nodes.classes.ClientShopSupplier_modernTasks import test1
 
     the_model = test1()
     the_model.build_json()

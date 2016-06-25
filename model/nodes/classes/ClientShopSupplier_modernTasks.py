@@ -101,14 +101,13 @@ class BaselogicTask(BaseTask):
     :param env : 'simpy.Enviroment' cls | delegated from node environment
     """
 
-    # todo self.good, qtty to child
-    # setup
     def __init__(self, name='Some buy task', env=None):
         super().__init__(name, env)
         self.states.set_init_state('null')
-        self.party = None
-        self.good = None
-        self.qtty = None
+        self.fields = {}
+
+    def add_fields(self, **fields):
+        self.fields.update(fields)
 
     def subscribe(self, event_name, subscriber=None):
         """
@@ -123,9 +122,6 @@ class BaselogicTask(BaseTask):
             my_event = self.events_map[event_name]
 
         return my_event
-
-    def setup(self, good, qtty):
-        self.good, self.qtty = good, qtty
 
     def change_state(self, to_state):
         self.states.change_state(to_state)
@@ -195,17 +191,14 @@ class cClient(cNodeBase, cSimNode):
             msg = yield self.in_orders.queue_local_jobs.get()
             task = msg.uows
 
-            if isinstance(task, RequestMoney):
-                self.sent_log('[gen_run_incoming_tasks] handling RequestMoney')
-                self.as_process(self.gen_sent_money(task))
-
-            elif isinstance(task, DeliveryGoods):
+            if task.fields['role'] == 'delivery_goods':
                 self.sent_log('[gen_run_incoming_tasks] handling DeliveryGoods')
                 task.change_state('fulfilled') # fast solution
-                self.item_wallet.add_items(task.good, task.qtty)
+                self.item_wallet.add_items(task.fields['order']['good'], task.fields['order']['qtty'])
 
-            elif isinstance(task, RequestGoods):
-                self.list_of_unknown_req.append(task)
+            elif task.fields['role'] == 'request_money':
+                self.sent_log('[gen_run_incoming_tasks] handling RequestMoney')
+                self.as_process(self.gen_sent_money(task))
 
             yield self.empty_event()
 
@@ -216,8 +209,8 @@ class cClient(cNodeBase, cSimNode):
             self.sent_log('new request for sushi', logging.DEBUG)
             # creating task
             sushi_request_task = RequestGoods('Sushi_request', self.simpy_env)
-            good, qtty = 'Sushi', 5
-            sushi_request_task.setup(good, qtty)
+            sushi_request_task.add_fields(role='request_goods', order={'good': 'Sushi', 'qtty': 5})
+
             fulfilled_event = sushi_request_task.subscribe('fulfilled')
 
             self.send_msg(sushi_request_task, self.connected_nodes[0])
@@ -229,13 +222,18 @@ class cClient(cNodeBase, cSimNode):
     def gen_sent_money(self, requester_task):
         # take 'from warehouse/wallet
         self.sent_log('[gen_sent_money] taking money')
-        yield self.as_process(self.money_wallet.gen_take_qtty(requester_task.good, requester_task.qtty))
+        wal_good = requester_task.fields['order']['good']
+        wal_qtty = requester_task.fields['order']['qtty']
+
+        yield self.as_process(self.money_wallet.gen_take_qtty(wal_good, wal_qtty))
         self.sent_log('[gen_sent_money] money are taken, sending')
 
         requester_task.change_state('fulfilled')
 
         delivery_task = DeliveryMoney('DeliveryMoney', self.simpy_env)
-        delivery_task.setup(requester_task.good, requester_task.qtty)
+        delivery_task.add_fields(role='delivery_money', order={'good': wal_good, 'qtty': wal_qtty})
+
+        # delivery_task.setup(requester_task.good, requester_task.qtty)
         delivery_event = delivery_task.subscribe('fulfilled')
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
@@ -283,32 +281,37 @@ class cShop(cNodeBase, cSimNode):
             # listen to incomes
             msg = yield self.in_orders.queue_local_jobs.get()
             task = msg.uows
-            if isinstance(task, RequestGoods):
+
+            if task.fields['role'] == 'request_goods':
                 self.sent_log('[gen_run_incoming_tasks] handling RequestGoods')
                 self.as_process(self.gen_deliver_good(task))
-            if isinstance(task, DeliveryMoney):
+
+            elif task.fields['role'] == 'delivery_money':
                 self.sent_log('[gen_run_incoming_tasks] handling DeliveryMoney')
-                self.money_wallet.add_items(task.good, task.qtty)
+                self.money_wallet.add_items(task.fields['order']['good'], task.fields['order']['qtty'])
             yield self.empty_event()
 
     def gen_deliver_good(self, requester_task):
         # take from warehouse/wallet
         self.sent_log('[gen_deliver_good] getting items from wallet')
-        yield self.as_process(self.item_wallet.gen_take_qtty(requester_task.good, requester_task.qtty))
+        yield self.as_process(self.item_wallet.gen_take_qtty(requester_task.fields['order']['good'],
+                                                             requester_task.fields['order']['qtty']))
+
         self.sent_log('[gen_deliver_good] items taken, delivering')
 
         requester_task.change_state('fulfilled')
 
         delivery_task = DeliveryGoods('DeliveryGoods', self.simpy_env)
-        delivery_task.setup(requester_task.good, requester_task.qtty)
+        delivery_task.add_fields(role='delivery_goods', order={'good': requester_task.fields['order']['good'],
+                                                         'qtty': requester_task.fields['order']['qtty']}
+                                 )
+
         delivery_event = delivery_task.subscribe('fulfilled')
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
 
 # Agreement (Blue Node)
 class cAgreement(cNodeBase, cSimNode):
-    partyA = 0  # client
-    partyB = 1  # supplier
 
     def __init__(self, name):
         super().__init__(name)
@@ -345,30 +348,26 @@ class cAgreement(cNodeBase, cSimNode):
 
             task = msg.uows
             # check if task is request
-            if isinstance(task, RequestGoods):
+
+            if task.fields['role'] == 'request_goods':
                 self.sent_log('[gen_run_incoming_tasks] handling RequestGoods')
                 evdone = task.subscribe('fulfilled')
-                task.party = self.partyB
-                #task.party = 'Client'
-                #task.is_client = True
-                # print(self.connected_nodes)
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
-            elif isinstance(task, DeliveryGoods):
+            elif task.fields['role'] == 'delivery_goods':
                 self.sent_log('[gen_run_incoming_tasks] handling DeliveryGoods')
                 evdone = task.subscribe('fulfilled')
-                money_sum = task.qtty * self.price_dict[task.good]
+                money_sum = task.fields['order']['qtty'] * self.price_dict[task.fields['order']['good']]
+                # money_sum = task.qtty * self.price_dict[task.good]
                 self.as_process(self.gen_ask_money(evdone, money_sum), repr='ask_money')
-                task.party = self.partyA
 
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
-            elif isinstance(task, DeliveryMoney):
+            elif task.fields['role'] == 'delivery_money':
                 self.sent_log('[gen_run_incoming_tasks] handling DeliveryMoney')
                 evdone = task.subscribe('fulfilled')
-                task.party = self.partyB
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
@@ -378,10 +377,11 @@ class cAgreement(cNodeBase, cSimNode):
         self.sent_log('[gen_ask_money] waiting for item delivery')
         yield event_delivered
         self.sent_log('[gen_ask_money] item delivered, requesting money')
-        task = RequestMoney('RequestMoney', self.simpy_env)
-        task.setup(good='USD', qtty=money_sum)
-        task.party = self.partyA
-        msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
+        rm_task = RequestMoney('RequestMoney', self.simpy_env)
+        rm_task.add_fields(role='request_money', order={'good': 'USD', 'qtty': money_sum})
+
+        # task.setup(good='USD', qtty=money_sum)
+        msg_to_send = cMessage(rm_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
 
 # Hub (Orange Node)
@@ -434,10 +434,26 @@ class cHubNode(cNodeBase, cSimNode):
             self.conditions_dict[expression(attr, expr, val)] = node
 
 
+    def condition_extra(self, conds=None):
+        # todo implement logic parsing from string
+        self.pushing = True
+
+        if conds:
+            expression = namedtuple('expression', 'attr expr val')
+
+            for node, express_list in conds.items():
+                for express in express_list:
+                    attr, expr, val = express.split(' ')
+                    self.conditions_dict[expression(attr, expr, val)] = node
+        else:
+            raise AttributeError('No condition were set')
+
+
     def _action(self, task):
         got_match = False
         # TODO make attributes priority to solve multiple successful conditions
-        for attr_i in task.__dict__.keys():
+        # for attr_i in task.__dict__.keys():
+        for attr_i in task.fields.keys():
             for expression in self.conditions_dict.keys():
                 if attr_i == expression.attr:
                     # TODO solve duplicating...
@@ -451,7 +467,7 @@ class cHubNode(cNodeBase, cSimNode):
                             self.messages.append(msg)
 
                     else:
-                        if do_expression(getattr(task, attr_i), expression.expr, expression.val):
+                        if do_expression(task.fields[attr_i], expression.expr, expression.val):
                             got_match = True
                             self.sent_log('Gonna send task {} to receiver {}'.format(task,
                                                                                      self.conditions_dict[expression]))
@@ -526,9 +542,14 @@ def test1():
     node4.connect_nodes(inp_nodes=[node2], out_nodes=[node1, node3])
     node3.connect_node(node2)
 
-    cond_dict = {node1: 'party = 0',
-                 node3: 'party = 1'}
-    node4.condition(cond_dict)
+    # current roles
+    # delivery_goods, request_money, request_goods, delivery_money
+    # cond_dict = {node1: 'role = buy',
+    #              node3: 'role = sell'}
+    cond_dict = {node3: ['role = request_goods', 'role = delivery_money'],
+                 node1: ['role = delivery_goods', 'role = request_money']
+                 }
+    node4.condition_extra(cond_dict)
 
     # create and add observers
     obs = []
