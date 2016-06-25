@@ -345,9 +345,9 @@ class cAgreement(cNodeBase, cSimNode):
             if isinstance(task, RequestGoods):
                 self.sent_log('[gen_run_incoming_tasks] handling RequestGoods')
                 evdone = task.subscribe('fulfilled')
-                # task.party = self.partyB
-                task.party = 'Client'
-                task.is_client = True
+                task.party = self.partyB
+                #task.party = 'Client'
+                #task.is_client = True
                 # print(self.connected_nodes)
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)

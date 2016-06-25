@@ -28,11 +28,11 @@ logger.error('that is impossible!')
 
 import logging
 
-USE_ONLY_LAST_NAME = True # "DEVS.Node.Shop or just Shop" ?
+USE_ONLY_LAST_NAME = False # "DEVS.Node.Shop or just Shop" ?
 if USE_ONLY_LAST_NAME:    # max length for console logger name (should be higher if we use full name)
-    NAME_TRUNC = 25
+    NAME_TRUNC = 50
 else:
-    NAME_TRUNC = 35
+    NAME_TRUNC = 50
 LEVEL_TRUNC = 4           # max length for console level name truncate
 
 def config_logging(level=logging.INFO, toconsole=True, tofile='', whitelist=None, blacklist=None):

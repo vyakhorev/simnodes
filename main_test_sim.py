@@ -175,9 +175,9 @@ def Test6():
 
 if __name__ == '__main__':
     import lg
-    WL = ['DEVS.cClient', 'DEVS.cShop', 'DEVS.cAgreement', 'DEVS.cHubNode']
+    #WL = ['DEVS.cClient', 'DEVS.cShop', 'DEVS.cAgreement', 'DEVS.cHubNode']
     lg.config_logging(tofile='logs/test.log',
-                      whitelist = [WL[3]],
+                      whitelist = None,
                       level=lg.logging.DEBUG)
     #lg.config_logging(tofile='logs/test.log', level = lg.logging.DEBUG)
     from model.nodes.classes.ClientShopSupplier import test1
