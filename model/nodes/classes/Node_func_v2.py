@@ -92,6 +92,10 @@ class cNodeBase():
         super(cNodeBase, self).__init__(name)
         self.parent = None
 
+        # Ideas about user-defined fields
+        self.fields = {}
+
+
     def send_msg(self, task, receiver):
         # todo add to trace
         msg = [task, self, [receiver]]
@@ -143,6 +147,10 @@ class cNodeBase():
             except AttributeError as e:
                 logger.warning(e)
         return serializables
+
+    # Ideas about user-defined fields
+    def add_fields(self, **kwargs):
+        self.fields.update(kwargs)
 
 
 class cAgentNodeSimple(cNodeBase, cSimNode):

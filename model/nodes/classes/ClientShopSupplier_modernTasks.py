@@ -106,8 +106,8 @@ class BaselogicTask(BaseTask):
         self.states.set_init_state('null')
         self.fields = {}
 
-    def add_fields(self, **fields):
-        self.fields.update(fields)
+    def add_fields(self, **kwargs):
+        self.fields.update(kwargs)
 
     def subscribe(self, event_name, subscriber=None):
         """
@@ -162,6 +162,8 @@ class cClient(cNodeBase, cSimNode):
 
         self.list_of_unknown_req = []
 
+
+
     def connect_node(self, node):
         self.connected_nodes += [node]
         self.out_orders.connect_to_port(node.in_orders)
@@ -209,7 +211,8 @@ class cClient(cNodeBase, cSimNode):
             self.sent_log('new request for sushi', logging.DEBUG)
             # creating task
             sushi_request_task = RequestGoods('Sushi_request', self.simpy_env)
-            sushi_request_task.add_fields(role='request_goods', order={'good': 'Sushi', 'qtty': 5})
+            sushi_request_task.add_fields(role='request_goods', order={'good': 'Sushi', 'qtty': 5},
+                                          company_token=self.fields['company_token'])
 
             fulfilled_event = sushi_request_task.subscribe('fulfilled')
 
@@ -231,12 +234,18 @@ class cClient(cNodeBase, cSimNode):
         requester_task.change_state('fulfilled')
 
         delivery_task = DeliveryMoney('DeliveryMoney', self.simpy_env)
-        delivery_task.add_fields(role='delivery_money', order={'good': wal_good, 'qtty': wal_qtty})
+        # company_token is not employed anywhere further
+        delivery_task.add_fields(role='delivery_money', order={'good': wal_good, 'qtty': wal_qtty},
+                                 company_token=self.fields['company_token'])
 
         # delivery_task.setup(requester_task.good, requester_task.qtty)
         delivery_event = delivery_task.subscribe('fulfilled')
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
+
+    def func_add_company_token(self, some_task):
+        # this function is added in a node way
+        some_task.add_fields('company_token')
 
 # Shop(Blue Node)
 class cShop(cNodeBase, cSimNode):
@@ -303,12 +312,16 @@ class cShop(cNodeBase, cSimNode):
 
         delivery_task = DeliveryGoods('DeliveryGoods', self.simpy_env)
         delivery_task.add_fields(role='delivery_goods', order={'good': requester_task.fields['order']['good'],
-                                                         'qtty': requester_task.fields['order']['qtty']}
-                                 )
+                                                         'qtty': requester_task.fields['order']['qtty']},
+                                 buyer_company=requester_task.fields['company_token'],
+                                 seller_company=self.fields['company_token'])
 
         delivery_event = delivery_task.subscribe('fulfilled')
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
+
+    def gen_replenish_inventory(self):
+        pass
 
 # Agreement (Blue Node)
 class cAgreement(cNodeBase, cSimNode):
@@ -532,32 +545,46 @@ def create_wallet_observers(a_node):
 def test1():
     from model.model import cNodeFieldModel
     the_model = cNodeFieldModel()
-    node1 = cClient('Retail client')
-    node2 = cAgreement('Retail agreement')
-    node3 = cShop('Shop')
-    node4 = cHubNode('Filter hub')
 
-    node1.connect_node(node2)
-    node2.connect_node(node4)
-    node4.connect_nodes(inp_nodes=[node2], out_nodes=[node1, node3])
-    node3.connect_node(node2)
+    nodeShop = cShop('Shop')
+    nodeShop.add_fields(company_token='Shop Inc.')
+    nodeHub4Shop = cHubNode('Hub for shop')
+    nodeShop.connect_node(nodeHub4Shop)
 
-    # current roles
-    # delivery_goods, request_money, request_goods, delivery_money
-    # cond_dict = {node1: 'role = buy',
-    #              node3: 'role = sell'}
-    cond_dict = {node3: ['role = request_goods', 'role = delivery_money'],
-                 node1: ['role = delivery_goods', 'role = request_money']
-                 }
-    node4.condition_extra(cond_dict)
+    nodeClient1 = cClient('Retail client 1')
+    nodeClient1.add_fields(company_token='ClientABC')
+    nodeAgreement1 = cAgreement('Retail agreement 1')
+    nodeHub1 = cHubNode('Filter hub 1')
+    nodeClient1.connect_node(nodeAgreement1)
+    nodeAgreement1.connect_node(nodeHub1)
+    nodeHub1.connect_nodes(inp_nodes=[nodeAgreement1], out_nodes=[nodeClient1, nodeShop])
+    nodeHub1.condition_extra({nodeShop: ['role = request_goods', 'role = delivery_money'],
+                             nodeClient1: ['role = delivery_goods', 'role = request_money']})
+
+    nodeClient2 = cClient('Retail client 2')
+    nodeClient2.add_fields(company_token='ClientXYZ')
+    nodeAgreement2 = cAgreement('Retail agreement 2')
+    nodeHub2 = cHubNode('Filter hub 2')
+    nodeClient2.connect_node(nodeAgreement2)
+    nodeAgreement2.connect_node(nodeHub2)
+    nodeHub2.connect_nodes(inp_nodes=[nodeAgreement2], out_nodes=[nodeClient2, nodeShop])
+    nodeHub2.condition_extra({nodeShop: ['role = request_goods', 'role = delivery_money'],
+                             nodeClient2: ['role = delivery_goods', 'role = request_money']})
+
+    nodeHub4Shop.connect_nodes(inp_nodes=[nodeShop], out_nodes=[nodeAgreement1, nodeAgreement2])
+    nodeHub4Shop.condition_extra({nodeAgreement1: ['buyer_company = ClientABC'],
+                                 nodeAgreement2: ['buyer_company = ClientXYZ']})
+
 
     # create and add observers
     obs = []
-    obs += create_wallet_observers(node1)
-    obs += create_wallet_observers(node3)
+    obs += create_wallet_observers(nodeClient2)
+    obs += create_wallet_observers(nodeClient1)
+    obs += create_wallet_observers(nodeShop)
     for obs_i in obs:
         the_model.addObserver(obs_i)
 
-    the_model.addNodes([node1, node2, node3, node4])
+    the_model.addNodes([nodeClient1, nodeAgreement1, nodeShop, nodeHub1])
+    the_model.addNodes([nodeClient2, nodeAgreement2, nodeShop, nodeHub2])
 
     return the_model
