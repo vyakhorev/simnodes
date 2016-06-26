@@ -179,7 +179,7 @@ if __name__ == '__main__':
     #WL = ['DEVS.cShop', 'DEVS.cSupplyBroker', 'DEVS.cManufacturer']
     BL = ['DEVS.cClient', 'DEVS.cAgreement']
     lg.config_logging(tofile='logs/test.log',
-                      blacklist = BL,
+                      blacklist = None,
                       level=lg.logging.DEBUG)
     #lg.config_logging(tofile='logs/test.log', level = lg.logging.DEBUG)
     # from model.nodes.classes.ClientShopSupplier import test1
@@ -188,10 +188,10 @@ if __name__ == '__main__':
     the_model = test1()
     the_model.build_json()
 
-    loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=25, seed=555, debug=True)
+    loganddata, runner = the_model.run_sim(datetime.date(2016, 3, 15), until=50, seed=555, debug=True)
 
     # Plot processes
-    # pm = cProcessMonitor(runner.system.simpy_env, until=25)
+    pm = cProcessMonitor(runner.system.simpy_env, until=25)
     # #print(id(runner.system.simpy_env))
     # pm.plot_procs_groups()
     # pm.plot_event_density()
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     for obs_name, var_name in runner.sim_results.get_available_names():
         data_frame = runner.sim_results.get_dataframe_for_epochvar(obs_name, var_name)
         print(data_frame)
-    #     data_frame.plot()
+        # data_frame.plot()
     # matplotlib.pyplot.show()
 
 

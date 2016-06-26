@@ -97,7 +97,7 @@ class cProcessMonitor:
     def _map_events_to_tuple(self):
         for an_event in sorted(self.env.event_set, key=lambda x: x[2]):
             self.events += [self.event_tuple(an_event[0], an_event[1], an_event[2], an_event[3], an_event[4:])]
-        logger.debug('<<NUMBER OF EVENTS>> :', len(self.events))
+        logger.debug('<<NUMBER OF EVENTS>> : {}'.format(len(self.events)))
 
     @_with_check
     def _map_event_tuple_to_proc_dict(self, ev_tuple):
@@ -182,7 +182,8 @@ class cProcessMonitor:
         o---------------------------------------------->Time
         """
         import textwrap
-        colors = 'rgcmykwrgcmykwrgcmykwrgcmykw'
+        # colors = 'rgcmykwrgcmykwrgcmykwrgcmykw'
+        colors = 'rgcmykwrgcmykwrgcmykwrgcmykwrgcmykwrgcmykwrgcmykwrgcmykw'
 
         height = len(self.proc_dict.keys())*10
         width = self.until

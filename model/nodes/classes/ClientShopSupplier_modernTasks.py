@@ -271,7 +271,7 @@ class cShop(cNodeBase, cSimNode):
     def init_sim(self):
         super().init_sim()
         self.item_wallet.spawn_pile('Sushi', 999)
-        self.money_wallet.spawn_pile('USD', 1000)
+        self.money_wallet.spawn_pile('USD', 10000)
 
     # GENERATORS
     def my_generator(self):
@@ -305,6 +305,14 @@ class cShop(cNodeBase, cSimNode):
                 self.sent_log('[gen_run_incoming_tasks] handling new input delivery')
                 self.item_wallet.add_items(task.fields['order']['good'], task.fields['order']['qtty'])
 
+            elif task.fields['role'] == 'request_money':
+                self.sent_log('[gen_run_incoming_tasks] handling new payment')
+                self.as_process(self.money_wallet.gen_take_qtty(task.fields['order']['good'],
+                                                                task.fields['order']['qtty']))
+
+            else:
+                self.sent_log('[gen_run_incoming_tasks] unknown task field', level=logging.WARN)
+
             yield self.empty_event()
 
     def gen_deliver_good(self, requester_task):
@@ -331,7 +339,7 @@ class cShop(cNodeBase, cSimNode):
     def gen_replenish_inventory(self):
         volume = 100
         interv = 10
-        good = 'sushi'
+        good = 'Sushi'
         while 1:
             yield self.timeout(interv)
             self.sent_log('replenishing')
@@ -666,9 +674,10 @@ class cSupplyBroker(cNodeBase, cSimNode):
 
     def say_order_id(self):
         if self.last_order_id is None:
-            last_order_id = 1
+            self.last_order_id = 1
         else:
-            last_order_id += 1
+            self.last_order_id += 1
+        return self.last_order_id
 
     def compose_order_in_transit_structure(self):
         s = {}
@@ -757,6 +766,12 @@ class cShipper(cNodeBase, cSimNode):
 
     def gen_do_service(self, request_task):
         self.sent_log('new service request!')
+        if request_task.fields['service_type'] == 'freight':
+            yield self.timeout(12)
+            request_task.change_state('fulfilled')
+        elif request_task.fields['service_type'] == 'local_delivery':
+            yield self.timeout(2)
+            request_task.change_state('fulfilled')
         yield self.empty_event()
 
 # Observers
@@ -829,12 +844,12 @@ def test1():
 
     nodeHubShipmentStages.connect_nodes(inp_nodes=[nodeSupplyBroker],
                                         out_nodes=[nodeShop, nodeAgreementWithManufacturer, nodeShipperAgreement])
-    nodeHubShipmentStages.condition_extra({nodeShop: ['role = request_money'],
+    nodeHubShipmentStages.condition_extra({nodeShop: ['role = delivery_goods'],
                                           nodeAgreementWithManufacturer: ['role = request_goods'],
                                           nodeShipperAgreement: ['role = request_service']})
 
     nodeHubAgrWithManuf.connect_nodes(inp_nodes=[nodeAgreementWithManufacturer], out_nodes=[nodeShop, nodeManufacturer])
-    nodeHubAgrWithManuf.condition_extra({nodeShop: ['role = delivery_goods'],
+    nodeHubAgrWithManuf.condition_extra({nodeShop: ['role = request_money'],
                                         nodeManufacturer: ['role = request_goods']})
 
     nodeShipperAgreement.connect_node(nodeShAgrHub)
