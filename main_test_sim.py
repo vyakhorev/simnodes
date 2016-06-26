@@ -176,8 +176,10 @@ def Test6():
 if __name__ == '__main__':
     import lg
     #WL = ['DEVS.cClient', 'DEVS.cShop', 'DEVS.cAgreement', 'DEVS.cHubNode']
+    #WL = ['DEVS.cShop', 'DEVS.cSupplyBroker', 'DEVS.cManufacturer']
+    BL = ['DEVS.cClient', 'DEVS.cAgreement']
     lg.config_logging(tofile='logs/test.log',
-                      whitelist = None,
+                      blacklist = BL,
                       level=lg.logging.DEBUG)
     #lg.config_logging(tofile='logs/test.log', level = lg.logging.DEBUG)
     # from model.nodes.classes.ClientShopSupplier import test1
@@ -194,6 +196,8 @@ if __name__ == '__main__':
     # pm.plot_procs_groups()
     # pm.plot_event_density()
     # pm.print_process()
+
+    # TODO: aggregate results with pandas for easier debug
 
     import matplotlib
     for obs_name, var_name in runner.sim_results.get_available_names():

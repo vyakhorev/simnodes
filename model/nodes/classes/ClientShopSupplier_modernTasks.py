@@ -268,7 +268,6 @@ class cShop(cNodeBase, cSimNode):
         self.connected_nodes += [node]
         self.out_orders.connect_to_port(node.in_orders)
 
-
     def init_sim(self):
         super().init_sim()
         self.item_wallet.spawn_pile('Sushi', 999)
@@ -281,6 +280,8 @@ class cShop(cNodeBase, cSimNode):
 
         if self.debug_on:
             self.as_process(self.gen_debug())
+
+        self.as_process(self.gen_replenish_inventory())
 
         yield self.empty_event()
 
@@ -298,6 +299,12 @@ class cShop(cNodeBase, cSimNode):
             elif task.fields['role'] == 'delivery_money':
                 self.sent_log('[gen_run_incoming_tasks] handling DeliveryMoney')
                 self.money_wallet.add_items(task.fields['order']['good'], task.fields['order']['qtty'])
+
+            elif task.fields['role'] == 'delivery_goods':
+                # a task from someone who delivered new goods to the Shop
+                self.sent_log('[gen_run_incoming_tasks] handling new input delivery')
+                self.item_wallet.add_items(task.fields['order']['good'], task.fields['order']['qtty'])
+
             yield self.empty_event()
 
     def gen_deliver_good(self, requester_task):
@@ -320,8 +327,20 @@ class cShop(cNodeBase, cSimNode):
         msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
 
+    # regulary check inventory level
     def gen_replenish_inventory(self):
-        pass
+        volume = 100
+        interv = 10
+        good = 'sushi'
+        while 1:
+            yield self.timeout(interv)
+            self.sent_log('replenishing')
+            replenish_task = BaselogicTask('ReplenishInventory', self.simpy_env)
+            replenish_task.add_fields(role='replenish', order={'good': good, 'qtty': volume})
+            replenished_event = replenish_task.subscribe('fulfilled')
+
+            msg_to_send = cMessage(replenish_task, self, [self.connected_nodes[0]])
+            self.out_orders.port_to_place.put(msg_to_send)
 
 # Agreement (Blue Node)
 class cAgreement(cNodeBase, cSimNode):
@@ -384,6 +403,9 @@ class cAgreement(cNodeBase, cSimNode):
                 msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
                 self.out_orders.port_to_place.put(msg_to_send)
 
+            else:
+                self.sent_log('[gen_run_incoming_tasks] unknown task role {} !'.format(task.fields['role']), level=logging.WARN)
+
             yield self.empty_event()
 
     def gen_ask_money(self, event_delivered, money_sum):
@@ -396,6 +418,31 @@ class cAgreement(cNodeBase, cSimNode):
         # task.setup(good='USD', qtty=money_sum)
         msg_to_send = cMessage(rm_task, self, [self.connected_nodes[0]])
         self.out_orders.port_to_place.put(msg_to_send)
+
+class cShipperAgreement(cAgreement):
+    def __init__(self, name):
+        super().__init__(name)
+        self.price_dict['freight'] = 2000
+        self.price_dict['local_delivery'] = 300
+
+    def gen_run_incoming_tasks(self):
+        while True:
+            msg = yield self.in_orders.queue_local_jobs.get()
+
+            task = msg.uows
+
+            if task.fields['role'] == 'request_service':
+                self.sent_log('[gen_run_incoming_tasks] handling new service: {}'.format(task.fields['service_type']))
+                evdone = task.subscribe('fulfilled')
+                money_sum = self.price_dict[task.fields['service_type']]
+                self.as_process(self.gen_ask_money(evdone, money_sum), repr='ask_money')
+
+                msg_to_send = cMessage(task, self, [self.connected_nodes[0]])
+                self.out_orders.port_to_place.put(msg_to_send)
+            else:
+                self.sent_log('[gen_run_incoming_tasks] unknown task role {} !'.format(task.fields['role']), level=logging.WARN)
+
+            yield self.empty_event()
 
 # Hub (Orange Node)
 class cHubNode(cNodeBase, cSimNode):
@@ -522,6 +569,196 @@ class cHubNode(cNodeBase, cSimNode):
 
         yield self.empty_event()
 
+# A scheduler and executor for import tasks
+class cSupplyBroker(cNodeBase, cSimNode):
+    def __init__(self, name):
+        super().__init__(name)
+        self.in_orders = ports.cManytoOneQueue(self)
+        self.out_orders = ports.cOnetoOneOutQueue(self)
+        self.register_port(self.in_orders)
+        self.register_port(self.out_orders)
+        self.connected_nodes = []
+        # multiple item wallets!
+        self.orders_in_transit = {} # by order id
+        self.last_order_id = None
+
+    def connect_node(self, node):
+        self.connected_nodes += [node]
+        self.out_orders.connect_to_port(node.in_orders)
+
+    def my_generator(self):
+        self.as_process(self.gen_run_incoming_tasks())
+        yield self.empty_event()
+
+    def gen_run_incoming_tasks(self):
+        while True:
+            # listen to incomes
+            msg = yield self.in_orders.queue_local_jobs.get()
+            task = msg.uows
+
+            # new order from Shop
+            if task.fields['role'] == 'replenish':
+                self.sent_log('[gen_run_incoming_tasks] handling new replenish')
+                self.as_process(self.gen_start_new_order(task))
+
+            # manufacturer produced goods and sent them here
+            elif task.fields['role'] == 'delivery_goods':
+                self.sent_log('[gen_run_incoming_tasks] handling goods delivery')
+                self.as_process(self.gen_handle_order_shipment(task))
+
+            yield self.empty_event()
+
+    def gen_start_new_order(self, task):
+        self.sent_log('new order!')
+        yield self.as_process(self.gen_invoice_thread(task.fields['order']['good'], task.fields['order']['qtty']))
+
+    def gen_invoice_thread(self, good, quantity):
+        order_to_manufacturer = BaselogicTask('Invoice', self.simpy_env)
+        order_to_manufacturer.add_fields(role='request_goods', order={'good': good, 'qtty': quantity},
+                                         orderid = self.say_order_id())
+
+        manufactured_event = order_to_manufacturer.subscribe('fulfilled')
+        order_in_transit = self.compose_order_in_transit_structure()
+        self.orders_in_transit[order_to_manufacturer.fields['orderid']] = order_in_transit
+
+        msg_to_send = cMessage(order_to_manufacturer, self, [self.connected_nodes[0]])
+        self.out_orders.port_to_place.put(msg_to_send)
+
+        yield manufactured_event
+        self.orders_in_transit[order_to_manufacturer.fields['orderid']]['confirmed'] = True
+
+    # after the order is produced
+    def gen_handle_order_shipment(self, task):
+        # in case there are no orderid we should postpone the task
+        order_str = self.orders_in_transit[task.fields['orderid']]
+        order_str['good'] = task.fields['order']['good']
+        order_str['qtty'] = task.fields['order']['qtty']
+        # now we start the routine and wait for it's fulfilment
+        # shipper should do some tasks
+        task_do_freight = BaselogicTask('Freight', self.simpy_env)
+        task_do_freight.add_fields(role='request_service', service_type = 'freight')
+        isshipped1 = task_do_freight.subscribe('fulfilled')
+        msg_to_send = cMessage(task_do_freight, self, [self.connected_nodes[0]])
+        self.out_orders.port_to_place.put(msg_to_send)
+        self.sent_log('the order would be shipped soon')
+        yield isshipped1
+        self.sent_log('the order is shipped, next step')
+
+        task_do_local_delivery = BaselogicTask('LocalDelivery', self.simpy_env)
+        task_do_local_delivery.add_fields(role='request_service', service_type = 'local_delivery')
+        isshipped2 = task_do_local_delivery.subscribe('fulfilled')
+        msg_to_send = cMessage(task_do_local_delivery, self, [self.connected_nodes[0]])
+        self.out_orders.port_to_place.put(msg_to_send)
+        self.sent_log('the order would be delivered')
+        yield isshipped2
+        self.sent_log('the order is delievered')
+
+        # now we send this goods to the Shop (give the Shop process the rights)
+        delivery_task = DeliveryGoods('DeliveryGoods', self.simpy_env)
+        delivery_task.add_fields(role='delivery_goods', order={'good': order_str['good'],
+                                                               'qtty': order_str['qtty']})
+        #delivery_event = delivery_task.subscribe('fulfilled')
+        msg_to_send = cMessage(delivery_task, self, [self.connected_nodes[0]])
+        self.out_orders.port_to_place.put(msg_to_send)
+
+    def make_id(self, task):
+        return task.nodeid
+
+    def say_order_id(self):
+        if self.last_order_id is None:
+            last_order_id = 1
+        else:
+            last_order_id += 1
+
+    def compose_order_in_transit_structure(self):
+        s = {}
+        s['orderid'] = None
+        s['confirmed'] = False
+        s['good'] = None
+        s['qtty'] = None
+        s['trace'] = []
+        return s
+
+class cManufacturer(cNodeBase, cSimNode):
+    def __init__(self, name):
+        super().__init__(name)
+        self.in_orders = ports.cManytoOneQueue(self)
+        self.out_orders = ports.cOnetoOneOutQueue(self)
+        self.register_port(self.in_orders)
+        self.register_port(self.out_orders)
+        self.connected_nodes = []
+
+    def connect_node(self, node):
+        self.connected_nodes += [node]
+        self.out_orders.connect_to_port(node.in_orders)
+
+    def my_generator(self):
+        self.as_process(self.gen_run_incoming_tasks())
+        yield self.empty_event()
+
+    def gen_run_incoming_tasks(self):
+        while True:
+            # listen to incomes
+            msg = yield self.in_orders.queue_local_jobs.get()
+            task = msg.uows
+
+            if task.fields['role'] == 'request_goods':
+                self.sent_log('new production request')
+                self.as_process(self.gen_produce_new_good(task))
+
+            yield self.empty_event()
+
+    def gen_produce_new_good(self, task):
+        good = task.fields['order']['good']
+        qtty = task.fields['order']['qtty']
+        orderid = task.fields['orderid']
+        lead_time = 13
+
+        self.sent_log('production of order {} started'.format(orderid))
+        yield self.timeout(lead_time)
+        self.sent_log('production of order {} finished'.format(orderid))
+        task.change_state('fulfilled') # notify agreement and supply broker
+
+        reply_task = BaselogicTask('Invoice', self.simpy_env)
+        reply_task.add_fields(role='delivery_goods', order={'good': good, 'qtty': qtty},
+                              orderid = orderid)
+
+        msg_to_send = cMessage(reply_task, self, [self.connected_nodes[0]])
+        self.out_orders.port_to_place.put(msg_to_send)
+
+class cShipper(cNodeBase, cSimNode):
+    def __init__(self, name):
+        super().__init__(name)
+        self.in_orders = ports.cManytoOneQueue(self)
+        self.out_orders = ports.cOnetoOneOutQueue(self)
+        self.register_port(self.in_orders)
+        self.register_port(self.out_orders)
+        self.connected_nodes = []
+
+    def connect_node(self, node):
+        self.connected_nodes += [node]
+        self.out_orders.connect_to_port(node.in_orders)
+
+    def my_generator(self):
+        self.as_process(self.gen_run_incoming_tasks())
+        yield self.empty_event()
+
+    def gen_run_incoming_tasks(self):
+        while True:
+            # listen to incomes
+            msg = yield self.in_orders.queue_local_jobs.get()
+            task = msg.uows
+
+            if task.fields['role'] == 'request_service':
+                self.sent_log('new service request')
+                self.as_process(self.gen_do_service(task))
+
+            yield self.empty_event()
+
+    def gen_do_service(self, request_task):
+        self.sent_log('new service request!')
+        yield self.empty_event()
+
 # Observers
 class cPeriodicWalletObserver(simulengin.cAbstPeriodicObserver):
     def __init__(self, wallet, period=1):
@@ -571,10 +808,39 @@ def test1():
     nodeHub2.condition_extra({nodeShop: ['role = request_goods', 'role = delivery_money'],
                              nodeClient2: ['role = delivery_goods', 'role = request_money']})
 
-    nodeHub4Shop.connect_nodes(inp_nodes=[nodeShop], out_nodes=[nodeAgreement1, nodeAgreement2])
-    nodeHub4Shop.condition_extra({nodeAgreement1: ['buyer_company = ClientABC'],
-                                 nodeAgreement2: ['buyer_company = ClientXYZ']})
+    nodeSupplyBroker = cSupplyBroker('Supply broker')
+    nodeManufacturer = cManufacturer('Japaneese Sushi Manufacturer')
+    nodeManufacturer.connect_node(nodeSupplyBroker)
+    nodeAgreementWithManufacturer = cAgreement('Import agreement')
+    nodeHubAgrWithManuf = cHubNode('Hub with manufacturer agreement')
+    nodeAgreementWithManufacturer.connect_node(nodeHubAgrWithManuf)
 
+    nodeHubShipmentStages = cHubNode('Filter hub for shipment stages')
+    nodeSupplyBroker.connect_node(nodeHubShipmentStages)
+
+    nodeHub4Shop.connect_nodes(inp_nodes=[nodeShop], out_nodes=[nodeAgreement1, nodeAgreement2, nodeSupplyBroker])
+    nodeHub4Shop.condition_extra({nodeAgreement1: ['buyer_company = ClientABC'],
+                                 nodeAgreement2: ['buyer_company = ClientXYZ'],
+                                 nodeSupplyBroker: ['role = replenish']})
+
+    nodeShipper = cShipper('Zombie Inc.')
+    nodeShipperAgreement = cShipperAgreement('Shipper agreement')
+    nodeShAgrHub = cHubNode('Hub for ship agr')
+
+    nodeHubShipmentStages.connect_nodes(inp_nodes=[nodeSupplyBroker],
+                                        out_nodes=[nodeShop, nodeAgreementWithManufacturer, nodeShipperAgreement])
+    nodeHubShipmentStages.condition_extra({nodeShop: ['role = request_money'],
+                                          nodeAgreementWithManufacturer: ['role = request_goods'],
+                                          nodeShipperAgreement: ['role = request_service']})
+
+    nodeHubAgrWithManuf.connect_nodes(inp_nodes=[nodeAgreementWithManufacturer], out_nodes=[nodeShop, nodeManufacturer])
+    nodeHubAgrWithManuf.condition_extra({nodeShop: ['role = delivery_goods'],
+                                        nodeManufacturer: ['role = request_goods']})
+
+    nodeShipperAgreement.connect_node(nodeShAgrHub)
+    nodeShAgrHub.connect_nodes(inp_nodes=[nodeShipperAgreement], out_nodes=[nodeShop, nodeShipper])
+    nodeShAgrHub.condition_extra({nodeShop: ['role = request_money'],
+                                 nodeShipper: ['role = request_service']})
 
     # create and add observers
     obs = []
@@ -584,7 +850,10 @@ def test1():
     for obs_i in obs:
         the_model.addObserver(obs_i)
 
-    the_model.addNodes([nodeClient1, nodeAgreement1, nodeShop, nodeHub1])
-    the_model.addNodes([nodeClient2, nodeAgreement2, nodeShop, nodeHub2])
+    the_model.addNodes([nodeClient1, nodeAgreement1, nodeHub1])
+    the_model.addNodes([nodeClient2, nodeAgreement2, nodeHub2])
+    the_model.addNodes([nodeHub4Shop, nodeSupplyBroker, nodeShop, nodeHubShipmentStages])
+    the_model.addNodes([nodeAgreementWithManufacturer, nodeHubAgrWithManuf, nodeManufacturer])
+    the_model.addNodes([nodeShipper, nodeShipperAgreement, nodeShAgrHub])
 
     return the_model
