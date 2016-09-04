@@ -106,6 +106,8 @@ class BaselogicTask(BaseTask):
     :param env : 'simpy.Enviroment' cls | delegated from node environment
     """
 
+    # todo "root" node
+
     def __init__(self, name='', env=None):
         super().__init__(name, env)
         self.states.set_init_state('null')
@@ -156,11 +158,11 @@ class StatesContainerResourcePullRequest(StatesContainer):
     """
     STATES = ['created', 'requested', 'received', 'deny', 'cancel', 'supplied']
 
-class cResourceIDInterface():
-    # TODO: "root" task base class
-    pass
+# class cResourceIDInterface():
+#     # TODO: "root" task base class
+#     pass
 
-class cResourcePullRequest(BaselogicTask, cResourceIDInterface):
+class cResourcePullRequest(BaselogicTask):
     """
     pull request to the provider port
     is a task itself (and may contain
@@ -170,7 +172,7 @@ class cResourcePullRequest(BaselogicTask, cResourceIDInterface):
         super().__init__(name, env)
         # FIXME: this is not right to destroy one state machine to create another
         self.states = None
-        self.states = StatesContainerPullRequest(self)
+        self.states = StatesContainerResourcePullRequest(self)
 
 ######################################
 # Some nice classes for information
@@ -202,7 +204,7 @@ class cResPassiveProviderPort(ports.cManytoOneQueue):
     pass
 
 # Pulls resources from cResPassiveProviderPort
-class cResAvtivePullerPort(ports.cOnetoOneOutQueue):
+class cResActivePullerPort(ports.cOnetoOneOutQueue):
     def __init__(self, parent_node=None):
         super().__init__(parent_node)
 
@@ -228,36 +230,82 @@ class cTaskActivePusherPort(ports.cOnetoOneOutQueue):
 
 # Base class for active nodes
 class cBlueNode(cNodeBase, cSimNode):
-    pass
+    def __init__(self, name):
+        self.connected_nodes = []
+        super().__init__(name)
+
 
 # An example of a resource provider
 class cNodeDoer(cBlueNode):
-    def __init__(self):
-        self._res_passive_provide_port = cResPassiveProviderPort(self)
-        self._task_passive_receive_port = cTaskPassiveReceiverPort(self)
+    def __init__(self, name):
+        super().__init__(name)
+        self.res_passive_provide_port = cResPassiveProviderPort(self)
+        self.task_passive_receive_port = cTaskPassiveReceiverPort(self)
+        self.register_port(self.res_passive_provide_port)
+        self.register_port(self.task_passive_receive_port)
 
     def my_generator(self):
-        # gen_do_a_task for each new task
-        pass
+        self.as_process(self.gen_task_listener())
+        self.as_process(self.gen_res_listener())
+        yield self.empty_event()
 
     def gen_do_a_task(self):
         # get new task from _task_passive_receive_port and
         # put a resource to _res_passive_provide_port
         pass
 
+    def gen_task_listener(self):
+        while True:
+            msg = yield self.task_passive_receive_port.queue_local_jobs.get()
+            task = msg.uows
+            task.getRootNode()
+
+    def gen_res_listener(self):
+        while True:
+            msg = yield self.res_passive_provide_port.queue_local_jobs.get()
+            task = msg.uows
+            task.getRootNode()
+
 # An example of a resource puller
 class cNodeOrderer(cBlueNode):
-    def __init__(self):
-        self._res_active_pull_port = cResAvtivePullerPort(self)
-        self._task_active_push_port = cTaskActivePusherPort(self)
+    def __init__(self, name):
+        super().__init__(name)
+        self.res_active_pull_port = cResActivePullerPort(self)
+        self.task_active_push_port = cTaskActivePusherPort(self)
+        self.register_port(self.res_active_pull_port)
+        self.register_port(self.task_active_push_port)
+
 
     def my_generator(self):
+        self.as_process(self.gen_order_new_task())
+        yield self.empty_event()
         # order_new_task with a timeout
-        pass
 
-    def order_new_task(self):
+
+    def gen_order_new_task(self):
         # old-scheme push a task via _task_active_push_port
-        pass
+        some_task = BaselogicTask('BricksDelivery', self.simpy_env)
+
+        # todo refactor
+        msg = [some_task, self, self.task_active_push_port.connected_ports[0]]
+        msg_to_send = cMessage(*msg)
+        self.task_active_push_port.port_to_place(msg_to_send)
+
+    def gen_order_new_res(self):
+        # old-scheme push a task via _task_active_push_port
+        some_res_pull = BaselogicTask('Bricks', self.simpy_env)
+
+        msg = [some_res_pull, self, self.res_active_pull_port.connected_ports[0]]
+        msg_to_send = cMessage(*msg)
+        self.task_active_push_port.port_to_place(msg_to_send)
+
+
+    def gen_order_task(self):
+        while True:
+            yield self.timeout(3)
+            self.as_process(self.gen_order_new_task())
+            self.as_process(self.gen_order_new_res())
+
 
 
 # Good old Hub (maybe we have to add something here)
@@ -385,3 +433,25 @@ class cHubNode(cNodeBase, cSimNode):
 
         yield self.empty_event()
 
+
+# system configuration
+def runner():
+
+    The_Doer = cNodeDoer('Doer')
+    The_Orderer_1 = cNodeOrderer('Orderer1')
+    The_Orderer_2 = cNodeOrderer('Orderer2')
+
+    # connecting tasks edges
+    The_Doer.task_passive_receive_port.connect_to_port(The_Orderer_1.task_active_push_port)
+    The_Doer.task_passive_receive_port.connect_to_port(The_Orderer_2.task_active_push_port)
+
+    # connecting resource edges
+    The_Orderer_1.res_active_pull_port.connect_to_port(The_Doer.res_passive_provide_port)
+    The_Orderer_2.res_active_pull_port.connect_to_port(The_Doer.res_passive_provide_port)
+
+
+    from model.model import cNodeFieldModel
+    the_model = cNodeFieldModel()
+
+    the_model.addNodes([The_Doer, The_Orderer_1, The_Orderer_2])
+    return the_model
